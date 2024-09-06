@@ -11,8 +11,10 @@ onMounted(() => {
 
     document.addEventListener("scroll", (e) => {
         const top = document.body.getClientRects()[0].top;
-        header.style.backgroundColor =
-            top !== 0 ? "rgba(0,0,0,0.9)" : "rgba(0,0,0,0)";
+        header.style.background =
+            top !== 0
+                ? "linear-gradient(rgba(0, 0, 0, 0.9) 70%, rgba(17, 9, 25, 1) 100%) rgba(0, 0, 0, 0)"
+                : "rgba(0,0,0,0)";
     });
 
     new Tooltip(document.body, {

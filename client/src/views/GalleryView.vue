@@ -1,26 +1,19 @@
 <template>
     <div>
-        <section id="rpg-avatar-gallery" class="mb-5 py-5">
+        <section id="rpg-avatar-gallery" class="mb-5">
             <div class="hero-area">
                 <div class="container">
                     <div class="row">
                         <div class="col-md-12">
-                            <h1 class="title">
-                                Create an RPG Avatar <br />
-                                <span>in Seconds</span>
-                            </h1>
-                            <div class="text-center my-5">
-                                <img
-                                    src="../assets/img/rpgavatarlogo.png"
-                                    alt="logo"
-                                />
-                            </div>
-                            <p class="mx-850 text-center">
-                                Our AI-driven generator makes it easy to design
+                            <ProductTitle
+                                size="h1"
+                                titleHTML="Create an RPG Avatar <br /><span>in Seconds</span>"
+                                :show-logo="true"
+                                sub-text="Our AI-driven generator makes it easy to design
                                 personalized RPG avatars. With just a few
                                 clicks, bring your fantasy character to life in
-                                vivid detail.
-                            </p>
+                                vivid detail."
+                            />
 
                             <div class="hero-btn">
                                 <router-link
@@ -70,6 +63,8 @@
     </div>
 </template>
 <script setup lang="ts">
+import ProductTitle from "@/components/global/ProductTitle.vue";
+
 const images = [
     "fire-mage-5.png",
     "watercolor-rogue.png",

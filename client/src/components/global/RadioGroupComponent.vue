@@ -8,6 +8,7 @@
                 class="radio-option d-flex flex-column"
                 :class="[
                     {
+                        disabled: loading,
                         selected:
                             JSON.stringify(modelValue) ===
                             JSON.stringify(option.size),
@@ -22,6 +23,9 @@
                 </span>
 
                 <div class="ratio-indicator">{{ option.ratio }}</div>
+                <div v-if="option.recommended" class="recommended-indicator">
+                    Recommended
+                </div>
             </div>
         </div>
     </div>
@@ -39,6 +43,7 @@ const props = defineProps({
     },
     label: String,
     id: String,
+    loading: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -66,6 +71,16 @@ const selectOption = (option) => {
     border: 1.5px solid #a3a3a3;
 }
 
+.recommended-indicator {
+    position: absolute;
+    bottom: 0;
+    padding: 0 3px;
+    font-size: 10px;
+    color: #9eddfe;
+    border: 1px solid #9eddfe;
+    border-radius: 4px;
+}
+
 .radio-option {
     width: 80px;
     height: 80px;
@@ -79,6 +94,11 @@ const selectOption = (option) => {
     font-size: 12px;
     position: relative;
     transition: background-color 0.3s;
+}
+
+.radio-option.disabled {
+    color: #ccc;
+    pointer-events: none;
 }
 
 .radio-option.ratio-5x4 {

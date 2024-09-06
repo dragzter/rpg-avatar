@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
-import type { NovitaImg, UserAIPrompt } from "@/stores/types";
-import { API } from "@/utils/product";
-import axios from "axios";
+import type { ImageGenResponse, NovitaImg, UserAIPrompt } from "@/stores/types";
+import { API } from "@/utils/";
+import axios, { type AxiosResponse } from "axios";
+import { useUserStore } from "@/stores/user";
 
 export const useAiStore = defineStore("aiImages", {
     state: () => ({
@@ -25,13 +26,22 @@ export const useAiStore = defineStore("aiImages", {
         },
         async getImageV2(userData: UserAIPrompt) {
             try {
+                const userStore = useUserStore();
                 this.requestLoading = true;
                 this.imagesLoaded = false;
-                const response = await axios.post(API.image_v2, {
-                    data: userData,
-                });
 
-                this.generatedImagesV2 = response.data;
+                const response: AxiosResponse<ImageGenResponse> =
+                    await axios.post(API.image_v2, {
+                        data: userData,
+                    });
+
+                this.generatedImagesV2 = response.data.images;
+
+                // Update the token balance once successful
+                if (response.data?.new_token_balance) {
+                    userStore.user.token_balance =
+                        response.data.new_token_balance;
+                }
 
                 if (this.generatedImagesV2.length) {
                     this.imagesLoaded = true;

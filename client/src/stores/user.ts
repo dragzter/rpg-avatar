@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import type { RedeemAPIResponse, RPGAvatarUser } from "@/stores/types";
 import { User } from "@auth0/auth0-vue";
 import axios, { type AxiosResponse } from "axios";
-import { API } from "@/utils/product";
+import { API } from "@/utils/";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -10,32 +10,54 @@ export const useUserStore = defineStore("user", {
         userLoading: false,
         user: {} as RPGAvatarUser,
         auth0User: {} as User,
-        redeemToastMessage: "",
+        toastMessage: "",
         userError: false,
     }),
     actions: {
-        async redeemCode(userId: string, code: string) {
+        async redeemCode(userId: string, code: string, codeType: string) {
             // redeem code
             try {
+                this.userLoading = true;
                 const response: AxiosResponse<RedeemAPIResponse> =
                     await axios.patch(API.redeem_code, {
                         code,
                         userId,
+                        codeType,
                     });
 
-                if (response.data.success) {
-                    this.user.token_balance = response.data.newBalance;
+                if (response.data?.token_balance) {
+                    this.user.token_balance = response.data.token_balance;
                 }
-                this.redeemToastMessage = response.data.message;
+
+                if (response.data?.nsfw_pass) {
+                    this.user.nsfw_pass = response.data.nsfw_pass;
+                }
+
+                this.toastMessage = response.data?.message || "";
                 this.userError = false;
             } catch (error) {
                 this.userError = true;
-                this.redeemToastMessage = (error as any).response.data.message;
+                this.toastMessage = (error as any).response.data.message;
+            } finally {
+                this.userLoading = false;
             }
         },
 
         async disableUser() {
             // TODO disable user (ui and api)
+        },
+
+        async signPurchaseDisclaimer(userId: string) {
+            console.log("patching dat disclaimer dawg!");
+            try {
+                const response = await axios.patch(API.sign_disclaimer, {
+                    userId,
+                });
+
+                this.toasMessage = response.data.message;
+            } catch (error) {
+                console.log(error);
+            }
         },
 
         async getUser(user: User) {

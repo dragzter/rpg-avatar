@@ -1,65 +1,3 @@
-section#app-hero {
-    padding: 4vw 0;
-
-    #intro {
-        max-width: 500px;
-    }
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-style: normal;
-}
-
-p, li {
-    font-family: "Inter", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 400;
-    font-style: normal;
-}
-
-#app {
-    position: relative;
-}
-
-#app::before {
-    content: " ";
-    background-image: url("../assets/img/bg-pattern-squares-1.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    opacity: 0.2;
-}
-
-
-/* =========================================
-
-# Template Name: Assistify
-# Author: Diversekit
-# Version: 1.0
-
-========================================= */
-/*
-=========================================
-Index
------------------------------------------
-# 00. Variable
-# 01. Common
-# 02. Header
-# 03. Hero
-# 04. Feature
-# 05. Solution
-# 06. Pricing
-# 07. Accordion
-# 08. Newsletter
-# 09. Tags
-# 10. Policy
-# 11. Contact
-# 12. 404
-# 13. Footer
-# 14. Responsive
-
-*/
 /* ======================================
  *  00. Variable
 /* ====================================== */
@@ -108,16 +46,114 @@ Index
     );
 }
 
+section#app-hero {
+    padding: 4vw 0;
+    position: relative;
+
+    #intro {
+        max-width: 500px;
+    }
+}
+
+.waves-1_bg:before {
+    content: " ";
+    background-image: url("../assets/img/waves-bg-1.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    opacity: 0.2;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: -1;
+    filter: hue-rotate(50deg) brightness(80%) saturate(120%);
+    width: 100%;
+    height: 100%;
+}
+
+
+.waves-3_bg:before {
+    content: " ";
+    background-image: url("../assets/img/waves-bg-3.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    opacity: 0.2;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: -1;
+    filter: hue-rotate(270deg);
+    width: 100%;
+    height: 100%;
+}
+
+.waves-1_bg_cover:before {
+    content: " ";
+    background-image: url("../assets/img/waves-bg-1.png");
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    opacity: 0.2;
+    top: 0;
+    left: 0;
+    position: absolute;
+    z-index: -1;
+    filter: hue-rotate(50deg) brightness(80%) saturate(120%);
+    width: 100%;
+    height: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+p, li {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+#app {
+    position: relative;
+}
+
+/*
+=========================================
+Index
+-----------------------------------------
+# 00. Variable
+# 01. Common
+# 02. Header
+# 03. Hero
+# 04. Feature
+# 05. Solution
+# 06. Pricing
+# 07. Accordion
+# 08. Newsletter
+# 09. Tags
+# 10. Policy
+# 11. Contact
+# 12. 404
+# 13. Footer
+# 14. Responsive
+*/
+
+
 /* ======================================
  *  01. Common
 /* ====================================== */
 body {
     min-width: 380px;
-    font-family: 'Manrope', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 1.5;
     font-weight: 400;
-    background: linear-gradient(to bottom, #110919 2%, #211334 15%);
+    background: linear-gradient(to bottom, #09050e 50%, #110919 90%);
+    /*background: #110919;*/
     color: var(--light-300);
 }
 
@@ -150,8 +186,19 @@ input::placeholder {
     color: var(--light-700);
 }
 
+.title-3, .title-4, .title-5 {
+    font-style: normal;
+    font-weight: 600;
+    line-height: 1.16;
+    text-align: center;
+    color: var(--light-700);
+}
+
 .title span,
 .title-2 span,
+.title-3 span,
+.title-4 span,
+.title-5 span,
 .accent-text,
 .accent-link {
     background: var(--gradient-lavender-pink-peach);
@@ -159,6 +206,23 @@ input::placeholder {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+.accent-link-outline {
+    background: var(--gradient-lavender-pink-peach);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-radius: 8px !important;
+    padding: 11px 24px !important;
+    border: 2px solid #ff6eb2; /* Define the border */
+}
+
+.accent-link-outline:hover {
+    background: #e93889;
+    color: #fff !important;
+    -webkit-text-fill-color: unset;
+}
+
 
 .accent-link {
     filter: brightness(1);
@@ -173,12 +237,18 @@ input::placeholder {
     margin-bottom: 64px;
 }
 
+.pricing-area .title-2 {
+    margin-bottom: 20px;
+
+}
+
+
 .btn {
     height: unset;
     min-height: unset;
     padding: 8px 16px;
     line-height: 1.5;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 16px;
     border-radius: 8px;
 }
@@ -284,9 +354,6 @@ header nav ul li a:hover {
 /* ======================================
  *  03. Hero
 /* ====================================== */
-.hero-area {
-    padding-top: 96px;
-}
 
 .hero-area p {
     font-size: 20px;
@@ -1095,19 +1162,6 @@ footer p {
  *  14. Responsive
 /* ====================================== */
 @media screen and (max-width: 991px) {
-    body {
-        padding: 0 16px;
-        background: linear-gradient(
-                to right,
-                rgba(33, 19, 52, 1) 0%,
-                50%,
-                rgba(38, 23, 64, 1) 100%
-        );
-    }
-
-    header {
-        padding: 15px 25px;
-    }
 
     .desktop-header {
         display: none;
@@ -1182,6 +1236,18 @@ footer p {
 
     .title-2 {
         font-size: 38px;
+    }
+
+    .title-3 {
+        font-size: 28px;
+    }
+
+    .title-4 {
+        font-size: 18px;
+    }
+
+    .title-5 {
+        font-size: 14px;
     }
 
     .solution-item {
@@ -1281,6 +1347,8 @@ footer p {
 
 body {
     padding-top: 150px;
+
+    overscroll-behavior: none;
 }
 
 .btn-info {
@@ -1294,6 +1362,27 @@ body {
     text-align: center;
     border-radius: 8px;
     padding: 4px 12px;
+}
+
+#product-currency-items, #product-passes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+    .product-card-item {
+        max-width: 340px;
+
+        .pricing-item {
+            min-height: 510px !important;
+        }
+    }
+}
+
+#product-currency-items .product-card-item {
+    p {
+        min-height: 108px;
+    }
 }
 
 .btn-info.btn-special {
@@ -1394,7 +1483,7 @@ body {
     margin: 1em auto;
     border: solid var(--b) transparent;
     padding: 1em;
-    max-width: 23em;
+    max-width: 29em;
     font: 1.25em ubuntu, sans-serif;
 
     &::before {
@@ -1484,19 +1573,25 @@ body {
 }
 
 #image-load-section {
+    width: auto;
+
     .output-images-container {
         display: flex;
         flex-wrap: wrap;
         gap: 5px;
-        justify-content: center; /* Center align the blocks */
+        justify-content: flex-start; /* Center align the blocks */
+        max-width: 750px;
+
+        .loader-wrapper .loader-element {
+            margin-left: -40px;
+        }
 
         .image-grid-block {
             background-color: #1d1d2e;
             position: relative;
             border: 5px solid #313151;
-            width: 550px;
-            height: 550px;
-            max-width: 750px;
+            width: 600px;
+            height: 600px;
             flex: 1 1 calc(50% - 10px);
 
 
@@ -1545,34 +1640,48 @@ body {
             }
         }
 
-        &.grid-2 {
+        &.grid-1 {
+            width: 512px !important;
+
             .image-grid-block {
-                width: 300px;
-                height: 300px;
+                width: 512px;
+                min-height: 512px;
+                height: 100%;
             }
+        }
 
+        &.grid-2 {
+            width: 700px;
 
+            .image-grid-block {
+                width: 350px;
+                min-height: 350px;
+                height: 100%;
+            }
         }
 
         &.grid-3 {
-            max-width: 700px;
+            width: 700px;
 
             .image-grid-block {
-                width: 300px;
-                height: 300px;
-                max-width: 300px;
-                max-height: 300px;
+                width: 350px;
+                min-height: 350px;
+                max-width: 350px;
+                max-height: 350px;
+                height: 100%;
             }
         }
 
         &.grid-4 {
-            max-width: 700px;
+            width: 700px;
+            height: 700px;
 
             .image-grid-block {
-                width: 300px;
-                height: 300px;
-                max-width: 300px;
-                max-height: 300px;
+                width: 350px;
+                min-height: 350px;
+                max-width: 350px;
+                max-height: 350px;
+                height: 100%;
             }
         }
 

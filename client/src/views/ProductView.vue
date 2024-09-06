@@ -3,12 +3,25 @@
         <div class="container">
             <ProductTitle
                 css-id="product-currency-title"
+                size="h1"
+                :show-logo="true"
+                titleHTML="Tokens <span>&</span> Passes"
+                sub-text=" <br><strong>NOTE</strong>: Token redemption and Pass purchases are final and non-refundable."
+            />
+
+            <ProductTitle
+                wrapper-css-classes="mt-5 pt-3"
+                css-id="product-currency-title"
+                size="h2"
                 titleHTML="Gen <span>Tokens</span>"
+                sub-text="Each token entitles you to one image prompt. Redeem your tokens one-for-one to bring your creative visions to life."
             />
 
             <div
-                class="alert alert-warning alert-dismissible fade show"
+                v-if="showDisclaimer"
+                class="alert alert-warning alert-dismissible mx-auto fade show"
                 role="alert"
+                style="max-width: 1030px"
             >
                 <div class="d-flex align-items-start">
                     <i
@@ -37,6 +50,7 @@
                                 type="checkbox"
                                 value="false"
                                 id="flexCheckDefault"
+                                @input="disclaimerSigned"
                             />
                             <label
                                 class="form-check-label"
@@ -52,7 +66,7 @@
             <div id="product-currency-items" class="row pb-5">
                 <div
                     v-for="(product, index) in productsEnhanced"
-                    class="col-md-4"
+                    class="product-card-item"
                     :key="`product-offer-${product.name + index}`"
                 >
                     <div
@@ -107,16 +121,20 @@
                 </div>
             </div>
 
-            <hr />
+            <div class="text-center my-5">
+                <img src="../assets/img/rpgavatarlogo.png" alt="logo" />
+            </div>
             <ProductTitle
                 css-id="product-currency-title"
                 titleHTML="Content <span>Passes</span>"
+                size="h2"
+                sub-text="Spend your tokens on NSFW art."
                 :wrapper-css-classes="['mt-5']"
             />
             <div id="product-passes" class="row">
                 <div
                     v-for="(product, index) in productsEnhanced"
-                    class="col-md-4"
+                    class="product-card-item"
                     :key="`product-offer-${product.name + index}`"
                 >
                     <div
@@ -152,11 +170,11 @@
                             <button @click="buy(product)">Buy Now</button>
                         </div>
                         <ul v-if="product.metadata?.type === 'passes'">
-                            <li>
+                            <li class="pb-0">
                                 <span style="color: goldenrod"
                                     ><i class="fa-solid fa-check"></i
                                 ></span>
-                                <p class="mb-0">
+                                <p class="mb-0 pb-0">
                                     {{
                                         product.metadata.item
                                             ? product.metadata.item
@@ -172,17 +190,22 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, onBeforeMount } from "vue";
+import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
 import type { ProductEnhanced } from "@/stores/types";
 import { useProductStore } from "@/stores/product";
 import axios from "axios";
-import { API } from "@/utils/product";
+import { API } from "@/utils/";
 import ProductTitle from "@/components/global/ProductTitle.vue";
+import { useUserStore } from "@/stores/user";
+import { useAuth0 } from "@auth0/auth0-vue";
 
 /**
  * DATA
  */
 const productStore = useProductStore();
+const userStore = useUserStore();
+const { isAuthenticated, loginWithPopup } = useAuth0();
+const showDisclaimer = ref(false);
 
 /**
  * COMPUTED
@@ -190,10 +213,27 @@ const productStore = useProductStore();
 const productsEnhanced = computed(
     () => productStore.productsEnhanced as ProductEnhanced[]
 );
+const rpgUser = computed(() => userStore.user);
+
+/**
+ * WATCHERS
+ */
+watch(
+    () => rpgUser.value,
+    (newUser) => {
+        showDisclaimer.value = !newUser.disclaimer_signed;
+    }
+);
 
 /**
  * LIFE-CYCLE
  */
+onMounted(() => {
+    if (rpgUser.value) {
+        showDisclaimer.value = !rpgUser.value.disclaimer_signed;
+    }
+});
+
 onBeforeMount(async () => {
     await Promise.all([productStore.getProducts(), productStore.getPrices()]);
 });
@@ -208,5 +248,17 @@ const buy = async (product: ProductEnhanced) => {
 
     console.log(response.data);
     window.location.href = response.data.url;
+};
+
+const disclaimerSigned = async (e: Event) => {
+    if ((e.target as HTMLInputElement).checked) {
+        if (!isAuthenticated.value) {
+            await loginWithPopup();
+            await userStore.signPurchaseDisclaimer(rpgUser.value.id);
+        } else {
+            console.log("signing...");
+            await userStore.signPurchaseDisclaimer(rpgUser.value.id);
+        }
+    }
 };
 </script>

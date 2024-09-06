@@ -10,46 +10,54 @@
                         <div
                             class="title-row mb-3 d-flex justify-content-between align-items-center"
                         >
-                            <h4 class="mb-0">
+                            <h5 class="mb-0">
                                 Prompt
                                 <span class="accent-link">Configuration</span>
-                            </h4>
+                            </h5>
 
                             <div
                                 class="text-end"
                                 style="
-                                    width: 50px;
+                                    width: 20px;
                                     height: 60px;
                                     border-right: 1px solid #313151;
                                 "
                             ></div>
                             <router-link
                                 to="get-tokens"
-                                class="fw-light py-2 px-3 accent-link ms-auto me-1"
+                                class="fw-light py-2 px-3 accent-link ms-2 me-1"
                                 >Buy
                             </router-link>
                             <h5 class="user-tokens-wrapper mb-0">
                                 <span style="color: goldenrod"
                                     ><i class="fa-sharp fa-light fa-coins"></i
                                 ></span>
-                                {{ rpgUser.token_balance }}
+                                {{ rpgUser.token_balance || 0 }}
                             </h5>
                         </div>
 
-                        <SelectComponent
-                            v-model="userSelections.art_style"
-                            :options="styleOptions"
-                            label="Art Style"
-                            :enable-tooltip="true"
-                            tooltip-text="Not all art styles are equally impactful in the AI output."
-                        />
-                        <SelectComponent
-                            v-model="userSelections.archetype"
-                            :options="archetypeOptions"
-                            label="Archetype"
-                            :enable-tooltip="true"
-                            tooltip-text="Archetypes come with some presets about image settings, character placement and overall look and feel."
-                        />
+                        <div
+                            class="d-flex align-items-center justify-content-between gap-3"
+                        >
+                            <SelectComponent
+                                v-model="userSelections.art_style"
+                                :options="styleOptions"
+                                class="w-100"
+                                label="Art Style"
+                                :enable-tooltip="true"
+                                tooltip-text="Not all art styles are equally impactful in the AI output."
+                                :loading="loading"
+                            />
+                            <SelectComponent
+                                v-model="userSelections.archetype"
+                                :options="archetypeOptions"
+                                class="w-100"
+                                label="Archetype"
+                                :enable-tooltip="true"
+                                tooltip-text="Archetypes come with some presets about image settings, character placement and overall look and feel."
+                                :loading="loading"
+                            />
+                        </div>
 
                         <InputComponent
                             v-model="userSelections.prompt"
@@ -57,22 +65,29 @@
                             placeholder="prompt"
                             id="custom-prompt"
                             label="Additional specific info..."
+                            :loading="loading"
                         />
 
                         <CollapseComponent label="Advanced">
                             <RadioGroupComponent
                                 v-model="userSelections.size"
-                                label="Select image size"
+                                label="Image size (px)"
                                 id="advanced-image-select"
-                                :options="imageOptions"
+                                :options="ImageOptions"
+                                :loading="loading"
                             />
                             <RangeComponent
                                 v-model="userSelections.count"
                                 :min="1"
-                                :max="4"
+                                :max="
+                                    rpgUser.token_balance >= 4
+                                        ? 4
+                                        : rpgUser.token_balance
+                                "
                                 :step="1"
                                 label="Number of images"
                                 id="image-count-range"
+                                :loading="loading"
                             />
                             <RangeComponent
                                 v-model="userSelections.adherence"
@@ -83,14 +98,36 @@
                                 :enable-tooltip="true"
                                 tooltip-text="Higher number limits AI's creativity. Recommended range is between 7 - 12"
                                 id="prompt-adherence-range"
+                                :loading="loading"
+                            />
+                            <InputComponent
+                                v-model="userSelections.negative_prompt"
+                                input-type="textarea"
+                                placeholder="prompt"
+                                id="custom-prompt"
+                                label="Negative prompt"
+                                height="90px"
+                                :loading="loading"
                             />
                         </CollapseComponent>
 
                         <div class="mt-auto ms-auto">
                             <button
                                 @click="handleSubmit"
-                                class="btn btn-info btn-large"
+                                class="btn accent-link-outline"
                                 :disabled="loading"
+                            >
+                                <div class="d-flex align-items-center">
+                                    <LoadSpinner v-if="loading" class="me-2" />
+                                    Surprise Me
+                                </div>
+                            </button>
+                            <button
+                                @click="handleSubmit"
+                                class="btn btn-info btn-large ms-3"
+                                :disabled="
+                                    loading || rpgUser?.token_balance === 0
+                                "
                             >
                                 <div class="d-flex align-items-center">
                                     <LoadSpinner v-if="loading" class="me-2" />
@@ -158,7 +195,7 @@
 import SelectComponent from "@/components/global/SelectComponent.vue";
 import { archetypeOptions, styleOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type { UserAIPrompt } from "@/stores/types";
 import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
@@ -169,8 +206,12 @@ import ButtonComponent from "@/components/global/ButtonComponent.vue";
 import RangeComponent from "@/components/global/RangeComponent.vue";
 import RadioGroupComponent from "@/components/global/RadioGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
+import { ImageOptions } from "@/utils";
+import { useAuth0 } from "@auth0/auth0-vue";
 
-// DATA
+/**
+ * DATA
+ */
 const userSelections = ref<UserAIPrompt>({
     archetype: "",
     model: "",
@@ -178,77 +219,31 @@ const userSelections = ref<UserAIPrompt>({
     prompt: "",
     nsfw_pass: false,
     count: 1,
-    negative_prompt: "",
+    negative_prompt:
+        "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined",
     user_id: "",
     adherence: 7.5,
     size: {
-        width: 512,
-        height: 512,
+        width: 1024,
+        height: 1024,
     },
 });
 
-const imageOptions = [
-    {
-        label: "512x512",
-        size: {
-            width: 512,
-            height: 512,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-    },
-    {
-        label: "1024x1024",
-        size: {
-            width: 1024,
-            height: 1024,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-    },
-    {
-        label: "2048x2048",
-        size: {
-            width: 2048,
-            height: 2048,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-    },
-    {
-        label: "1280x1024",
-        size: {
-            width: 1280,
-            height: 1024,
-        },
-        ratio: "5:4",
-        cssClass: "ratio-5x4",
-    },
-    {
-        label: "1536x1024",
-        size: {
-            width: 1536,
-            height: 1024,
-        },
-        ratio: "3:2",
-        cssClass: "ratio-3x2",
-    },
-];
-
 const aiStore = useAiStore();
 const userStore = useUserStore();
+const { isAuthenticated, loginWithPopup } = useAuth0();
 
-// COMPUTED
-const imageUrl = computed(() => aiStore.generatedImageUrl);
+/**
+ * COMPUTED
+ */
 const loading = computed(() => aiStore.requestLoading);
 const loaded = computed(() => aiStore.imagesLoaded);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
-const rpgUser = computed(() => userStore.user);
+const rpgUser = computed(() => userStore.user || { token_balance: 0 });
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
     const desiredCount = userSelections.value.count || 1;
 
-    // Fill the array with empty objects if needed to reach the desired count
     return [
         ...existingImages,
         ...Array.from(
@@ -260,6 +255,16 @@ const imagesV2 = computed(() => {
     ];
 });
 
+/**
+ * LIFE-CYCLE
+ */
+onMounted(() => {
+    console.log(rpgUser.value);
+});
+
+/**
+ * WATCHERS
+ */
 watch(
     () => loading.value,
     (newval) => {
@@ -267,15 +272,29 @@ watch(
     }
 );
 
-// HANDLERS
+watch(
+    () => rpgUser.value,
+    (newRgpUser) => {
+        userSelections.value.nsfw_pass = newRgpUser.nsfw_pass;
+        userSelections.value.user_id = newRgpUser.id;
+    }
+);
+
+/**
+ * HANDLERS
+ */
 const resetImages = () => {
     aiStore.generatedImagesV2 = [];
 };
 
 const handleSubmit = async () => {
-    console.log(userSelections.value);
+    if (!isAuthenticated.value) {
+        await loginWithPopup();
+        resetImages();
+    } else {
+        resetImages();
+        await aiStore.getImageV2(userSelections.value);
+    }
     //await aiStore.generateImageWithUserData(userSelections.value);
-    resetImages();
-    await aiStore.getImageV2(userSelections.value);
 };
 </script>

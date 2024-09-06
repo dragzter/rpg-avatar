@@ -33,8 +33,7 @@ export const UserSchema = new Schema({
         required: true,
     },
     nsfw_pass: {
-        type: String,
-        required: true,
+        type: Boolean,
         default: false,
     },
     email_verified: {
@@ -61,4 +60,16 @@ export const UserSchema = new Schema({
         type: Boolean,
         required: false,
     },
+    admin: {
+        type: Boolean,
+        required: false,
+    },
+    disclaimer_signed: {
+        type: Boolean,
+        default: false
+    },
+    disclaimer_signed_on_date: {
+        type: String,
+        required: false,
+    }
 });

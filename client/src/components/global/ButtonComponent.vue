@@ -2,6 +2,7 @@
     <button
         :class="buttonClass"
         @click="handleClick"
+        :disabled="loading"
         v-bind="tooltipAttributes"
     >
         <slot></slot>
@@ -44,6 +45,7 @@ const props = defineProps({
         type: String,
         default: "",
     },
+    loading: Boolean,
 });
 
 const emit = defineEmits(["click"]);

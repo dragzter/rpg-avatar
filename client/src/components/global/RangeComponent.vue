@@ -7,6 +7,7 @@
                 v-if="enableTooltip"
                 button-type="btn-dark"
                 :enable-tooltip="true"
+                :loading="loading"
                 :tooltip-title="tooltipText"
                 button-classes="bg-transparent border-0 ps-1"
             >
@@ -23,6 +24,7 @@
                 :value="modelValue"
                 class="form-range"
                 @input="onInput"
+                :disabled="loading"
             />
             <div class="range-counter">{{ modelValue }}</div>
         </div>
@@ -66,6 +68,7 @@ const props = defineProps({
         type: String,
         default: "",
     },
+    loading: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue"]);
