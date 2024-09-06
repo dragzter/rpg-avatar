@@ -1,6 +1,9 @@
 <template>
     <div id="rpg-avatar-loader-page">
-        <product-title titleHTML="Fun With <span>Loaders</span>" />
+        <product-title
+            titleHTML="Fun With <span>Loaders</span>"
+            :show-logo="true"
+        />
 
         <p class="text-center mb-3">
             Courtesy of the fantastic people at

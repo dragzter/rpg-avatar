@@ -86,6 +86,13 @@ export interface NovitaImg {
     nsfw_detection_result: null;
 }
 
+export interface ImageGenResponse {
+    images: NovitaImg[];
+    success: boolean;
+    message: string;
+    new_token_balance: number;
+}
+
 interface SavedUserPrompts
     extends Pick<
         UserAIPrompt,
@@ -103,6 +110,8 @@ export interface RPGAvatarUser {
     email: string;
     token_balance: number;
     nsfw_pass: boolean;
+    disclaimer_signed: boolean;
+    disclaimer_signed_on_date: string;
 
     email_verified?: boolean;
     picture?: string;
@@ -110,10 +119,18 @@ export interface RPGAvatarUser {
     prompts?: SavedUserPrompts;
     custom_attributes?: Record<string, unknown>;
     disabled?: boolean;
+    admin?: boolean;
 }
 
 export interface RedeemAPIResponse {
     message: string;
     success: boolean;
-    newBalance: number;
+    error?: string;
+    token_balance?: number;
+    nsfw_pass?: boolean;
 }
+
+export const RedemptionType = {
+    nsfw: "nsfw",
+    tokens: "tokens",
+};

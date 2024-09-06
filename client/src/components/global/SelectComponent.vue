@@ -17,6 +17,7 @@
             v-model="internalValue"
             class="form-select"
             :id="cssId"
+            :disabled="loading"
             @change="handleChange"
         >
             <option
@@ -68,6 +69,7 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    loading: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue"]);

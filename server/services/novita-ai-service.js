@@ -5,71 +5,17 @@ dotenv.config();
 
 class NovitaAIService {
     client
-    defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands , undefined"
+    defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined"
 
     defaultModel = "gleipnir_v20BF16_174601.safetensors"
     altModel = "dreamshaperXL09Alpha_alpha2Xl10_91562.safetensors"
     alt2Model = "demonCORESFWNSFW_v22_135842.safetensors"
+    basePrompt = "ludicrously gorgeous brunette rogue in the high fantasy art style, wearing skimpy leather armor, large breasts,  incredibly fit and lean, long flowing hair, subtle smile, gorgeous eyes, full lips"
 
 
     constructor() {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY)
     }
-
-    // async generateImage(prompt) {
-    //     try {
-    //         const response = await this.client.txt2ImgV3({
-    //             request: {
-    //                 model_name: this.defaultModel,
-    //                 prompt: prompt,
-    //                 negative_prompt: this.defaultNegativePrompt,
-    //                 width: 1024,
-    //                 height: 1024,
-    //                 sampler_name: "DPM++ 2S a Karras",
-    //                 guidance_scale: 7.5,
-    //                 steps: 25,
-    //                 image_num: 1,
-    //                 clip_skip: 1,
-    //                 seed: -1,
-    //                 loras: [],
-    //             },
-    //         });
-    //
-    //         if (response && response.task_id) {
-    //             while (true) {
-    //                 try {
-    //                     const progressRes = await this.client.progressV3({
-    //                         task_id: response.task_id,
-    //                     });
-    //
-    //                     if (progressRes.task.status === TaskStatus.SUCCEED) {
-    //                         console.log("finished!", progressRes.images);
-    //                         return progressRes.images;
-    //                     }
-    //
-    //                     if (progressRes.task.status === TaskStatus.FAILED) {
-    //                         console.warn("failed!", progressRes.task.reason);
-    //                         throw new Error(`Task failed: ${progressRes.task.reason}`);
-    //                     }
-    //
-    //                     if (progressRes.task.status === TaskStatus.QUEUED) {
-    //                         console.log("queueing");
-    //                     }
-    //
-    //                     // Wait for 1 second before checking again
-    //                     await new Promise(resolve => setTimeout(resolve, 1000));
-    //
-    //                 } catch (err) {
-    //                     console.error("progress error:", err);
-    //                 }
-    //             }
-    //         }
-    //
-    //     } catch (error) {
-    //         console.log("Error generating image:", error);
-    //         throw error;  // Re-throw the error to be handled by the caller
-    //     }
-    // }
 
     async checkProgress(taskId, maxAttempts = 100, attempt = 0) {
         try {
@@ -81,7 +27,7 @@ class NovitaAIService {
 
             if (progressRes.task.status === TaskStatus.FAILED) {
                 console.warn("failed!", progressRes.task.reason);
-                throw new Error(`Task failed: ${progressRes.task.reason}`);
+                return new Error(`Task failed: ${progressRes.task.reason}`);
             }
 
             if (progressRes.task.status === TaskStatus.QUEUED) {
@@ -90,16 +36,17 @@ class NovitaAIService {
 
             if (attempt < maxAttempts) {
                 // Wait for 1 second before checking again
+                console.log("retrying...  Attempt: " + attempt + " / " + maxAttempts)
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 return this.checkProgress.call(this, taskId, maxAttempts, attempt + 1);
             } else {
                 console.warn("Task did not complete in the expected time.");
-                throw new Error("Task did not complete within the timeout period.");
+                return new Error("Task did not complete within the timeout period.");
             }
 
         } catch (err) {
             console.error("progress error:", err);
-            throw err; // Rethrow error if needed
+            return err;
         }
     }
 
@@ -126,15 +73,15 @@ class NovitaAIService {
      */
     async generateImage(userData) {
 
-        const basePrompt = "ludicrously gorgeous brunette rogue in the high fantasy art style, wearing skimpy leather armor, large breasts,  incredibly fit and lean, long flowing hair, subtle smile, gorgeous eyes, full lips"
 
-        const configured_prompt = userData.prompt
-        const rwidth = userData.size?.width || 1024
-        const rheight = userData.size?.height || 1024
+        const configured_prompt = userData?.prompt || "a white rabbit"
+        const rwidth = userData?.size?.width || 1024
+        const rheight = userData?.size?.height || 1024
         const adherence = userData.adherence || 7.5
         const negative_prompt = userData.negative_prompt || this.defaultNegativePrompt
 
         try {
+            console.log(negative_prompt, "final prompt")
             const response = await this.client.txt2ImgV3({
                 request: {
                     model_name: this.defaultModel,
@@ -158,10 +105,12 @@ class NovitaAIService {
             });
 
             if (response && response.task_id) {
+                // TODO Charge a token here
                 return await this.checkProgress.call(this, response.task_id);
             }
 
         } catch (error) {
+            // TODO refund token
             console.log(error);
         }
     }

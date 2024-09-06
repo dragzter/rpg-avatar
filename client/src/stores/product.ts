@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import type { Price, Product } from "@/stores/types";
-import { API, getCurrencyLabel } from "@/utils/product";
+import { API, getCurrencyLabel } from "@/utils/";
 import axios from "axios";
 
 export const useProductStore = defineStore("product", {

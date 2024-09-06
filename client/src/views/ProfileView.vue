@@ -2,7 +2,7 @@
     <div id="user-profile">
         <div class="container">
             <div class="row">
-                <h2 class="mb-4">User Profile</h2>
+                <h2 class="mb-4 title-2">User <span>Profile</span></h2>
 
                 <div class="card w-100 mb-3 ps-0">
                     <div class="card-body p-0 d-flex">
@@ -57,8 +57,87 @@
                                     button-text="Redeem"
                                     label-text="Redeem a "
                                     accent-text="TOKEN CODE"
-                                    @button-click="redeemCode"
+                                    @button-click="
+                                        redeemCode(
+                                            RedemptionType.tokens,
+                                            codeToRedeem
+                                        )
+                                    "
                                 />
+
+                                <InputButtonSubmit
+                                    v-model="nsfwCode"
+                                    placeholder-text="Code"
+                                    button-text="Redeem"
+                                    label-text="Redeem a "
+                                    accent-text="CONTENT PASS CODE"
+                                    @button-click="
+                                        redeemCode(
+                                            RedemptionType.nsfw,
+                                            nsfwCode
+                                        )
+                                    "
+                                />
+                            </div>
+
+                            <hr />
+
+                            <div class="card">
+                                <div class="card-header bg-info text-dark">
+                                    Content Passes
+                                </div>
+                                <div class="card-body">
+                                    <div
+                                        v-if="!rpgUser.nsfw_pass"
+                                        class="alert alert-warning alert-dismissible fade show"
+                                        role="alert"
+                                    >
+                                        <strong>Content Limited!</strong> You
+                                        currently do not have an NSFW content
+                                        pass.
+                                        <button
+                                            type="button"
+                                            class="btn btn-link p-0 m-0 align-baseline"
+                                        >
+                                            Upgrade
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="alert"
+                                            aria-label="Close"
+                                        ></button>
+                                    </div>
+
+                                    <div
+                                        class="d-flex mb-3 align-items-center nsfw-pass-entry"
+                                    >
+                                        <h5 class="mb-0">NSFW:</h5>
+                                        <div
+                                            v-if="!rpgUser.nsfw_pass"
+                                            class="ms-2 badge fs-6 text-bg-secondary"
+                                        >
+                                            Unavailable
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="ms-2 badge fs-6 text-bg-success"
+                                        >
+                                            Purchased
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="d-flex mb-3 align-items-center nsfw-pass-entry"
+                                    >
+                                        <h5 class="mb-0">FaceCrunch:</h5>
+                                        <div
+                                            class="ms-2 badge fs-6 text-bg-secondary"
+                                        >
+                                            Unavailable
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -68,7 +147,7 @@
 
         <ToastComponent
             :show="showToast"
-            :message="redeemToastMessage"
+            :message="toastMessage"
             :autoClose="true"
             :autoCloseDelay="6000"
             :isError="userError"
@@ -81,28 +160,44 @@ import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
 import InputButtonSubmit from "@/components/global/InputButtonSubmit.vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
+import { RedemptionType } from "@/stores/types";
 
+/**
+ * DATA
+ */
 const userStore = useUserStore();
 const codeToRedeem = ref("");
+const nsfwCode = ref("");
 const showToast = ref(false);
 
+/**
+ * COMPUTED
+ */
 const rpgUser = computed(() => userStore.user);
-const redeemToastMessage = computed(() => userStore.redeemToastMessage);
+const toastMessage = computed(() => userStore.toastMessage);
 const userError = computed(() => userStore.userError);
+const loading = computed(() => userStore.userLoading);
 
+/**
+ * WATCHERS
+ */
 watch(
-    () => userError.value,
-    (newUserErrpr) => {
-        if (!newUserErrpr) {
+    () => [userError.value, loading.value],
+    (newValues) => {
+        if (!newValues[0] && !newValues[1]) {
             codeToRedeem.value = "";
+            nsfwCode.value = "";
             showToast.value = false;
         }
     }
 );
 
-const redeemCode = async () => {
+/**
+ * HANDLERS
+ */
+const redeemCode = async (codeType, code: string) => {
     showToast.value = false;
-    await userStore.redeemCode(rpgUser.value.id, codeToRedeem.value);
+    await userStore.redeemCode(rpgUser.value.id, code, codeType);
     showToast.value = true;
 };
 </script>

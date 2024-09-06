@@ -1,6 +1,7 @@
 {
   "ignore": [
     "keys/codes.json",
+    "keys/nsfw-codes.json",
     "*.log"
   ],
   "watch": [

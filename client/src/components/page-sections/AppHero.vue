@@ -1,5 +1,5 @@
 <template>
-    <section id="app-hero">
+    <section id="app-hero" class="waves-1_bg">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-md-6 text-center">
                     <div class="accent-frame">
-                        <div>
+                        <div style="transform: rotate(2deg)">
                             <img
                                 alt=""
                                 class="img-fluid"

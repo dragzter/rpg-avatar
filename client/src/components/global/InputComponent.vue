@@ -4,9 +4,10 @@
             <textarea
                 :value="internalValue"
                 class="form-control"
+                :disabled="loading"
                 :placeholder="placeholder"
                 :id="id"
-                style="height: 140px; max-height: 200px !important"
+                :style="`height: ${height}; max-height: 200px !important`"
                 @input="handleInput"
             ></textarea>
             <label :for="id">{{ label }}</label>
@@ -20,6 +21,7 @@
             :id="id"
             :value="internalValue"
             @input="handleInput"
+            :disabled="loading"
             :placeholder="placeholder"
         />
     </div>
@@ -49,6 +51,11 @@ const props = defineProps({
         type: String,
         default: "dynamic-input",
     },
+    height: {
+        type: String,
+        default: "140px",
+    },
+    loading: Boolean,
 });
 
 const emit = defineEmits(["update:modelValue"]);
