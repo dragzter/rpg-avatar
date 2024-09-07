@@ -35,7 +35,7 @@ export const useAiStore = defineStore("aiImages", {
                         data: userData,
                     });
 
-                this.generatedImagesV2 = response.data.images;
+                this.generatedImagesV2 = response.data?.images || [];
 
                 // Update the token balance once successful
                 if (response.data?.new_token_balance) {
@@ -43,7 +43,7 @@ export const useAiStore = defineStore("aiImages", {
                         response.data.new_token_balance;
                 }
 
-                if (this.generatedImagesV2.length) {
+                if (this.generatedImagesV2?.length) {
                     this.imagesLoaded = true;
                 }
             } catch (err) {

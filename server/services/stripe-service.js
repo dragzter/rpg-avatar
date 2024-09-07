@@ -8,7 +8,7 @@ class StripeService {
     client
 
     constructor() {
-        this.client = stripe(process.env.STRIPE_SECRET_TEST_KEY)
+        this.client = stripe(process.env.STRIPE_SECRET_LIVE_KEY)
     }
 
     async getProduct(productId) {

@@ -10,13 +10,14 @@
             />
 
             <ProductTitle
-                wrapper-css-classes="mt-5 pt-3"
+                wrapper-css-classes="mt-5 mb-5 pt-3"
                 css-id="product-currency-title"
                 size="h2"
                 titleHTML="Gen <span>Tokens</span>"
                 sub-text="Each token entitles you to one image prompt. Redeem your tokens one-for-one to bring your creative visions to life."
             />
 
+            <!-- disclaimer-->
             <div
                 v-if="showDisclaimer"
                 class="alert alert-warning alert-dismissible mx-auto fade show"
@@ -64,61 +65,63 @@
             </div>
 
             <div id="product-currency-items" class="row pb-5">
-                <div
-                    v-for="(product, index) in productsEnhanced"
-                    class="product-card-item"
-                    :key="`product-offer-${product.name + index}`"
-                >
+                <template v-for="(product, index) in productsEnhanced">
                     <div
-                        class="pricing-item"
+                        class="product-card-item"
+                        :key="`product-offer-${product.name + index}`"
                         v-if="product?.metadata?.type === 'currency'"
                     >
-                        <h5
-                            class="product-alt-title"
-                            v-if="product?.metadata?.alt_title"
-                        >
-                            {{ product.metadata?.alt_title }}
-                        </h5>
-                        <h3
-                            v-if="product.metadata?.type === 'currency'"
-                            class="text-muted d-flex justify-content-center py-2"
-                        >
-                            <span style="color: goldenrod"
-                                ><i class="fa-sharp fa-light fa-coins"></i
-                            ></span>
-                            <span>{{ product.metadata.subtitle }}</span>
-                        </h3>
+                        <div class="pricing-item">
+                            <h5
+                                class="product-alt-title"
+                                v-if="product?.metadata?.alt_title"
+                            >
+                                {{ product.metadata?.alt_title }}
+                            </h5>
+                            <h3
+                                v-if="product.metadata?.type === 'currency'"
+                                class="text-muted d-flex justify-content-center py-2"
+                            >
+                                <span style="color: goldenrod"
+                                    ><i class="fa-sharp fa-light fa-coins"></i
+                                ></span>
+                                <span>{{ product.metadata.subtitle }}</span>
+                            </h3>
 
-                        <h3 v-else style="color: goldenrod">
-                            {{ product.name }}
+                            <h3 v-else style="color: goldenrod">
+                                {{ product.name }}
 
-                            <span class="fs-6">
-                                <Popper placement="top" :hover="true">
-                                    <i
-                                        v-if="product.metadata?.limited_notice"
-                                        class="fa-regular fa-circle-question"
-                                    ></i>
-                                    <template #content
-                                        ><p class="m-0">
-                                            {{
+                                <span class="fs-6">
+                                    <Popper placement="top" :hover="true">
+                                        <i
+                                            v-if="
                                                 product.metadata?.limited_notice
-                                            }}
-                                        </p>
-                                    </template>
-                                </Popper>
-                            </span>
-                        </h3>
-                        <hr />
-                        <p class="fs-4">{{ product.description }}</p>
+                                            "
+                                            class="fa-regular fa-circle-question"
+                                        ></i>
+                                        <template #content
+                                            ><p class="m-0">
+                                                {{
+                                                    product.metadata
+                                                        ?.limited_notice
+                                                }}
+                                            </p>
+                                        </template>
+                                    </Popper>
+                                </span>
+                            </h3>
+                            <hr />
+                            <p class="fs-4">{{ product.description }}</p>
 
-                        <h4>
-                            <span>{{ product.price }}</span>
-                        </h4>
-                        <div class="pricing-button">
-                            <button @click="buy(product)">Buy Now</button>
+                            <h4>
+                                <span>{{ product.price }}</span>
+                            </h4>
+                            <div class="pricing-button">
+                                <button @click="buy(product)">Buy Now</button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </template>
             </div>
 
             <div class="text-center my-5">
@@ -132,59 +135,61 @@
                 :wrapper-css-classes="['mt-5']"
             />
             <div id="product-passes" class="row">
-                <div
-                    v-for="(product, index) in productsEnhanced"
-                    class="product-card-item"
-                    :key="`product-offer-${product.name + index}`"
-                >
+                <template v-for="(product, index) in productsEnhanced">
                     <div
-                        class="pricing-item"
                         v-if="product?.metadata?.type === 'passes'"
+                        class="product-card-item"
+                        :key="`product-offer-${product.name + index}`"
                     >
-                        <h3 style="color: goldenrod">
-                            {{ product.name }}
+                        <div class="pricing-item">
+                            <h3 style="color: goldenrod">
+                                {{ product.name }}
 
-                            <span class="fs-6 text-white">
-                                <Popper placement="top" :hover="true">
-                                    <i
-                                        v-if="product.metadata?.limited_notice"
-                                        class="fa-regular fa-circle-question"
-                                    ></i>
-                                    <template #content
-                                        ><p class="m-0">
-                                            {{
+                                <span class="fs-6 text-white">
+                                    <Popper placement="top" :hover="true">
+                                        <i
+                                            v-if="
                                                 product.metadata?.limited_notice
-                                            }}
-                                        </p>
-                                    </template>
-                                </Popper>
-                            </span>
-                        </h3>
-                        <hr />
-                        <p class="fs-4">{{ product.description }}</p>
+                                            "
+                                            class="fa-regular fa-circle-question"
+                                        ></i>
+                                        <template #content
+                                            ><p class="m-0">
+                                                {{
+                                                    product.metadata
+                                                        ?.limited_notice
+                                                }}
+                                            </p>
+                                        </template>
+                                    </Popper>
+                                </span>
+                            </h3>
+                            <hr />
+                            <p class="fs-4">{{ product.description }}</p>
 
-                        <h4>
-                            <span>{{ product.price }}</span>
-                        </h4>
-                        <div class="pricing-button">
-                            <button @click="buy(product)">Buy Now</button>
+                            <h4>
+                                <span>{{ product.price }}</span>
+                            </h4>
+                            <div class="pricing-button">
+                                <button @click="buy(product)">Buy Now</button>
+                            </div>
+                            <ul v-if="product.metadata?.type === 'passes'">
+                                <li class="pb-0">
+                                    <span style="color: goldenrod"
+                                        ><i class="fa-solid fa-check"></i
+                                    ></span>
+                                    <p class="mb-0 pb-0">
+                                        {{
+                                            product.metadata.item
+                                                ? product.metadata.item
+                                                : product.name
+                                        }}
+                                    </p>
+                                </li>
+                            </ul>
                         </div>
-                        <ul v-if="product.metadata?.type === 'passes'">
-                            <li class="pb-0">
-                                <span style="color: goldenrod"
-                                    ><i class="fa-solid fa-check"></i
-                                ></span>
-                                <p class="mb-0 pb-0">
-                                    {{
-                                        product.metadata.item
-                                            ? product.metadata.item
-                                            : product.name
-                                    }}
-                                </p>
-                            </li>
-                        </ul>
                     </div>
-                </div>
+                </template>
             </div>
         </div>
     </div>

@@ -168,6 +168,7 @@
                                         button-type="btn-dark"
                                         :enable-tooltip="true"
                                         button-classes="fs-5 bg-transparent border-0"
+                                        @click="downloadImage(image)"
                                     >
                                         <i
                                             class="fa-solid fa-arrow-down-to-bracket"
@@ -178,6 +179,7 @@
                                         :enable-tooltip="true"
                                         tooltip-title="View"
                                         button-classes="fs-5 bg-transparent border-0"
+                                        @click="viewImage(image)"
                                     >
                                         <i class="fa-solid fa-eye"></i>
                                     </ButtonComponent>
@@ -186,6 +188,64 @@
                         </template>
                     </div>
                     <LoaderComponent />
+
+                    <vue-easy-lightbox
+                        :visible="visibleRef"
+                        :imgs="imgsRef"
+                        :index="indexRef"
+                        @hide="onHide"
+                    >
+                        <template v-slot:toolbar="{ toolbarMethods }">
+                            <div class="vel-toolbar view-image-actions">
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="toolbarMethods.zoomIn"
+                                >
+                                    <i
+                                        class="fa-regular fa-magnifying-glass-plus"
+                                    ></i>
+                                </button>
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="toolbarMethods.zoomOut"
+                                >
+                                    <i
+                                        class="fa-regular fa-magnifying-glass-minus"
+                                    ></i>
+                                </button>
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="toolbarMethods.rotateLeft"
+                                >
+                                    <i
+                                        class="fa-regular fa-arrows-rotate-reverse"
+                                    ></i>
+                                </button>
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="toolbarMethods.rotateRight"
+                                >
+                                    <i class="fa-regular fa-arrows-rotate"></i>
+                                </button>
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="downloadImage"
+                                >
+                                    <i
+                                        class="fa-solid fa-arrow-down-to-bracket"
+                                    ></i>
+                                </button>
+                            </div>
+                        </template>
+                    </vue-easy-lightbox>
+
+                    <ToastComponent
+                        :show="showToast"
+                        :message="toastMessage"
+                        :autoClose="true"
+                        :autoCloseDelay="3000"
+                        :isError="isError"
+                    />
                 </div>
             </div>
         </div>
@@ -195,8 +255,8 @@
 import SelectComponent from "@/components/global/SelectComponent.vue";
 import { archetypeOptions, styleOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
-import { computed, onMounted, ref, watch } from "vue";
-import type { UserAIPrompt } from "@/stores/types";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
+import type { NovitaImg, UserAIPrompt } from "@/stores/types";
 import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import CollapseComponent from "@/components/global/CollapseComponent.vue";
@@ -208,6 +268,7 @@ import RadioGroupComponent from "@/components/global/RadioGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
+import ToastComponent from "@/components/global/ToastComponent.vue";
 
 /**
  * DATA
@@ -232,6 +293,14 @@ const userSelections = ref<UserAIPrompt>({
 const aiStore = useAiStore();
 const userStore = useUserStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
+const showToast = ref(false);
+const toastMessage = ref("");
+const isError = ref(false);
+
+// Ez-lightbox
+const visibleRef = ref(false);
+const indexRef = ref(0); // default 0 - only when using multiple images
+const imgsRef = ref([]);
 
 /**
  * COMPUTED
@@ -259,7 +328,10 @@ const imagesV2 = computed(() => {
  * LIFE-CYCLE
  */
 onMounted(() => {
-    console.log(rpgUser.value);
+    if (rpgUser.value) {
+        userSelections.value.nsfw_pass = rpgUser.value.nsfw_pass;
+        userSelections.value.user_id = rpgUser.value.id;
+    }
 });
 
 /**
@@ -288,13 +360,48 @@ const resetImages = () => {
 };
 
 const handleSubmit = async () => {
+    resetImages();
     if (!isAuthenticated.value) {
         await loginWithPopup();
-        resetImages();
     } else {
-        resetImages();
         await aiStore.getImageV2(userSelections.value);
     }
     //await aiStore.generateImageWithUserData(userSelections.value);
+};
+
+const downloadImage = async () => {
+    isError.value = false;
+    showToast.value = false;
+    toastMessage.value = "";
+
+    await nextTick();
+    try {
+        showToast.value = true;
+        toastMessage.value = "Download in progress, enjoy!";
+
+        const link = document.createElement("a");
+        link.href = imgsRef.value;
+        link.setAttribute("download", "download"); // Optionally, you can set the filename by replacing 'download' with a filename + extension
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (err) {
+        console.log(err);
+        showToast.value = true;
+        isError.value = true;
+        toastMessage.value = "Download failed.";
+    }
+};
+
+const onShow = () => {
+    visibleRef.value = true;
+};
+
+const onHide = () => (visibleRef.value = false);
+
+const viewImage = (img: NovitaImg) => {
+    imgsRef.value = img.image_url;
+
+    onShow();
 };
 </script>

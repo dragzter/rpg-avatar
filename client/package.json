@@ -21,6 +21,7 @@
     "pinia": "^2.1.7",
     "prettier": "^3.3.3",
     "vue": "^3.4.29",
+    "vue-easy-lightbox": "^1.19.0",
     "vue-router": "^4.3.3",
     "vue3-popper": "^1.5.0"
   },

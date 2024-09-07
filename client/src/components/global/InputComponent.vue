@@ -53,7 +53,7 @@ const props = defineProps({
     },
     height: {
         type: String,
-        default: "140px",
+        default: "120px",
     },
     loading: Boolean,
 });
