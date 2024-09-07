@@ -32,16 +32,16 @@ export const ImageOptions = [
         cssClass: "ratio-1x1",
         recommended: true,
     },
-    {
-        label: "2048x2048",
-        size: {
-            width: 2048,
-            height: 2048,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: false,
-    },
+    // {
+    //     label: "2048x2048",
+    //     size: {
+    //         width: 2048,
+    //         height: 2048,
+    //     },
+    //     ratio: "1:1",
+    //     cssClass: "ratio-1x1",
+    //     recommended: false,
+    // },
     {
         label: "1280x1024",
         size: {

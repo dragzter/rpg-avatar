@@ -3,6 +3,10 @@ import "bootstrap";
 import "./assets/main.css";
 import "./assets/loader.css";
 
+// Vue easy lightbox plugin
+import "vue-easy-lightbox/dist/external-css/vue-easy-lightbox.css";
+import VueEasyLightbox from "vue-easy-lightbox";
+
 import Popper from "vue3-popper";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
@@ -24,4 +28,7 @@ app.use(
 
 app.component("Popper", Popper);
 
-app.use(createPinia()).use(createRouter(app)).mount("#app");
+app.use(createPinia())
+    .use(createRouter(app))
+    .use(VueEasyLightbox)
+    .mount("#app");

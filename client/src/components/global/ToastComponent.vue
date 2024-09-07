@@ -2,7 +2,7 @@
     <div
         v-if="showToast"
         class="position-fixed start-50 translate-middle p-3"
-        style="z-index: 11; top: 120px"
+        style="z-index: 9999; top: 120px"
     >
         <div
             class="toast align-items-center show"

@@ -134,7 +134,7 @@ const { loginWithRedirect, user, isAuthenticated, logout } = useAuth0();
 const userStore = useUserStore();
 
 const login = () => {
-    loginWithRedirect({});
+    loginWithRedirect({ redirect_uri: window.location.href });
 };
 
 watch(
@@ -149,5 +149,5 @@ watch(
 );
 
 const logOut = () =>
-    logout({ logoutParams: { returnTo: window.location.origin } });
+    logout({ logoutParams: { returnTo: window.location.href } });
 </script>

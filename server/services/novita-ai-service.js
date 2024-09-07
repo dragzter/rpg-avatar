@@ -12,12 +12,17 @@ class NovitaAIService {
     alt2Model = "demonCORESFWNSFW_v22_135842.safetensors"
     basePrompt = "ludicrously gorgeous brunette rogue in the high fantasy art style, wearing skimpy leather armor, large breasts,  incredibly fit and lean, long flowing hair, subtle smile, gorgeous eyes, full lips"
 
+    portrait_specialized_Model_2 = "demonCORESFWNSFW_v22_135842.safetensors"
+    character_specialized_Model_1 = "gleipnir_v20BF16_174601.safetensors"
+
+
+    testPrompt = "amazing blonde, perfect body perfect face, smiling, slim and very fit, large breasts, gorgeous smile, 4k image, perfect quality, full body shot"
 
     constructor() {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY)
     }
 
-    async checkProgress(taskId, maxAttempts = 100, attempt = 0) {
+    async checkProgress(taskId, maxAttempts = 300, attempt = 0) {
         try {
             const progressRes = await this.client.progressV3({task_id: taskId});
 
