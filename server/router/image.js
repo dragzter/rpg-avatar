@@ -2,7 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
-import UserService from "../services/user-service.js";
+import taskManager from "../services/task-manager.js";
 
 dotenv.config()
 
@@ -20,38 +20,58 @@ router.post("/api/image", async (req, res) => {
     }
 })
 
-router.post("/api/image-v2", async (req, res) => {
+router.post("/api/cancel-task", (req, res) => {
+    const {task_id} = req.body;
+    taskManager.cancelTask(task_id);
+    res.json({success: true, message: `Task ${task_id} has been canceled.`});
+});
+
+router.post("/api/task-image-progress", async (req, res) => {
+    const {task_id} = req.body;
+
     try {
-        const {user_id, count} = req.body.data
-        const user = await UserService.getUserById(user_id)
+        const response = await NovitaAiService.checkImageGenerationProgress(task_id);
 
-        if (user?.token_balance >= count) {
-            const response = await NovitaAiService.generateImage(req.body?.data)
-
-            if (response?.length) {
-                user.token_balance -= count
-                await UserService.saveUser(user)
-
-                res.status(200).json({
-                    images: response,
-                    success: true,
-                    message: "Image generation successful.",
-                    new_token_balance: user.token_balance
-                })
-            }
-
-        } else {
-            return res.status(201).json({
-                message: "Not enough tokens for this request.",
+        if (response?.success && response?.images) {
+            console.log("Images generated successfully:", response.images);
+            res.status(200).json(response);
+        } else if (!response?.success) {
+            res.status(400).json({
                 success: false,
-            })
+                message: "Task was canceled or failed.",
+            });
+        } else {
+            res.status(200).json({
+                success: false,
+                message: "Task is still in progress.",
+            });
         }
 
     } catch (error) {
-        res.status(500).json(error)
-        console.log(error)
+        res.status(500).json({
+            success: false,
+            message: "Error checking task progress.",
+        });
     }
-})
+});
 
+router.post("/api/task-image-v2", async (req, res) => {
+    try {
+        const response = await NovitaAiService.startImageGeneration(req.body?.data);
+
+        if (response?.task_id) {
+            return res.status(200).json(response);
+        } else {
+            return res.status(500).json(response);
+        }
+
+    } catch (error) {
+        console.log("Error: ", error);
+        return res.status(500).json({
+            message: "Error initiating the Image Generation Service",
+            error
+        });
+    }
+});
 
 export {router}

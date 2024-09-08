@@ -10,9 +10,6 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-//await OpenAiService.requestImage()
-//await OpenAiService.requestAiPrompt()
-
 db.once("open", () => {
     console.log("Connected to Database.");
     app.use("/", router);

@@ -25,15 +25,33 @@
                             ></div>
                             <router-link
                                 to="get-tokens"
-                                class="fw-light py-2 px-3 accent-link ms-2 me-1"
-                                >Buy
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="top"
+                                data-bs-title="Buy More Tokens"
+                                class="fw-light"
+                                ><h5
+                                    :class="{
+                                        'border-danger':
+                                            rpgUser.token_balance === 0,
+                                    }"
+                                    class="user-tokens-wrapper mb-0"
+                                >
+                                    <span style="color: goldenrod"
+                                        ><i
+                                            class="fa-sharp fa-light fa-coins"
+                                        ></i
+                                    ></span>
+                                    <span
+                                        class="ms-2"
+                                        :class="{
+                                            'text-danger':
+                                                rpgUser.token_balance === 0,
+                                        }"
+                                    >
+                                        {{ rpgUser.token_balance || 0 }}
+                                    </span>
+                                </h5>
                             </router-link>
-                            <h5 class="user-tokens-wrapper mb-0">
-                                <span style="color: goldenrod"
-                                    ><i class="fa-sharp fa-light fa-coins"></i
-                                ></span>
-                                {{ rpgUser.token_balance || 0 }}
-                            </h5>
                         </div>
 
                         <div
@@ -64,7 +82,7 @@
                             input-type="textarea"
                             placeholder="prompt"
                             id="custom-prompt"
-                            label="Additional specific info..."
+                            label="Additional details..."
                             :loading="loading"
                         />
 
@@ -112,32 +130,57 @@
                         </CollapseComponent>
 
                         <div class="mt-auto ms-auto">
-                            <button
-                                @click="handleSubmit"
-                                class="btn accent-link-outline"
-                                :disabled="loading"
-                            >
-                                <div class="d-flex align-items-center">
-                                    <LoadSpinner v-if="loading" class="me-2" />
-                                    Surprise Me
-                                </div>
-                            </button>
-                            <button
-                                @click="handleSubmit"
-                                class="btn btn-info btn-large ms-3"
-                                :disabled="
-                                    loading || rpgUser?.token_balance === 0
-                                "
-                            >
-                                <div class="d-flex align-items-center">
-                                    <LoadSpinner v-if="loading" class="me-2" />
-                                    Submit
-                                </div>
-                            </button>
+                            <span v-if="rpgUser.token_balance > 0">
+                                <button
+                                    v-if="loading"
+                                    class="btn me-2"
+                                    @click="cancelImageRequest"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    @click="handleSubmit"
+                                    class="btn accent-link-outline"
+                                    :disabled="
+                                        loading || rpgUser?.token_balance === 0
+                                    "
+                                >
+                                    <div class="d-flex align-items-center">
+                                        <LoadSpinner
+                                            v-if="loading"
+                                            class="me-2"
+                                        />
+                                        Surprise Me
+                                    </div>
+                                </button>
+                                <button
+                                    @click="handleSubmit"
+                                    class="btn btn-info btn-large ms-3"
+                                    :disabled="
+                                        loading || rpgUser?.token_balance === 0
+                                    "
+                                >
+                                    <div class="d-flex align-items-center">
+                                        <LoadSpinner
+                                            v-if="loading"
+                                            class="me-2"
+                                        />
+                                        Submit
+                                    </div>
+                                </button>
+                            </span>
+                            <span v-else>
+                                <router-link
+                                    to="get-tokens"
+                                    class="fw-light py-2 fw-bold px-3 btn btn-primary ms-2 me-1"
+                                    >Buy Tokens
+                                </router-link>
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- image generation column-->
             <div
                 class="col-lg-6 col-md-12 d-flex align-items-center image-generation-column"
             >
@@ -191,7 +234,7 @@
 
                     <vue-easy-lightbox
                         :visible="visibleRef"
-                        :imgs="imgsRef"
+                        :imgs="lightboxImages"
                         :index="indexRef"
                         @hide="onHide"
                     >
@@ -309,6 +352,9 @@ const loading = computed(() => aiStore.requestLoading);
 const loaded = computed(() => aiStore.imagesLoaded);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
 const rpgUser = computed(() => userStore.user || { token_balance: 0 });
+const lightboxImages = computed(() =>
+    aiStore.generatedImagesV2.map((img) => img.image_url)
+);
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
     const desiredCount = userSelections.value.count || 1;
@@ -337,12 +383,6 @@ onMounted(() => {
 /**
  * WATCHERS
  */
-watch(
-    () => loading.value,
-    (newval) => {
-        console.log("loading", newval);
-    }
-);
 
 watch(
     () => rpgUser.value,
@@ -367,6 +407,10 @@ const handleSubmit = async () => {
         await aiStore.getImageV2(userSelections.value);
     }
     //await aiStore.generateImageWithUserData(userSelections.value);
+};
+
+const cancelImageRequest = async () => {
+    await aiStore.cancelImageGenerationTask();
 };
 
 const downloadImage = async () => {
@@ -400,7 +444,9 @@ const onShow = () => {
 const onHide = () => (visibleRef.value = false);
 
 const viewImage = (img: NovitaImg) => {
-    imgsRef.value = img.image_url;
+    indexRef.value = lightboxImages.value.findIndex(
+        (image) => image === img.image_url
+    );
 
     onShow();
 };

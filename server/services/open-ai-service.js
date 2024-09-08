@@ -58,6 +58,24 @@ class OpenAIService {
         return response.choices[0].message.content;
     }
 
+    async talkToAi(prompt) {
+        if (!prompt) {
+            return
+        }
+        const response = await this.openai.chat.completions.create({
+            model: this.MODEL.Gpt4oMini,
+            messages: [
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            max_tokens: 4000
+        });
+
+        return response.choices[0].message.content;
+    }
+
     async requestImage(userRequest) {
 
         const prompt = await this.requestAiPrompt(userRequest)

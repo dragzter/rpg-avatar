@@ -14,7 +14,7 @@ export const useProductStore = defineStore("product", {
             try {
                 const response = await axios.get(API.products);
 
-                this.products = response.data?.data?.reverse();
+                this.products = response.data?.data;
             } catch (err) {
                 console.log(err);
             }

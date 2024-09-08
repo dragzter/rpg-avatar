@@ -12,9 +12,10 @@ import ProfileView from "@/views/ProfileView.vue";
 import { createAuthGuard } from "@auth0/auth0-vue";
 import GalleryView from "@/views/GalleryView.vue";
 import LoaderView from "@/views/LoaderView.vue";
+import AdminDashboard from "@/views/AdminDashboard.vue";
 
 export function createRouter(app: App): Router {
-    return createVueRouter({
+    const router = createVueRouter({
         history: createWebHistory(import.meta.env.BASE_URL),
         routes: [
             {
@@ -31,6 +32,12 @@ export function createRouter(app: App): Router {
                 path: "/get-tokens",
                 name: "get-tokens",
                 component: ProductView,
+            },
+            {
+                path: "/admin-dashboard",
+                name: "admin-dashboard",
+                component: AdminDashboard,
+                beforeEnter: createAuthGuard(app),
             },
             {
                 path: "/loaders",
@@ -55,4 +62,6 @@ export function createRouter(app: App): Router {
             },
         ],
     });
+
+    return router;
 }
