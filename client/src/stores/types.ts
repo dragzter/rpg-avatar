@@ -79,6 +79,21 @@ export interface UserAIPrompt {
     adherence?: number;
 }
 
+export interface UserAiPrompt {
+    prompt: string;
+    user_id: string;
+    archetype: string;
+
+    art_style?: string;
+    steps?: number;
+    negative_prompt?: string;
+    adherence?: number;
+    size?: {
+        width: number; // 1024
+        height: number; // 1024
+    };
+}
+
 export interface NovitaImg {
     image_url: string;
     image_type: string;
@@ -99,17 +114,6 @@ export interface ImageTaskStartedResponse {
     message: string;
 }
 
-interface SavedUserPrompts
-    extends Pick<
-        UserAIPrompt,
-        | "prompt"
-        | "archetype"
-        | "size"
-        | "negative_prompt"
-        | "steps"
-        | "adherence"
-    > {}
-
 export interface RPGAvatarUser {
     name: string;
     id: string; // The ID the user came with
@@ -122,7 +126,6 @@ export interface RPGAvatarUser {
     email_verified?: boolean;
     picture?: string;
     nickname?: string;
-    prompts?: SavedUserPrompts;
     custom_attributes?: Record<string, unknown>;
     disabled?: boolean;
     admin?: boolean;

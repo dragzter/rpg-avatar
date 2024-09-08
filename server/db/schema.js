@@ -3,9 +3,12 @@ import mongoose from "mongoose";
 const {Schema} = mongoose;
 
 // This is based on a typescript type in types.ts in the client folder.
-const SavedUserPromptsSchema = new Schema({
+export const PromptSchema = new Schema({
     prompt: {type: String, required: true},
     archetype: {type: String, required: true},
+    user_id: {type: String, required: true},
+    art_style: {type: String, required: false},
+    date: {type: String, required: true},
     size: {
         width: {type: Number, required: false},
         height: {type: Number, required: false},
@@ -13,7 +16,8 @@ const SavedUserPromptsSchema = new Schema({
     negative_prompt: {type: String, required: false},
     steps: {type: Number, required: false},
     adherence: {type: Number, required: false},
-});
+}, {collection: "prompts"});
+
 
 export const UserSchema = new Schema({
     name: {
@@ -48,10 +52,6 @@ export const UserSchema = new Schema({
         type: String,
         required: false,
     },
-    prompts: {
-        type: [SavedUserPromptsSchema],
-        required: false,
-    },
     custom_attributes: {
         type: Object,
         required: false,
@@ -72,4 +72,5 @@ export const UserSchema = new Schema({
         type: String,
         required: false,
     }
-});
+}, {collection: "users"});
+

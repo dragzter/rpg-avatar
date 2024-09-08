@@ -10,7 +10,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-db.once("open", () => {
+db.once("open", async () => {
     console.log("Connected to Database.");
     app.use("/", router);
 

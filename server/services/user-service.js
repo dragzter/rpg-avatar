@@ -1,4 +1,4 @@
-import {UserModel} from "../db/model.js";
+import {PromptModel, UserModel} from "../db/model.js";
 
 class UserService {
     async getUserById(userId) {
@@ -18,6 +18,15 @@ class UserService {
         try {
             const _user = new UserModel(user);
             await _user.save();
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async savePrompt(userPrompt) {
+        try {
+            const _prompt = new PromptModel(userPrompt)
+            await _prompt.save()
         } catch (err) {
             console.log(err)
         }
