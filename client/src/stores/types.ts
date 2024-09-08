@@ -93,6 +93,12 @@ export interface ImageGenResponse {
     new_token_balance: number;
 }
 
+export interface ImageTaskStartedResponse {
+    task_id?: string;
+    success: boolean;
+    message: string;
+}
+
 interface SavedUserPrompts
     extends Pick<
         UserAIPrompt,
