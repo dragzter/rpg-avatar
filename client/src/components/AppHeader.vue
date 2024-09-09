@@ -6,13 +6,16 @@
           <div
               class="brand-container d-flex align-items-center position-relative"
           >
-            <img
-                id="main-logo"
-                alt="RPG Avatar"
-                class="img-fluid me-3"
-                src="/public/assets/rpgavatarlogo.png"
-            />
-            <code>rpgavatar.com</code>
+            <router-link to="/">
+
+              <img
+                  id="main-logo"
+                  alt="RPG Avatar"
+                  class="img-fluid me-3"
+                  src="/assets/rpgavatarlogo.png"
+              />
+              <code>rpgavatar.com</code>
+            </router-link>
             <div
                 class="position-absolute px-1 fw-bolder"
                 style="
