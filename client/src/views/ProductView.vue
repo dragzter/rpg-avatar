@@ -125,7 +125,7 @@
       </div>
 
       <div class="text-center my-5">
-        <img alt="logo" src="../assets/img/rpgavatarlogo.png"/>
+        <img alt="logo" src="/public/img/rpgavatarlogo.png"/>
       </div>
       <ProductTitle
           :wrapper-css-classes="['mt-5']"
@@ -137,9 +137,10 @@
       <div id="product-passes" class="row">
         <template v-for="(product, index) in productsEnhanced">
           <div
-              v-if="product?.metadata?.type === 'passes' && !rpgUser.nsfw_pass"
+              v-if="product?.metadata?.type === 'passes'"
               :key="`product-offer-${product.name + index}`"
-              class="product-card-item"
+              :class="{'client-purchased': rpgUser.nsfw_pass}"
+              class="product-card-item product-passes"
           >
             <div class="pricing-item">
 
@@ -147,33 +148,32 @@
                 {{ product.name }}
 
                 <span class="fs-6 text-white">
-                                    <Popper :hover="true" placement="top">
-                                        <i
-                                            v-if="
-                                                product.metadata?.limited_notice
-                                            "
-                                            class="fa-regular fa-circle-question"
-                                        ></i>
-                                        <template #content
-                                        ><p class="m-0">
-                                                {{
-                                            product.metadata
-                                                ?.limited_notice
-                                          }}
-                                            </p>
-                                        </template>
-                                    </Popper>
-                                </span>
+                    <Popper :hover="true" placement="top">
+                        <i
+                            v-if="
+                                product.metadata?.limited_notice
+                            "
+                            class="fa-regular fa-circle-question"
+                        ></i>
+                        <template #content
+                        ><p class="m-0">
+                          {{ product.metadata?.limited_notice }}
+                        </p>
+                        </template>
+                    </Popper>
+                </span>
               </h3>
               <hr/>
-              <p class="fs-4">{{ product.description }}</p>
+              <p class="fs-4 product-description">{{ product.description }}</p>
 
               <h4>
                 <span>{{ product.price }}</span>
               </h4>
-              <div class="pricing-button">
+              <div v-if="!rpgUser.nsfw_pass" class="pricing-button">
                 <button @click="buy(product)">Buy Now</button>
               </div>
+              <span v-else class="badge w-100 fs-4 mt-2 text-bg-info ">Purchased</span>
+
               <ul v-if="product.metadata?.type === 'passes'">
                 <li class="pb-0">
                                     <span style="color: goldenrod"

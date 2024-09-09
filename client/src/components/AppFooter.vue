@@ -8,8 +8,9 @@
               <code class="text-white">rpgavatar.com</code>
             </div>
             <p class="accent-text ms-0 mb-0" style="width: 100px">
-              v0.30.0
+              v0.30.5
             </p>
+            <router-link class="ms-3" to="loaders">Loaders</router-link>
           </div>
           <div class="w-100 text-end">&copy; 2024 WebTrek LLC</div>
         </div>
@@ -17,3 +18,5 @@
     </div>
   </section>
 </template>
+<script lang="ts" setup>
+</script>
