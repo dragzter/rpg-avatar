@@ -125,7 +125,7 @@
       </div>
 
       <div class="text-center my-5">
-        <img alt="logo" src="/public/assets/rpgavatarlogo.png"/>
+        <img alt="logo" src="/assets/rpgavatarlogo.png"/>
       </div>
       <ProductTitle
           :wrapper-css-classes="['mt-5']"
