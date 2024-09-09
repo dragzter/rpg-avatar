@@ -145,7 +145,7 @@ const userStore = useUserStore();
 const rpgUser = computed(() => userStore.user);
 
 const login = () => {
-  loginWithRedirect({redirect_uri: window.location.href});
+  loginWithRedirect({redirect_uri: window.location.href} as Record<string, string>);
 };
 
 watch(

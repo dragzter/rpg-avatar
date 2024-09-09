@@ -1,5 +1,8 @@
 {
   "files": [],
+  "compilerOptions":  {
+    "types": ["./src/vue-shim.d.ts"],
+  },
   "references": [
     {
       "path": "./tsconfig.node.json"
