@@ -5,9 +5,11 @@ import db from "./db/index.js"
 import stripeWebhookRouter from "./services/stripe-webhooks.js";
 
 const app = express()
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
+app.options('*', cors());
+app.set('trust proxy', 1);
 
 // Stripe webhook, this is using the raw body parser to validate the stripe signature
 // It must be done before using the express.json() middleware 🐣
