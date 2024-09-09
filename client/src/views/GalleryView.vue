@@ -51,7 +51,7 @@
                 class="col position-relative"
             >
               <img
-                  :src="`public/img/${image}`"
+                  :src="`public/assets/${image}`"
                   alt="RPG Avatar"
                   class="img-fluid"
               />
