@@ -1373,8 +1373,28 @@ body {
     .product-card-item {
         max-width: 340px;
 
+        &.client-purchased {
+            h4 {
+                display: none;
+            }
+        }
+
         .pricing-item {
             min-height: 510px !important;
+        }
+    }
+}
+
+#product-passes {
+    .product-card-item {
+        &.client-purchased {
+            .product-description {
+                margin-bottom: 60px
+            }
+
+            h4 {
+                display: none;
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
                 id="main-logo"
                 alt="RPG Avatar"
                 class="img-fluid me-3"
-                src="../assets/img/rpgavatarlogo.png"
+                src="/public/img/rpgavatarlogo.png"
             />
             <code>rpgavatar.com</code>
             <div
