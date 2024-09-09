@@ -31,7 +31,7 @@
               <img
                   alt=""
                   class="img-fluid"
-                  src="/public/img/rogue-24-female.png"
+                  src="/public/assets/rogue-24-female.png"
                   style="border-radius: 10px"
               />
             </div>
