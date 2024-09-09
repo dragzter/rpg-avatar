@@ -49,7 +49,6 @@ router.get("/api/prices", async (req, res) => {
 })
 
 router.post("/api/checkout", async (req, res) => {
-    console.log(req.body)
     try {
         const sessionURL = await StripeService.getCheckoutSession(req.body.data)
         res.status(200).json(sessionURL)

@@ -1403,6 +1403,7 @@ body {
     z-index: 1;
     padding: 18px 0;
     transition: background-color 0.5s;
+    min-width: 380px;
 
     .brand-container {
         #main-logo {
@@ -1412,11 +1413,23 @@ body {
         code {
             font-size: 20px;
         }
+
+        @media (max-width: 991px) {
+            #main-logo {
+                width: 40px;
+                margin-right: 8px !important;
+            }
+
+            code {
+                font-size: 14px;
+            }
+        }
     }
 
     .welcome-user {
         display: inline-block;
     }
+
 
     .nav-link {
         padding: 8px 12px;
@@ -1427,6 +1440,19 @@ body {
     .nav-link:not(.accent-link):hover {
         background: #9a9ac1;
         color: #000;
+    }
+
+    @media (max-width: 1366px) {
+        .user-nickname {
+            display: none;
+        }
+
+        #nav-column {
+            a {
+                padding: 0 !important;
+                font-size: 14px !important;
+            }
+        }
     }
 
     #auth-column {

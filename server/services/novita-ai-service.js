@@ -1,24 +1,35 @@
 import {NovitaSDK, TaskStatus} from "novita-sdk";
-import dotenv from 'dotenv';
 import taskManager from "./task-manager.js";
 import UserService from "./user-service.js";
+import "../config.js"
 
-dotenv.config();
 
 class NovitaAIService {
     client
+    userPrompt = {
+        date: ""
+    }
     user
+    promptProperties = [
+        "prompt",
+        "archetype",
+        "user_id",
+        "art_style",
+        "size",
+        "negative_prompt",
+        "steps",
+        "adherence"
+    ]
+
     defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined"
 
     defaultModel = "gleipnir_v20BF16_174601.safetensors"
     altModel = "dreamshaperXL09Alpha_alpha2Xl10_91562.safetensors"
-    alt2Model = "demonCORESFWNSFW_v22_135842.safetensors"
-    basePrompt = "ludicrously gorgeous brunette rogue in the high fantasy art style, wearing skimpy leather armor, large breasts,  incredibly fit and lean, long flowing hair, subtle smile, gorgeous eyes, full lips"
 
     portrait_specialized_Model_2 = "demonCORESFWNSFW_v22_135842.safetensors"
     character_specialized_Model_1 = "gleipnir_v20BF16_174601.safetensors"
     pixelArt_specialized_Model_1 = "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
-    testPrompt = "amazing blonde, perfect body perfect face, smiling, slim and very fit, large breasts, gorgeous smile, 4k image, perfect quality, full body shot"
+
 
     constructor() {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY)
@@ -27,7 +38,20 @@ class NovitaAIService {
     async startImageGeneration(userData) {
         this.user = await UserService.getUserById(userData.user_id);
 
+        // Add date to determine when the prompt ran
+        this.userPrompt.date = new Date().toLocaleString()
+
+        for (let i = 0; i < this.promptProperties.length; i++) {
+            if (userData[this.promptProperties[i]]) {
+                this.userPrompt[this.promptProperties[i]] =
+                    userData[this.promptProperties[i]]
+            }
+        }
+
+
         if (this.user.token_balance < userData.count) {
+            this.userPrompt = {}
+
             return {
                 message: "Not enough tokens for this request",
                 success: false
@@ -74,6 +98,8 @@ class NovitaAIService {
                 };
             }
         } catch (error) {
+            this.userPrompt = {}
+
             console.log("Error initiating image generation:", error);
             return {
                 success: false,
@@ -88,10 +114,16 @@ class NovitaAIService {
         await UserService.saveUser(this.user);
     }
 
+    async savePrompt() {
+        await UserService.savePrompt(this.userPrompt);
+    }
+
     async checkImageGenerationProgress(taskId, maxAttempts = 300, attempt = 0) {
         try {
             if (taskManager.isTaskCanceled(taskId)) {
                 console.log(`Task ${taskId} was canceled.`);
+                this.userPrompt = {}
+
                 return {
                     success: false,
                     message: "Task was canceled. The user will not be credited."
@@ -104,7 +136,11 @@ class NovitaAIService {
                 taskManager.removeTask(taskId);
 
                 // Credit the user
-                await this.creditUserForImages(progressResponse.images.length)
+                await Promise.all([
+                    this.creditUserForImages(progressResponse.images.length),
+                    // TODO Need to figure out how to prevent duplicate prompt saves
+                    //this.savePrompt()
+                ])
 
                 return {
                     images: progressResponse.images,
@@ -120,6 +156,8 @@ class NovitaAIService {
 
             if (progressResponse.task.status === TaskStatus.FAILED) {
                 taskManager.removeTask(taskId);
+                this.userPrompt = {}
+
                 console.log("task failed")
                 return new Error(`Task failed: ${progressResponse.task.reason}`);
             }
@@ -133,6 +171,7 @@ class NovitaAIService {
                 return new Error("Task did not complete within the timeout period.");
             }
         } catch (error) {
+            this.userPrompt = {}
             taskManager.removeTask(taskId);
             console.error("Error checking progress:", error);
             throw error;
