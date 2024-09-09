@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import type { RedeemAPIResponse, RPGAvatarUser } from "@/stores/types";
-import { User } from "@auth0/auth0-vue";
-import axios, { type AxiosResponse } from "axios";
-import { API } from "@/utils/";
+import {defineStore} from "pinia";
+import type {RedeemAPIResponse, RPGAvatarUser} from "@/stores/types";
+import {User} from "@auth0/auth0-vue";
+import axios, {type AxiosResponse} from "axios";
+import {API} from "@/utils/";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -54,7 +54,7 @@ export const useUserStore = defineStore("user", {
                     userId,
                 });
 
-                this.toasMessage = response.data.message;
+                this.toastMessage = response.data.message;
             } catch (error) {
                 console.log(error);
             }

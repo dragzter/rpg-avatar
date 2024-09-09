@@ -1,12 +1,8 @@
-import { defineStore } from "pinia";
-import type {
-    ImageTaskStartedResponse,
-    NovitaImg,
-    UserAIPrompt,
-} from "@/stores/types";
-import { API } from "@/utils/";
-import axios, { type AxiosResponse } from "axios";
-import { useUserStore } from "@/stores/user";
+import {defineStore} from "pinia";
+import type {ImageTaskStartedResponse, NovitaImg, UserAIPrompt,} from "@/stores/types";
+import {API} from "@/utils/";
+import axios, {type AxiosResponse} from "axios";
+import {useUserStore} from "@/stores/user";
 
 export const useAiStore = defineStore("aiImages", {
     state: () => ({
@@ -77,7 +73,7 @@ export const useAiStore = defineStore("aiImages", {
             } catch (err) {
                 console.log(err);
                 // TODO to something here
-                this.toastMessage = err.message;
+                this.toastMessage = (err as any).message;
             } finally {
                 this.requestLoading = false;
             }
