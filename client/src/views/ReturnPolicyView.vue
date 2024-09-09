@@ -14,7 +14,7 @@
             <div class="text-center my-5">
               <img
                   alt="logo"
-                  src="../assets/img/rpgavatarlogo.png"
+                  src="/public/img/rpgavatarlogo.png"
               />
             </div>
             <p>
