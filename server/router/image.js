@@ -1,10 +1,7 @@
 import express from "express"
-import dotenv from "dotenv"
 import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
 import taskManager from "../services/task-manager.js";
-
-dotenv.config()
 
 const router = express.Router();
 
@@ -57,6 +54,7 @@ router.post("/api/task-image-progress", async (req, res) => {
 
 router.post("/api/task-image-v2", async (req, res) => {
     try {
+        console.log(req.body.data)
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
 
         if (response?.task_id) {

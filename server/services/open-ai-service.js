@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import {getRandomSetting} from "./helpers.js";
+import "../config.js"
 
 dotenv.config();
 

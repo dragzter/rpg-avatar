@@ -1,9 +1,8 @@
 import {NovitaSDK, TaskStatus} from "novita-sdk";
-import dotenv from 'dotenv';
 import taskManager from "./task-manager.js";
 import UserService from "./user-service.js";
+import "../config.js"
 
-dotenv.config();
 
 class NovitaAIService {
     client
@@ -43,7 +42,6 @@ class NovitaAIService {
         this.userPrompt.date = new Date().toLocaleString()
 
         for (let i = 0; i < this.promptProperties.length; i++) {
-            console.log(this.promptProperties[i], userData[this.promptProperties[i]])
             if (userData[this.promptProperties[i]]) {
                 this.userPrompt[this.promptProperties[i]] =
                     userData[this.promptProperties[i]]

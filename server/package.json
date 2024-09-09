@@ -4,7 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=production nodemon index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js"
   },
   "keywords": [],
   "author": "",
@@ -12,9 +14,11 @@
   "description": "",
   "dependencies": {
     "axios": "^1.7.3",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "https": "^1.0.0",
     "mongoose": "^8.5.4",
     "nodemon": "^3.1.4",
     "novita-sdk": "^1.0.44",
@@ -23,5 +27,8 @@
     "stripe": "^16.8.0",
     "url": "^0.11.4",
     "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

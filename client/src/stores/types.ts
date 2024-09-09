@@ -131,6 +131,17 @@ export interface RPGAvatarUser {
     admin?: boolean;
 }
 
+export interface LineItem {
+    price: string,
+    quantity: number
+}
+
+export interface CheckoutSessionData {
+    user_id: string
+    product_id: string
+    line_items: LineItem[]
+}
+
 export interface RedeemAPIResponse {
     message: string;
     success: boolean;

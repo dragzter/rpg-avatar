@@ -12,6 +12,7 @@ export const API = {
     sign_disclaimer:
         import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
     cancel_task: import.meta.env.VITE_APP_API_URL + "/api/cancel-task",
+    start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
 };
 
 export const ImageOptions = [
@@ -70,7 +71,6 @@ export const ImageOptions = [
 export function getCurrencyLabel(amount: number) {
     const formattedAmount = (amount / 100).toFixed(2); // Convert cents to dollars and format to 2 decimal places
 
-    console.log(formattedAmount);
     return new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD",

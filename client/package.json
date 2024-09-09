@@ -8,6 +8,7 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
+    "serve:development": "vite --mode development",
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {

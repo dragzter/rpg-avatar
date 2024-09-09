@@ -36,11 +36,8 @@ router.post("/api/user/:userId", async (req, res) => {
                 return res.status(400).json({message: "User account is disabled"})
             }
 
-            console.log("Found user!", user)
             return res.status(200).json(user)
         } else {
-            console.log("gonna have to make one")
-
             const newUser = {
                 token_balance: 1,
                 nsfw_pass: false,
@@ -73,11 +70,9 @@ router.patch("/api/user/sign-disclaimer", async (req, res) => {
     // TODO Disable user
     const {userId} = req.body; // Get userId from URL
 
-    console.log(userId)
     try {
         const user = await UserService.getUserById(userId)
 
-        console.log(user, "User in disclaimer")
         if (user) {
             user.disclaimer_signed = true
             user.disclaimer_signed_on_date = new Date().toDateString()
@@ -134,14 +129,9 @@ router.patch("/api/redeem", async (req, res) => {
             });
         }
 
-        console.log("code is valid")
-        // Assign tokens to the user (e.g., 100 tokens for a valid code)
-        //const newBalance = await CodeRedemptionService.assignTokensToUser(userId,
-        // TOKEN_AWARD);
 
         const response = await actions[codeType](userId)
 
-        console.log("Redeem Response", response)
         return res.status(200).json(response);
     } catch (error) {
         return res.status(500).json({

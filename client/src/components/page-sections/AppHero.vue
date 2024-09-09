@@ -26,10 +26,11 @@
                     </div>
                 </div>
                 <div class="col-md-6 text-center">
-                    <div class="accent-frame">
-                        <div style="transform: rotate(2deg)">
+                    <div class="accent-frame" style="transform: rotate(3deg)">
+                        <div>
                             <img
                                 alt=""
+                                style="border-radius: 10px"
                                 class="img-fluid"
                                 src="../../assets/img/rogue-24-female.png"
                             />

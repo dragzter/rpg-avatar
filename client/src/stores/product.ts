@@ -1,12 +1,12 @@
-import { defineStore } from "pinia";
-import type { Price, Product } from "@/stores/types";
-import { API, getCurrencyLabel } from "@/utils/";
+import {defineStore} from "pinia";
+import type {CheckoutSessionData, Price, Product} from "@/stores/types";
+import {API, getCurrencyLabel} from "@/utils/";
 import axios from "axios";
 
 export const useProductStore = defineStore("product", {
     state: () => ({
         products: [] as Product[],
-        prices: { data: [] as Price[] },
+        prices: {data: [] as Price[]},
         generatedImageUrl: "",
     }),
     actions: {
@@ -38,6 +38,16 @@ export const useProductStore = defineStore("product", {
                 console.log(err);
             }
         },
+        async beginCheckoutSession({line_items, product_id, user_id}: CheckoutSessionData) {
+            try {
+                const response = await axios.post(API.checkout, {data: {line_items, product_id, user_id}});
+
+                window.location.href = response.data.url;
+
+            } catch (err) {
+                console.log(err);
+            }
+        }
     },
     getters: {
         productsEnhanced: (state) => {

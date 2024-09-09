@@ -55,12 +55,39 @@ class CodeRedemptionService {
                 };
             }
 
-            console.log("got this far", user)
             user.token_balance += tokensToAdd;
             await UserService.saveUser(user);
 
             return {
                 message: "Code redeemed successfully.",
+                success: true,
+                token_balance: user.token_balance
+            }
+        } catch (error) {
+            return {
+                message: "Token balance update failed.",
+                success: false,
+                error: error.message,
+            }
+        }
+    }
+
+    async assignPurchasedTokensToUser(userId, tokensToAdd) {
+        try {
+
+            const user = await UserService.getUserById(userId);
+            if (!user) {
+                return {
+                    message: "User not found",
+                    success: false
+                };
+            }
+
+            user.token_balance += tokensToAdd;
+            await UserService.saveUser(user);
+
+            return {
+                message: "Tokens purchased successfully.",
                 success: true,
                 token_balance: user.token_balance
             }
