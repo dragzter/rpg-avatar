@@ -49,8 +49,8 @@ class StripeService {
 
     async getCheckoutSession({user_id, line_items, product_id}) {
         const session = await this.client.checkout.sessions.create({
-            success_url: "http://localhost:5173/get-tokens",
-            cancel_url: "http://localhost:5173/get-tokens",
+            success_url: process.env.STRIPE_CHECKOUT_SUCCESS_URL,
+            cancel_url: process.env.STRIPE_CHECKOUT_CANCEL_URL,
             line_items: line_items,
             payment_method_types: ["card"],
             mode: "payment",
