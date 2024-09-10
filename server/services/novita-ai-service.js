@@ -1,15 +1,16 @@
 import {NovitaSDK, TaskStatus} from "novita-sdk";
-import taskManager from "./task-manager.js";
+import taskManager, {ApiTaskStatus} from "./task-manager.js";
 import UserService from "./user-service.js";
 import "../config.js"
 
 
 class NovitaAIService {
     client
+    user
+    FinishedImages = {}
     userPrompt = {
         date: ""
     }
-    user
     promptProperties = [
         "prompt",
         "archetype",
@@ -59,8 +60,8 @@ class NovitaAIService {
         }
 
         const configured_prompt = userData?.prompt || "a white rabbit";
-        const rwidth = userData?.size?.width || 1024;
-        const rheight = userData?.size?.height || 1024;
+        const r_width = userData?.size?.width || 1024;
+        const r_height = userData?.size?.height || 1024;
         const adherence = userData.adherence || 7.5;
         const negative_prompt = userData.negative_prompt || "none";
 
@@ -69,8 +70,8 @@ class NovitaAIService {
                 model_name: this.defaultModel,
                 prompt: configured_prompt,
                 negative_prompt: negative_prompt,
-                width: rwidth,
-                height: rheight,
+                width: r_width,
+                height: r_height,
                 sampler_name: "DPM++ 2S a Karras",
                 guidance_scale: adherence,
                 steps: 26,
@@ -118,64 +119,83 @@ class NovitaAIService {
         await UserService.savePrompt(this.userPrompt);
     }
 
-    async checkImageGenerationProgress(taskId, maxAttempts = 300, attempt = 0) {
-        try {
-            if (taskManager.isTaskCanceled(taskId)) {
-                console.log(`Task ${taskId} was canceled.`);
-                this.userPrompt = {}
-
-                return {
-                    success: false,
-                    message: "Task was canceled. The user will not be credited."
-                };
+    getFinishedImages(taskId) {
+        if (!this.FinishedImages[taskId]) {
+            return {
+                success: false,
+                message: "No images found for this task."
             }
-
-            const progressResponse = await this.client.progressV3({task_id: taskId});
-
-            if (progressResponse.task.status === TaskStatus.SUCCEED) {
-                taskManager.removeTask(taskId);
-
-                // Credit the user
-                await Promise.all([
-                    this.creditUserForImages(progressResponse.images.length),
-                    // TODO Need to figure out how to prevent duplicate prompt saves
-                    //this.savePrompt()
-                ])
-
-                return {
-                    images: progressResponse.images,
-                    success: true,
-                    message: "Images successfully created.",
-                    new_token_balance: this.user.token_balance
-                };
-            }
-
-            if (progressResponse.task.status === TaskStatus.QUEUED) {
-                console.log("queueing task");
-            }
-
-            if (progressResponse.task.status === TaskStatus.FAILED) {
-                taskManager.removeTask(taskId);
-                this.userPrompt = {}
-
-                console.log("task failed")
-                return new Error(`Task failed: ${progressResponse.task.reason}`);
-            }
-
-            if (attempt < maxAttempts) {
-                console.log("retrying...  Attempt: " + attempt + " / " + maxAttempts)
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                return this.checkImageGenerationProgress(taskId, maxAttempts, attempt + 1);
-            } else {
-                taskManager.removeTask(taskId);
-                return new Error("Task did not complete within the timeout period.");
-            }
-        } catch (error) {
-            this.userPrompt = {}
-            taskManager.removeTask(taskId);
-            console.error("Error checking progress:", error);
-            throw error;
         }
+
+        return {
+            success: true,
+            images: this.FinishedImages[taskId].images,
+        }
+    }
+
+
+    async startTaskStatusPolling(task_id, maxAttempts = 300, attempt = 0) {
+
+        return new Promise(async (resolve, reject) => {
+            const check = async () => {
+                try {
+                    const progress = await this.client.progressV3({task_id});
+
+                    const TaskSucceeded = progress.task.status === TaskStatus.SUCCEED;
+                    const TaskFailed = progress.task.status === TaskStatus.FAILED;
+                    const MaxAttemptsNotReached = attempt < maxAttempts;
+
+                    if (TaskSucceeded) {
+                        const userResponse = {
+                            images: progress.images,
+                            success: true,
+                            message: "Images successfully created.",
+                            token_cost: progress.images.length,
+                            new_token_balance: this.user.token_balance,
+                            status: ApiTaskStatus.COMPLETE,
+                            task_id,
+                        }
+
+                        // Store finished images
+                        this.FinishedImages[task_id] = userResponse;
+
+                        // Credit the user
+                        await this.creditUserForImages(progress.images.length);
+
+                        resolve(userResponse);
+
+                    } else if (TaskFailed) {
+                        taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
+                        reject({
+                            message: "Task failed: " + progress.task.reason,
+                            success: false
+                        });
+                    } else if (MaxAttemptsNotReached) {
+                        attempt++
+
+                        // Retry after 1 second
+                        console.log("Retry: " + attempt + " / " + maxAttempts)
+                        setTimeout(() => check(), 1000);
+                    } else {
+                        taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;
+                        reject({
+                            message: "Task did not complete within the timeout period.",
+                            success: false
+                        });
+                    }
+                } catch (error) {
+                    console.log("BOOOM", error)
+                    taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
+                    reject({
+                        message: "Error checking progress: " + error,
+                        success: false
+                    });
+                }
+            };
+
+            // Start the first check
+            await check();
+        });
     }
 }
 

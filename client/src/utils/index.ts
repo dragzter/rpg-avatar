@@ -4,7 +4,6 @@ export const API = {
     prices: import.meta.env.VITE_APP_API_URL + "/api/prices",
     checkout: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     image: import.meta.env.VITE_APP_API_URL + "/api/image",
-    image_v2: import.meta.env.VITE_APP_API_URL + "/api/task-image-progress",
     start_image_v2_task:
         import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
     get_user: import.meta.env.VITE_APP_API_URL + "/api/user",
@@ -12,7 +11,17 @@ export const API = {
     sign_disclaimer:
         import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
     cancel_task: import.meta.env.VITE_APP_API_URL + "/api/cancel-task",
+    check_task_status: import.meta.env.VITE_APP_API_URL + "/api/task-status",
     start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
+    get_finished_images: import.meta.env.VITE_APP_API_URL + "/api/get-images",
+};
+
+export const ApiTaskStatus = {
+    PENDING: "pending",
+    COMPLETE: "complete",
+    FAILED: "failed",
+    CANCELED: "canceled",
+    TIMEOUT: "timeout",
 };
 
 export const ImageOptions = [

@@ -1,7 +1,7 @@
 import express from "express"
 import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
-import taskManager from "../services/task-manager.js";
+import taskManager, {ApiTaskStatus} from "../services/task-manager.js";
 
 const router = express.Router();
 
@@ -23,45 +23,75 @@ router.post("/api/cancel-task", (req, res) => {
     res.json({success: true, message: `Task ${task_id} has been canceled.`});
 });
 
-router.post("/api/task-image-progress", async (req, res) => {
+router.post("/api/task-status", (req, res) => {
     const {task_id} = req.body;
+    const task = taskManager.getTaskStatus(task_id);
 
-    try {
-        const response = await NovitaAiService.checkImageGenerationProgress(task_id);
+    if (task.status === ApiTaskStatus.COMPLETE) {
+        const result = NovitaAiService.getFinishedImages(task_id);
+        taskManager.removeTask(task_id);
+        return res.json({success: true, task, images: result.images});
 
-        if (response?.success && response?.images) {
-            console.log("Images generated successfully:", response.images);
-            res.status(200).json(response);
-        } else if (!response?.success) {
-            res.status(400).json({
-                success: false,
-                message: "Task was canceled or failed.",
-            });
-        } else {
-            res.status(200).json({
-                success: false,
-                message: "Task is still in progress.",
-            });
-        }
-
-    } catch (error) {
-        res.status(500).json({
+    } else if (task.canceled) {
+        return res.status(400).json({
             success: false,
-            message: "Error checking task progress.",
+            message: `Task ${task_id} has been canceled.`
         });
+    } else {
+        return res.json({success: true, task});
     }
-});
+})
+
+// router.post("/api/task-status", (req, res) => {
+//     try {
+//         const {task_id} = req.body;
+//         const task = taskManager.getTaskStatus(task_id);
+//
+//         console.log(task_id, "task");
+//
+//         if (!task) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: `Task ${task_id} not found.`
+//             });
+//         }
+//
+//         // If the task is complete, fetch the images
+//         if (task.status === ApiTaskStatus.COMPLETE) {
+//             const result = NovitaAiService.getFinishedImages(task_id);
+//
+//             taskManager.removeTask(task_id);
+//             return res.json({success: true, task, images: result.images});
+//
+//         } else if (task.canceled) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: `Task ${task_id} has been canceled.`
+//             });
+//         } else {
+//             return res.json({success: true, task});
+//         }
+//     } catch (error) {
+//         console.error("Error in task-status endpoint:", error);  // Log the actual
+// error return res.status(500).json({ success: false, message: "An error occurred while
+// checking task status." }); } });
+
 
 router.post("/api/task-image-v2", async (req, res) => {
     try {
-        console.log(req.body.data)
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
+
+
+        NovitaAiService.startTaskStatusPolling(response.task_id).then((_resp) => {
+            taskManager.activeTasks[_resp.task_id].status = "complete";
+        })
 
         if (response?.task_id) {
             return res.status(200).json(response);
         } else {
             return res.status(500).json(response);
         }
+
 
     } catch (error) {
         console.log("Error: ", error);

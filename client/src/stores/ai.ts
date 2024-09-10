@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import type {ImageTaskStartedResponse, NovitaImg, UserAIPrompt,} from "@/stores/types";
-import {API} from "@/utils/";
+import {API, ApiTaskStatus} from "@/utils/";
 import axios, {type AxiosResponse} from "axios";
 import {useUserStore} from "@/stores/user";
 
@@ -45,37 +45,64 @@ export const useAiStore = defineStore("aiImages", {
                 this.imagesLoaded = false;
 
                 // Start image generation task - get a task_id
-                const taskResponse: AxiosResponse<ImageTaskStartedResponse> =
+                const taskIdResponse: AxiosResponse<ImageTaskStartedResponse> =
                     await axios.post(API.start_image_v2_task, {
                         data: userData,
                     });
 
+
                 // With the task id we call to initiate backend polling for the task.
                 // Once we get the images, we update our state.
-                if (taskResponse.data.task_id) {
-                    this.task_id = taskResponse.data.task_id;
-                    const imageResponse = await axios.post(API.image_v2, {
-                        task_id: taskResponse.data.task_id,
-                    });
+                if (taskIdResponse.data.task_id) {
+                    this.task_id = taskIdResponse.data.task_id;
 
-                    this.generatedImagesV2 = imageResponse.data?.images || [];
+                    const pollTaskStatus = () => {
+                        const pollInterval = setInterval(async () => {
+                            try {
+                                const statusResponse = await axios.post(API.check_task_status, {task_id: taskIdResponse.data.task_id});
 
-                    // Update the token balance once successful
-                    if (imageResponse.data?.new_token_balance) {
-                        userStore.user.token_balance =
-                            imageResponse.data.new_token_balance;
-                    }
+
+                                // If the task is complete, fetch the generated images
+                                if (statusResponse.data.task.status === ApiTaskStatus.COMPLETE) {
+                                    clearInterval(pollInterval);
+
+                                    // Update state with images
+                                    this.generatedImagesV2 = statusResponse.data?.images || [];
+
+                                    // Update the token balance once successful
+                                    if (statusResponse.data?.new_token_balance) {
+                                        userStore.user.token_balance = statusResponse.data.new_token_balance;
+                                    }
+
+                                    // Set flags to update UI
+                                    if (this.generatedImagesV2?.length) {
+                                        this.imagesLoaded = true;
+                                        this.requestLoading = false;
+                                    }
+
+                                } else if (statusResponse.data.task.status === ApiTaskStatus.FAILED) {
+                                    clearInterval(pollInterval);
+                                }
+
+                            } catch (error) {
+                                console.error("Error checking task status:", error);
+                                clearInterval(pollInterval); // Stop polling on error
+                            }
+                        }, 1200);
+                    };
+
+                    // Start polling
+                    pollTaskStatus();
                 }
 
                 if (this.generatedImagesV2?.length) {
                     this.imagesLoaded = true;
+                    this.requestLoading = false;
                 }
             } catch (err) {
                 console.log(err);
                 // TODO to something here
                 this.toastMessage = (err as any).message;
-            } finally {
-                this.requestLoading = false;
             }
         },
     },

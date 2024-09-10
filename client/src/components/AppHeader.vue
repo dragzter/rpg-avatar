@@ -33,17 +33,17 @@
           <div id="nav-column" class="d-flex align-items-center d-none d-md-inline-flex">
             <router-link
                 aria-current="page"
-                class="nav-link fs-6 mx-2"
+                class="nav-link mx-2"
                 to="/"
             >HOME
             </router-link>
             <router-link
-                class="nav-link fs-6 mx-2 btn-outline-special"
+                class="nav-link mx-2 btn-outline-special"
                 to="get-tokens"
             >BUY
             </router-link>
             <router-link
-                class="nav-link fs-6 mx-2 accent-link"
+                class="nav-link mx-2 accent-link"
                 to="community-gallery"
             >GALLERY
             </router-link>

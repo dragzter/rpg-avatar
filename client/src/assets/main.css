@@ -1451,15 +1451,20 @@ body {
     }
 
 
-    .nav-link {
-        padding: 8px 12px;
-        border-radius: 8px;
-        transition: 0.2s;
-    }
+    #nav-column {
+        .nav-link {
+            color: #fff;
+            font-family: "Montserrat", sans-serif;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+            font-size: 14px;
+        }
 
-    .nav-link:not(.accent-link):hover {
-        background: #9a9ac1;
-        color: #000;
+        .nav-link:not(.accent-link):hover {
+            background: #9a9ac1;
+            color: #000;
+        }
     }
 
     @media (max-width: 1366px) {
@@ -1470,7 +1475,7 @@ body {
         #nav-column {
             a {
                 padding: 0 !important;
-                font-size: 14px !important;
+                font-size: 13px !important;
             }
         }
     }
