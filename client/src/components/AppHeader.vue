@@ -16,18 +16,7 @@
               />
               <code>rpgavatar.com</code>
             </router-link>
-            <div
-                class="position-absolute px-1 fw-bolder"
-                style="
-                                left: 4px;
-                                bottom: -24px;
-                                border: 2px solid #f0b93e;
-                                border-radius: 8px;
-                                color: #f0b93e;
-                            "
-            >
-              BETA
-            </div>
+           
           </div>
 
           <div id="nav-column" class="d-flex align-items-center d-none d-md-inline-flex">

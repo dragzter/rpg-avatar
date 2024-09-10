@@ -26,7 +26,7 @@
           </div>
         </div>
         <div class="col-md-6 text-center">
-          <div class="accent-frame" style="transform: rotate(3deg)">
+          <div class="accent-frame hero-image-main" style="transform: rotate(3deg)">
             <div>
               <img
                   alt=""

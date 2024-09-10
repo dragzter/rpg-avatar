@@ -26,6 +26,8 @@
     --dark-700: #171726;
     --dark-800: #101019;
     --dark-900: #08080d;
+    --white-500: #eeeeee;
+    --white-700: #f8f8f8;
     --input-bg: #0000004d;
     --input-border: #3d2d5a;
     --gradient-lavender-pink-peach: linear-gradient(
@@ -52,6 +54,16 @@ section#app-hero {
 
     #intro {
         max-width: 500px;
+
+        @media (max-width: 768px) {
+            margin-bottom: 20px !important;
+        }
+    }
+
+    .hero-image-main {
+        @media (max-width: 768px) {
+            width: calc(100% - 50px) !important;
+        }
     }
 }
 
@@ -1028,7 +1040,6 @@ h2.accordion-header button,
 }
 
 .contact-form .form-group input {
-    color: var(--white-700);
     width: 100%;
     background-color: var(--input-bg);
     border: 1px solid var(--input-border);
@@ -1348,8 +1359,22 @@ footer p {
 body {
     padding-top: 150px;
 
-    overscroll-behavior: none;
+    @media (max-width: 991px) {
+        padding-top: 90px;
+    }
+
+    @media (max-width: 767px) {
+        padding-top: 80px;
+    }
+
+    overscroll-behavior: none !important;
 }
+
+html, body {
+    overflow-x: hidden !important;
+    overscroll-behavior: none !important;
+}
+
 
 .btn-info {
     padding: 12px 24px;
@@ -1474,7 +1499,6 @@ body {
 
         #nav-column {
             a {
-                padding: 0 !important;
                 font-size: 13px !important;
             }
         }
