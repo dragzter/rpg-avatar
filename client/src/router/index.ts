@@ -22,6 +22,13 @@ export function createRouter(app: App): Router {
                 path: "/",
                 name: "home",
                 component: HomeView,
+                meta: {
+                    title: "RPG Art Generator",
+                    description:
+                        "Create unique RPG avatars and high-fantasy artwork with our AI generator. Design custom visuals and bring your imagination to life in your RPG universe.",
+                    ogImage:
+                        "https://rpgartgenerator.com/assets/rogue-24-female.png",
+                },
             },
             {
                 path: "/generate-image",
