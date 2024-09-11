@@ -223,7 +223,9 @@
                                         :enable-tooltip="true"
                                         button-classes="fs-5 bg-transparent border-0"
                                         button-type="btn-dark"
-                                        @click="downloadImage(image)"
+                                        @click="
+                                            downloadImage(image as NovitaImg)
+                                        "
                                     >
                                         <i
                                             class="fa-solid fa-arrow-down-to-bracket"
@@ -285,7 +287,11 @@
                                 <button
                                     class="btn action-btn btn-dark"
                                     @click="
-                                        downloadImage(lightboxImages[indexRef])
+                                        downloadImage(
+                                            lightboxImages[
+                                                indexRef
+                                            ] as NovitaImg
+                                        )
                                     "
                                 >
                                     <i
