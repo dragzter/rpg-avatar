@@ -12,9 +12,11 @@
                     <p>
                         {{ text }}
                     </p>
-                    <router-link :to="routerTo" class="btn btn-secondary">{{
-                        buttonText
-                    }}</router-link>
+                    <router-link
+                        :to="routerTo as string"
+                        class="btn btn-secondary"
+                        >{{ buttonText }}
+                    </router-link>
                 </div>
             </template>
             <template v-else>
@@ -23,9 +25,11 @@
                     <p>
                         {{ text }}
                     </p>
-                    <router-link :to="routerTo" class="btn btn-secondary">{{
-                        buttonText
-                    }}</router-link>
+                    <router-link
+                        :to="routerTo as string"
+                        class="btn btn-secondary"
+                        >{{ buttonText }}
+                    </router-link>
                 </div>
                 <div class="col-md-6 pl-47 mt-30">
                     <img :src="`assets/${image}`" alt="" />
