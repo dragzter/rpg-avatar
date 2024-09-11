@@ -13,6 +13,7 @@ import { createAuthGuard } from "@auth0/auth0-vue";
 import GalleryView from "@/views/GalleryView.vue";
 import LoaderView from "@/views/LoaderView.vue";
 import AdminDashboard from "@/views/AdminDashboard.vue";
+import SupportView from "@/views/SupportView.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -34,6 +35,11 @@ export function createRouter(app: App): Router {
                 path: "/generate-image",
                 name: "generate-image",
                 component: GenerateImageView,
+            },
+            {
+                path: "/support",
+                name: "support",
+                component: SupportView,
             },
             {
                 path: "/get-tokens",
