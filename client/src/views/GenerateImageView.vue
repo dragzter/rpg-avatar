@@ -138,7 +138,7 @@
                             />
                         </CollapseComponent>
 
-                        <div class="mt-0 ms-auto button-action-row">
+                        <div class="mt-auto ms-auto button-action-row">
                             <span v-if="rpgUser.token_balance > 0">
                                 <button
                                     v-if="loading"
@@ -201,7 +201,11 @@
                             <div
                                 :class="[
                                     `image-grid-block gblock-${index + 1}`,
-                                    { 'h-auto': loaded, 'w-auto': loaded },
+                                    {
+                                        'h-auto': loaded,
+                                        'w-auto': loaded,
+                                        'images-loaded': loaded,
+                                    },
                                 ]"
                             >
                                 <img
@@ -219,7 +223,7 @@
                                         :enable-tooltip="true"
                                         button-classes="fs-5 bg-transparent border-0"
                                         button-type="btn-dark"
-                                        @click="downloadImage"
+                                        @click="downloadImage(image)"
                                     >
                                         <i
                                             class="fa-solid fa-arrow-down-to-bracket"
@@ -235,10 +239,10 @@
                                         <i class="fa-solid fa-eye"></i>
                                     </ButtonComponent>
                                 </ActionOverlayComponent>
+                                <LoaderComponent />
                             </div>
                         </template>
                     </div>
-                    <LoaderComponent />
 
                     <vue-easy-lightbox
                         :imgs="lightboxImages"
@@ -280,7 +284,9 @@
                                 </button>
                                 <button
                                     class="btn action-btn btn-dark"
-                                    @click="downloadImage(indexRef)"
+                                    @click="
+                                        downloadImage(lightboxImages[indexRef])
+                                    "
                                 >
                                     <i
                                         class="fa-solid fa-arrow-down-to-bracket"
@@ -319,6 +325,7 @@ import { useUserStore } from "@/stores/user";
 import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
+import axios from "axios";
 
 /**
  * DATA
@@ -360,7 +367,7 @@ const loaded = computed(() => aiStore.imagesLoaded);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
 const rpgUser = computed(() => userStore.user || { token_balance: 0 });
 const lightboxImages = computed(() =>
-    aiStore.generatedImagesV2.map((img) => img.image_url)
+    aiStore.generatedImagesV2.map((img) => ({ image_url: img.image_url }))
 );
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
@@ -420,24 +427,66 @@ const cancelImageRequest = async () => {
     await aiStore.cancelImageGenerationTask();
 };
 
-const downloadImage = async (index: number) => {
+// const downloadImage = async (img: NovitaImg) => {
+//     isError.value = false;
+//     showToast.value = false;
+//     toastMessage.value = "";
+//
+//     await nextTick();
+//     try {
+//         showToast.value = true;
+//         toastMessage.value = "Download in progress, enjoy!";
+//
+//         const link = document.createElement("a");
+//         link.href = img.image_url;
+//         link.download = "generated-image.jpeg";
+//
+//         document.body.appendChild(link);
+//         link.click();
+//         document.body.removeChild(link);
+//     } catch (err) {
+//         console.log(err);
+//         showToast.value = true;
+//         isError.value = true;
+//         toastMessage.value = "Download failed.";
+//     }
+// };
+
+const downloadImage = async (img: NovitaImg) => {
     isError.value = false;
     showToast.value = false;
     toastMessage.value = "";
 
     await nextTick();
+
     try {
         showToast.value = true;
         toastMessage.value = "Download in progress, enjoy!";
 
+        // Fetch the image using Axios and get the image as a blob
+        const response = await axios.get(img.image_url, {
+            responseType: "blob", // This ensures we get the image as a binary blob
+        });
+
+        // Create a URL for the Blob object
+        const blobUrl = URL.createObjectURL(new Blob([response.data]));
+
+        // Create a link element for download
         const link = document.createElement("a");
-        link.href = imgsRef.value[index];
-        link.setAttribute("download", "download"); // Optionally, you can set the filename by replacing 'download' with a filename + extension
+        link.href = blobUrl;
+        link.download = `rpgavatar.com-${rpgUser.value.nickname}-image.jpeg`; // Set the desired file name
+
+        // Trigger the download
         document.body.appendChild(link);
         link.click();
+
+        // Clean up the Blob URL
+        URL.revokeObjectURL(blobUrl);
         document.body.removeChild(link);
+
+        toastMessage.value = "Download completed!";
     } catch (err) {
-        console.log(err);
+        console.error(err);
         showToast.value = true;
         isError.value = true;
         toastMessage.value = "Download failed.";
@@ -452,7 +501,7 @@ const onHide = () => (visibleRef.value = false);
 
 const viewImage = (img: NovitaImg) => {
     indexRef.value = lightboxImages.value.findIndex(
-        (image) => image === img.image_url
+        (image) => image.image_url === img.image_url
     );
 
     onShow();

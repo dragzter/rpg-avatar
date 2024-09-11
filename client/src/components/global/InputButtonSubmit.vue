@@ -1,25 +1,25 @@
 <template>
     <div>
-        <label class="mb-2" :for="inputId">
+        <label :for="inputId" class="mb-2">
             {{ labelText }}
             <span v-if="accentText" class="accent-text">{{ accentText }}</span>
         </label>
 
-        <div style="max-width: 400px" class="input-group mb-3">
+        <div class="input-group mb-3" style="max-width: 400px">
             <input
                 :id="inputId"
-                type="text"
-                class="form-control"
-                :placeholder="placeholderText"
                 :aria-label="placeholderText"
+                :placeholder="placeholderText"
                 :value="inputValue"
+                class="form-control"
+                type="text"
                 @input="handleInput"
             />
             <button
-                @click="handleButtonClick"
+                :disabled="!inputValue || inputValue?.trim()?.length < 2"
                 class="btn btn-primary"
                 type="button"
-                :disabled="!inputValue || inputValue?.trim()?.length < 2"
+                @click="handleButtonClick"
             >
                 {{ buttonText }}
             </button>
@@ -27,7 +27,7 @@
     </div>
 </template>
 <script setup>
-import { defineEmits, defineProps, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps({
     inputId: {

@@ -1,8 +1,12 @@
-import {defineStore} from "pinia";
-import type {ImageTaskStartedResponse, NovitaImg, UserAIPrompt,} from "@/stores/types";
-import {API, ApiTaskStatus} from "@/utils/";
-import axios, {type AxiosResponse} from "axios";
-import {useUserStore} from "@/stores/user";
+import { defineStore } from "pinia";
+import type {
+    ImageTaskStartedResponse,
+    NovitaImg,
+    UserAIPrompt,
+} from "@/stores/types";
+import { API, ApiTaskStatus } from "@/utils/";
+import axios, { type AxiosResponse } from "axios";
+import { useUserStore } from "@/stores/user";
 
 export const useAiStore = defineStore("aiImages", {
     state: () => ({
@@ -50,7 +54,6 @@ export const useAiStore = defineStore("aiImages", {
                         data: userData,
                     });
 
-
                 // With the task id we call to initiate backend polling for the task.
                 // Once we get the images, we update our state.
                 if (taskIdResponse.data.task_id) {
@@ -59,19 +62,28 @@ export const useAiStore = defineStore("aiImages", {
                     const pollTaskStatus = () => {
                         const pollInterval = setInterval(async () => {
                             try {
-                                const statusResponse = await axios.post(API.check_task_status, {task_id: taskIdResponse.data.task_id});
-
+                                const statusResponse = await axios.post(
+                                    API.check_task_status,
+                                    { task_id: taskIdResponse.data.task_id }
+                                );
 
                                 // If the task is complete, fetch the generated images
-                                if (statusResponse.data.task.status === ApiTaskStatus.COMPLETE) {
+                                if (
+                                    statusResponse.data.status ===
+                                    ApiTaskStatus.COMPLETE
+                                ) {
                                     clearInterval(pollInterval);
 
                                     // Update state with images
-                                    this.generatedImagesV2 = statusResponse.data?.images || [];
+                                    this.generatedImagesV2 =
+                                        statusResponse.data?.images || [];
 
                                     // Update the token balance once successful
-                                    if (statusResponse.data?.new_token_balance) {
-                                        userStore.user.token_balance = statusResponse.data.new_token_balance;
+                                    if (
+                                        statusResponse.data?.new_token_balance
+                                    ) {
+                                        userStore.user.token_balance =
+                                            statusResponse.data.new_token_balance;
                                     }
 
                                     // Set flags to update UI
@@ -79,13 +91,17 @@ export const useAiStore = defineStore("aiImages", {
                                         this.imagesLoaded = true;
                                         this.requestLoading = false;
                                     }
-
-                                } else if (statusResponse.data.task.status === ApiTaskStatus.FAILED) {
+                                } else if (
+                                    statusResponse.data.status ===
+                                    ApiTaskStatus.FAILED
+                                ) {
                                     clearInterval(pollInterval);
                                 }
-
                             } catch (error) {
-                                console.error("Error checking task status:", error);
+                                console.error(
+                                    "Error checking task status:",
+                                    error
+                                );
                                 clearInterval(pollInterval); // Stop polling on error
                             }
                         }, 1200);
