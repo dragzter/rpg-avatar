@@ -2,139 +2,162 @@
     <div id="user-profile">
         <div class="container">
             <div class="row">
-                <h2 class="mb-4 title-2">User <span>Profile</span></h2>
+                <div class="col">
+                    <h2 class="mb-4 title-2">User <span>Profile</span></h2>
 
-                <div class="card w-100 mb-3 ps-0">
-                    <div class="card-body p-0 d-flex">
-                        <ul class="nav nav-tabs flex-column settings-nav-menu">
-                            <li class="nav-item">
-                                <a
-                                    class="nav-link active"
-                                    aria-current="page"
-                                    href="#"
-                                    >Profile</a
+                    <div class="card w-100 mb-3 p-0">
+                        <div class="card-body p-0 d-flex">
+                            <div class="p-3 user-details w-100">
+                                <div
+                                    class="gap-4 d-flex align-items-center flex-column flex-sm-row justify-content-between"
                                 >
-                            </li>
-                        </ul>
-                        <div class="p-3 user-details w-100">
-                            <div
-                                class="gap-4 d-flex align-items-center justify-content-between"
-                            >
-                                <div>
-                                    <h5 class="card-title">Settings</h5>
-                                    <p class="card-text">
-                                        Welcome,
-                                        <span class="user-nickname">{{
-                                            rpgUser.nickname
-                                        }}</span>
-                                    </p>
-                                </div>
-                                <router-link
-                                    to="generate-image"
-                                    class="btn p-2 px-3 me-auto btn-primary"
-                                >
-                                    Generate
-                                </router-link>
-                                <div class="d-flex align-items-center">
-                                    <p class="me-3 mb-0">Gen Tokens</p>
-                                    <h5 class="user-tokens-wrapper mb-0">
-                                        <span style="color: goldenrod"
-                                            ><i
-                                                class="fa-sharp fa-light fa-coins"
-                                            ></i
-                                        ></span>
-                                        {{ rpgUser.token_balance }}
-                                    </h5>
-                                </div>
-                            </div>
-
-                            <hr />
-
-                            <div class="position-relative">
-                                <InputButtonSubmit
-                                    v-model="codeToRedeem"
-                                    placeholder-text="Code"
-                                    button-text="Redeem"
-                                    label-text="Redeem a "
-                                    accent-text="TOKEN CODE"
-                                    @button-click="
-                                        redeemCode(
-                                            RedemptionType.tokens,
-                                            codeToRedeem
-                                        )
-                                    "
-                                />
-
-                                <InputButtonSubmit
-                                    v-model="nsfwCode"
-                                    placeholder-text="Code"
-                                    button-text="Redeem"
-                                    label-text="Redeem a "
-                                    accent-text="CONTENT PASS CODE"
-                                    @button-click="
-                                        redeemCode(
-                                            RedemptionType.nsfw,
-                                            nsfwCode
-                                        )
-                                    "
-                                />
-                            </div>
-
-                            <hr />
-
-                            <div class="card">
-                                <div class="card-header bg-info text-dark">
-                                    Content Passes
-                                </div>
-                                <div class="card-body">
-                                    <div
-                                        v-if="!rpgUser.nsfw_pass"
-                                        class="alert alert-warning alert-dismissible fade show"
-                                        role="alert"
-                                    >
-                                        <strong>Content Limited!</strong> You
-                                        currently do not have an NSFW content
-                                        pass.
-                                        <button
-                                            type="button"
-                                            class="btn btn-link p-0 m-0 align-baseline"
-                                        >
-                                            Upgrade
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="btn-close"
-                                            data-bs-dismiss="alert"
-                                            aria-label="Close"
-                                        ></button>
+                                    <div>
+                                        <p class="card-text">
+                                            Welcome,
+                                            <span class="user-nickname">{{
+                                                rpgUser.nickname
+                                            }}</span>
+                                        </p>
                                     </div>
+                                    <div class="d-flex flex-row gap-5">
+                                        <router-link
+                                            class="btn p-2 px-3 m-0 me-md-auto btn-primary"
+                                            to="generate-image"
+                                        >
+                                            Generate
+                                        </router-link>
+                                        <div class="d-flex align-items-center">
+                                            <p
+                                                class="me-3 d-none d-sm-block mb-0"
+                                            >
+                                                Gen Tokens
+                                            </p>
+                                            <router-link
+                                                class="fw-light"
+                                                data-bs-placement="top"
+                                                data-bs-title="Buy More Tokens"
+                                                data-bs-toggle="tooltip"
+                                                to="get-tokens"
+                                                ><h5
+                                                    :class="{
+                                                        'border-danger':
+                                                            rpgUser.token_balance ===
+                                                            0,
+                                                    }"
+                                                    class="user-tokens-wrapper mb-0"
+                                                >
+                                                    <span
+                                                        style="color: goldenrod"
+                                                        ><i
+                                                            class="fa-sharp fa-light fa-coins"
+                                                        ></i
+                                                    ></span>
+                                                    <span
+                                                        :class="{
+                                                            'text-danger':
+                                                                rpgUser.token_balance ===
+                                                                0,
+                                                        }"
+                                                        class="ms-2"
+                                                        >{{
+                                                            rpgUser.token_balance ||
+                                                            0
+                                                        }}</span
+                                                    >
+                                                </h5>
+                                            </router-link>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    <div
-                                        class="d-flex mb-3 align-items-center nsfw-pass-entry"
-                                    >
-                                        <h5 class="mb-0">NSFW:</h5>
+                                <hr />
+
+                                <div class="position-relative">
+                                    <InputButtonSubmit
+                                        v-model="codeToRedeem"
+                                        accent-text="TOKEN CODE"
+                                        button-text="Redeem"
+                                        label-text="Redeem a "
+                                        placeholder-text="Code"
+                                        @button-click="
+                                            redeemCode(
+                                                RedemptionType.tokens,
+                                                codeToRedeem
+                                            )
+                                        "
+                                    />
+
+                                    <InputButtonSubmit
+                                        v-model="nsfwCode"
+                                        accent-text="CONTENT PASS CODE"
+                                        button-text="Redeem"
+                                        label-text="Redeem a "
+                                        placeholder-text="Code"
+                                        @button-click="
+                                            redeemCode(
+                                                RedemptionType.nsfw,
+                                                nsfwCode
+                                            )
+                                        "
+                                    />
+                                </div>
+
+                                <hr />
+
+                                <div class="card">
+                                    <div class="card-header bg-info text-dark">
+                                        Content Passes
+                                    </div>
+                                    <div class="card-body">
                                         <div
                                             v-if="!rpgUser.nsfw_pass"
-                                            class="ms-2 badge fs-6 text-bg-secondary"
+                                            class="alert alert-warning alert-dismissible fade show"
+                                            role="alert"
                                         >
-                                            Unavailable
+                                            <strong>Content Limited!</strong>
+                                            You currently do not have an NSFW
+                                            content pass.
+                                            <button
+                                                class="btn btn-link p-0 m-0 align-baseline"
+                                                type="button"
+                                            >
+                                                Upgrade
+                                            </button>
+                                            <button
+                                                aria-label="Close"
+                                                class="btn-close"
+                                                data-bs-dismiss="alert"
+                                                type="button"
+                                            ></button>
                                         </div>
-                                        <div
-                                            v-else
-                                            class="ms-2 badge fs-6 text-bg-success"
-                                        >
-                                            Purchased
-                                        </div>
-                                    </div>
 
-                                    <div
-                                        class="d-flex mb-3 align-items-center nsfw-pass-entry"
-                                    >
-                                        <h5 class="mb-0">FaceCrunch:</h5>
                                         <div
-                                            class="ms-2 badge fs-6 text-bg-secondary"
+                                            class="d-flex mb-3 align-items-center nsfw-pass-entry"
                                         >
-                                            Unavailable
+                                            <h5 class="mb-0">NSFW:</h5>
+                                            <div
+                                                v-if="!rpgUser.nsfw_pass"
+                                                class="ms-2 badge fs-6 text-bg-secondary"
+                                            >
+                                                Unavailable
+                                            </div>
+                                            <div
+                                                v-else
+                                                class="ms-2 badge fs-6 text-bg-success"
+                                            >
+                                                Purchased
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="d-flex mb-3 align-items-center nsfw-pass-entry"
+                                        >
+                                            <h5 class="mb-0">FaceCrunch:</h5>
+                                            <div
+                                                class="ms-2 badge fs-6 text-bg-secondary"
+                                            >
+                                                Unavailable
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -146,16 +169,16 @@
         </div>
 
         <ToastComponent
-            :show="showToast"
-            :message="toastMessage"
             :autoClose="true"
             :autoCloseDelay="6000"
             :isError="userError"
+            :message="toastMessage"
+            :show="showToast"
         />
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
 import InputButtonSubmit from "@/components/global/InputButtonSubmit.vue";
