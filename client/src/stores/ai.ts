@@ -62,28 +62,25 @@ export const useAiStore = defineStore("aiImages", {
                     const pollTaskStatus = () => {
                         const pollInterval = setInterval(async () => {
                             try {
-                                const statusResponse = await axios.post(
+                                const _resp = await axios.post(
                                     API.check_task_status,
                                     { task_id: taskIdResponse.data.task_id }
                                 );
 
-                                // If the task is complete, fetch the generated images
+                                //If the task is complete, fetch the generated images
                                 if (
-                                    statusResponse.data.status ===
-                                    ApiTaskStatus.COMPLETE
+                                    _resp.data.status === ApiTaskStatus.COMPLETE
                                 ) {
                                     clearInterval(pollInterval);
 
                                     // Update state with images
                                     this.generatedImagesV2 =
-                                        statusResponse.data?.images || [];
+                                        _resp.data?.images || [];
 
                                     // Update the token balance once successful
-                                    if (
-                                        statusResponse.data?.new_token_balance
-                                    ) {
+                                    if (_resp.data?.new_token_balance) {
                                         userStore.user.token_balance =
-                                            statusResponse.data.new_token_balance;
+                                            _resp.data.new_token_balance;
                                     }
 
                                     // Set flags to update UI
@@ -92,8 +89,7 @@ export const useAiStore = defineStore("aiImages", {
                                         this.requestLoading = false;
                                     }
                                 } else if (
-                                    statusResponse.data.status ===
-                                    ApiTaskStatus.FAILED
+                                    _resp.data.status === ApiTaskStatus.FAILED
                                 ) {
                                     clearInterval(pollInterval);
                                 }
