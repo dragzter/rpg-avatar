@@ -1,15 +1,15 @@
 <template>
-    <div class="mb-3 pb-2">
+    <div class="mb-0 pb-2">
         <label :for="id" class="form-label">
             {{ label }}
 
             <ButtonComponent
                 v-if="enableTooltip"
-                button-type="btn-dark"
                 :enable-tooltip="true"
                 :loading="loading"
                 :tooltip-title="tooltipText"
-                button-classes="bg-transparent border-0 ps-1"
+                button-classes="bg-transparent border-0 ps-1 p-0"
+                button-type="btn-dark"
             >
                 <i class="fa-regular fa-circle-info"></i>
             </ButtonComponent>
@@ -17,21 +17,21 @@
         <div class="d-flex align-items-center">
             <input
                 :id="id"
-                type="range"
-                :min="min"
+                :disabled="loading || disabled"
                 :max="max"
+                :min="min"
                 :step="step"
                 :value="modelValue"
                 class="form-range"
+                type="range"
                 @input="onInput"
-                :disabled="loading"
             />
             <div class="range-counter">{{ modelValue }}</div>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { defineEmits, defineProps } from "vue";
 import ButtonComponent from "@/components/global/ButtonComponent.vue";
 
@@ -68,7 +68,14 @@ const props = defineProps({
         type: String,
         default: "",
     },
-    loading: Boolean,
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -83,9 +90,9 @@ const onInput = (event: Event) => {
 /* Add any necessary styles */
 
 .range-counter {
-    padding: 3px 18px;
+    padding: 3px 12px;
     margin-left: 12px;
-    min-width: 90px;
+    min-width: 70px;
     text-align: center;
     border-radius: 8px;
     color: #fff;

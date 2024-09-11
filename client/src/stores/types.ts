@@ -132,14 +132,14 @@ export interface RPGAvatarUser {
 }
 
 export interface LineItem {
-    price: string,
-    quantity: number
+    price: string;
+    quantity: number;
 }
 
 export interface CheckoutSessionData {
-    user_id: string
-    product_id: string
-    line_items: LineItem[]
+    user_id: string;
+    product_id: string;
+    line_items: LineItem[];
 }
 
 export interface RedeemAPIResponse {
@@ -153,4 +153,13 @@ export interface RedeemAPIResponse {
 export const RedemptionType = {
     nsfw: "nsfw",
     tokens: "tokens",
+};
+
+export type ContentItem = {
+    title: string;
+    text: string;
+    routerTo?: string;
+    image?: string;
+    buttonText?: string;
+    imagePosition: string;
 };
