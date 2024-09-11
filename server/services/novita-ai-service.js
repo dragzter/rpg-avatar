@@ -128,8 +128,7 @@ class NovitaAIService {
         }
 
         return {
-            success: true,
-            images: this.FinishedImages[taskId].images,
+            ...this.FinishedImages[taskId],
         }
     }
 
@@ -162,6 +161,7 @@ class NovitaAIService {
                         // Credit the user
                         await this.creditUserForImages(progress.images.length);
 
+                        console.log("Image Finished")
                         resolve(userResponse);
 
                     } else if (TaskFailed) {
@@ -174,7 +174,7 @@ class NovitaAIService {
                         attempt++
 
                         // Retry after 1 second
-                        console.log("Retry: " + attempt + " / " + maxAttempts)
+                        console.log("Retry: " + attempt + " / " + maxAttempts + " | ", this.user?.nickname)
                         setTimeout(() => check(), 1000);
                     } else {
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;

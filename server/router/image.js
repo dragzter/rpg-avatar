@@ -29,8 +29,9 @@ router.post("/api/task-status", (req, res) => {
 
     if (task.status === ApiTaskStatus.COMPLETE) {
         const result = NovitaAiService.getFinishedImages(task_id);
+        console.log(result)
         taskManager.removeTask(task_id);
-        return res.json({success: true, task, images: result.images});
+        return res.json({...result});
 
     } else if (task.canceled) {
         return res.status(400).json({
@@ -38,44 +39,9 @@ router.post("/api/task-status", (req, res) => {
             message: `Task ${task_id} has been canceled.`
         });
     } else {
-        return res.json({success: true, task});
+        return res.json({success: true, status: task.status, task_id: task.task_id});
     }
 })
-
-// router.post("/api/task-status", (req, res) => {
-//     try {
-//         const {task_id} = req.body;
-//         const task = taskManager.getTaskStatus(task_id);
-//
-//         console.log(task_id, "task");
-//
-//         if (!task) {
-//             return res.status(404).json({
-//                 success: false,
-//                 message: `Task ${task_id} not found.`
-//             });
-//         }
-//
-//         // If the task is complete, fetch the images
-//         if (task.status === ApiTaskStatus.COMPLETE) {
-//             const result = NovitaAiService.getFinishedImages(task_id);
-//
-//             taskManager.removeTask(task_id);
-//             return res.json({success: true, task, images: result.images});
-//
-//         } else if (task.canceled) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: `Task ${task_id} has been canceled.`
-//             });
-//         } else {
-//             return res.json({success: true, task});
-//         }
-//     } catch (error) {
-//         console.error("Error in task-status endpoint:", error);  // Log the actual
-// error return res.status(500).json({ success: false, message: "An error occurred while
-// checking task status." }); } });
-
 
 router.post("/api/task-image-v2", async (req, res) => {
     try {
