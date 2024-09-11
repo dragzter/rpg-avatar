@@ -27,9 +27,8 @@ router.post("/api/task-status", (req, res) => {
     const {task_id} = req.body;
     const task = taskManager.getTaskStatus(task_id);
 
-    if (task.status === ApiTaskStatus.COMPLETE) {
+    if (task?.status === ApiTaskStatus.COMPLETE) {
         const result = NovitaAiService.getFinishedImages(task_id);
-        console.log(result)
         taskManager.removeTask(task_id);
         return res.json({...result});
 
@@ -46,7 +45,6 @@ router.post("/api/task-status", (req, res) => {
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
-
 
         NovitaAiService.startTaskStatusPolling(response.task_id).then((_resp) => {
             taskManager.activeTasks[_resp.task_id].status = "complete";

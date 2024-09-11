@@ -5,13 +5,11 @@ import "../config.js"
 
 
 class NovitaAIService {
+    // store state specific to the user/request
+    state = new Map()
     client
     user
-    FinishedImages = {}
-    userPrompt = {
-        date: ""
-    }
-    promptProperties = [
+    PROMPT_PROPS = [
         "prompt",
         "archetype",
         "user_id",
@@ -37,27 +35,25 @@ class NovitaAIService {
     }
 
     async startImageGeneration(userData) {
-        this.user = await UserService.getUserById(userData.user_id);
-
-        // Add date to determine when the prompt ran
-        this.userPrompt.date = new Date().toLocaleString()
-
-        for (let i = 0; i < this.promptProperties.length; i++) {
-            if (userData[this.promptProperties[i]]) {
-                this.userPrompt[this.promptProperties[i]] =
-                    userData[this.promptProperties[i]]
-            }
-        }
-
-
-        if (this.user.token_balance < userData.count) {
-            this.userPrompt = {}
-
+        const user = await UserService.getUserById(userData.user_id);
+        if (user?.token_balance < userData.count) {
             return {
                 message: "Not enough tokens for this request",
                 success: false
             }
         }
+
+        // Add date to determine when the prompt ran
+        //this.userPrompt.date = new Date().toLocaleString()
+        const userPrompt = {created: new Date().toLocaleString()}
+
+        for (let i = 0; i < this.PROMPT_PROPS.length; i++) {
+            if (userData[this.PROMPT_PROPS[i]]) {
+                userPrompt[this.PROMPT_PROPS[i]] =
+                    userData[this.PROMPT_PROPS[i]]
+            }
+        }
+
 
         const configured_prompt = userData?.prompt || "a white rabbit";
         const r_width = userData?.size?.width || 1024;
@@ -92,6 +88,13 @@ class NovitaAIService {
 
             if (response?.task_id) {
                 taskManager.addTask(response.task_id);
+
+                // Set the Instance State
+                this.state.set(response.task_id, {
+                    user,
+                    prompt: userPrompt,
+                });
+
                 return {
                     task_id: response.task_id,
                     success: true,
@@ -99,8 +102,7 @@ class NovitaAIService {
                 };
             }
         } catch (error) {
-            this.userPrompt = {}
-
+            // In case of error, wipe the state, new request will be needed.
             console.log("Error initiating image generation:", error);
             return {
                 success: false,
@@ -110,25 +112,21 @@ class NovitaAIService {
         }
     }
 
-    async creditUserForImages(credits) {
-        this.user.token_balance -= credits;
-        await UserService.saveUser(this.user);
+    async creditUserForImages(credits, task_id) {
+        const state = this.state.get(task_id)
+        state.user.token_balance -= credits;
+        await UserService.saveUser(state.user);
     }
 
     async savePrompt() {
-        await UserService.savePrompt(this.userPrompt);
+        // TODO if we save this, will need to use the instance state
+        //await UserService.savePrompt(this.userPrompt);
     }
 
-    getFinishedImages(taskId) {
-        if (!this.FinishedImages[taskId]) {
-            return {
-                success: false,
-                message: "No images found for this task."
-            }
-        }
-
+    getFinishedImages(task_id) {
+        const state = this.state.get(task_id)
         return {
-            ...this.FinishedImages[taskId],
+            ...state,
         }
     }
 
@@ -145,25 +143,19 @@ class NovitaAIService {
                     const MaxAttemptsNotReached = attempt < maxAttempts;
 
                     if (TaskSucceeded) {
-                        const userResponse = {
-                            images: progress.images,
-                            success: true,
-                            message: "Images successfully created.",
-                            token_cost: progress.images.length,
-                            new_token_balance: this.user.token_balance,
-                            status: ApiTaskStatus.COMPLETE,
-                            task_id,
-                        }
+                        await this.creditUserForImages(progress.images.length, task_id);
+                        const state = this.state.get(task_id)
+                        const user = state.user;
 
-                        // Store finished images
-                        this.FinishedImages[task_id] = userResponse;
+                        state["images"] = progress.images;
+                        state["success"] = true;
+                        state["message"] = "Images successfully created.";
+                        state["token_cost"] = progress.images.length;
+                        state["new_token_balance"] = user.token_balance;
+                        state["status"] = ApiTaskStatus.COMPLETE;
+                        state["task_id"] = task_id;
 
-                        // Credit the user
-                        await this.creditUserForImages(progress.images.length);
-
-                        console.log("Image Finished")
-                        resolve(userResponse);
-
+                        resolve(state);
                     } else if (TaskFailed) {
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
                         reject({
@@ -172,9 +164,10 @@ class NovitaAIService {
                         });
                     } else if (MaxAttemptsNotReached) {
                         attempt++
+                        const state = this.state.get(task_id)
 
                         // Retry after 1 second
-                        console.log("Retry: " + attempt + " / " + maxAttempts + " | ", this.user?.nickname)
+                        console.log("Retry: " + attempt + " / " + maxAttempts + " | ", state.user?.nickname)
                         setTimeout(() => check(), 1000);
                     } else {
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;
