@@ -94,7 +94,7 @@
                                 label="Image size (px)"
                             />
                             <div
-                                class="d-flex align-items-center justify-content-between gap-3"
+                                class="d-flex align-items-center justify-content-between flex-sm-row gap-3 flex-column"
                             >
                                 <RangeComponent
                                     id="image-count-range"
@@ -138,7 +138,7 @@
                             />
                         </CollapseComponent>
 
-                        <div class="mt-0 ms-auto">
+                        <div class="mt-0 ms-auto button-action-row">
                             <span v-if="rpgUser.token_balance > 0">
                                 <button
                                     v-if="loading"
@@ -147,19 +147,19 @@
                                 >
                                     Cancel
                                 </button>
-                                <button
-                                    :disabled="loading"
-                                    class="btn accent-link-outline"
-                                    @click="handleSubmit"
-                                >
-                                    <div class="d-flex align-items-center">
-                                        <LoadSpinner
-                                            v-if="loading"
-                                            class="me-2"
-                                        />
-                                        Surprise Me
-                                    </div>
-                                </button>
+                                <!--                                <button-->
+                                <!--                                    :disabled="loading"-->
+                                <!--                                    class="btn accent-link-outline"-->
+                                <!--                                    @click="handleSubmit"-->
+                                <!--                                >-->
+                                <!--                                    <div class="d-flex align-items-center">-->
+                                <!--                                        <LoadSpinner-->
+                                <!--                                            v-if="loading"-->
+                                <!--                                            class="me-2"-->
+                                <!--                                        />-->
+                                <!--                                        Surprise Me-->
+                                <!--                                    </div>-->
+                                <!--                                </button>-->
                                 <button
                                     :disabled="
                                         loading || rpgUser?.token_balance === 0

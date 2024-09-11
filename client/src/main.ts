@@ -20,6 +20,8 @@ app.use(
     createAuth0({
         domain: "dev-g8dl84yolh7g3giy.us.auth0.com",
         clientId: import.meta.env.VITE_APP_AUTH0_CLIENT_ID,
+        cacheLocation: "localstorage",
+        useRefreshTokens: true,
         authorizationParams: {
             redirect_uri: window.location.origin,
         },
