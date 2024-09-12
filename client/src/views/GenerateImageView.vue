@@ -223,9 +223,7 @@
                                         :enable-tooltip="true"
                                         button-classes="fs-5 bg-transparent border-0"
                                         button-type="btn-dark"
-                                        @click="
-                                            downloadImage(image as NovitaImg)
-                                        "
+                                        @click="downloadImage(image.image_url)"
                                     >
                                         <i
                                             class="fa-solid fa-arrow-down-to-bracket"
@@ -236,7 +234,7 @@
                                         button-classes="fs-5 bg-transparent border-0"
                                         button-type="btn-dark"
                                         tooltip-title="View"
-                                        @click="viewImage(image as NovitaImg)"
+                                        @click="viewImage(image.image_url)"
                                     >
                                         <i class="fa-solid fa-eye"></i>
                                     </ButtonComponent>
@@ -373,7 +371,7 @@ const loaded = computed(() => aiStore.imagesLoaded);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
 const rpgUser = computed(() => userStore.user || { token_balance: 0 });
 const lightboxImages = computed(() =>
-    aiStore.generatedImagesV2.map((img) => ({ image_url: img.image_url }))
+    aiStore.generatedImagesV2.map((img) => img.image_url)
 );
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
@@ -433,44 +431,21 @@ const cancelImageRequest = async () => {
     await aiStore.cancelImageGenerationTask();
 };
 
-// const downloadImage = async (img: NovitaImg) => {
-//     isError.value = false;
-//     showToast.value = false;
-//     toastMessage.value = "";
-//
-//     await nextTick();
-//     try {
-//         showToast.value = true;
-//         toastMessage.value = "Download in progress, enjoy!";
-//
-//         const link = document.createElement("a");
-//         link.href = img.image_url;
-//         link.download = "generated-image.jpeg";
-//
-//         document.body.appendChild(link);
-//         link.click();
-//         document.body.removeChild(link);
-//     } catch (err) {
-//         console.log(err);
-//         showToast.value = true;
-//         isError.value = true;
-//         toastMessage.value = "Download failed.";
-//     }
-// };
-
-const downloadImage = async (img: NovitaImg) => {
+const downloadImage = async (url) => {
     isError.value = false;
     showToast.value = false;
     toastMessage.value = "";
 
     await nextTick();
 
+    console.log(url);
+
     try {
         showToast.value = true;
         toastMessage.value = "Download in progress, enjoy!";
 
         // Fetch the image using Axios and get the image as a blob
-        const response = await axios.get(img.image_url, {
+        const response = await axios.get(url, {
             responseType: "blob", // This ensures we get the image as a binary blob
         });
 
@@ -505,11 +480,8 @@ const onShow = () => {
 
 const onHide = () => (visibleRef.value = false);
 
-const viewImage = (img: NovitaImg) => {
-    indexRef.value = lightboxImages.value.findIndex(
-        (image) => image.image_url === img.image_url
-    );
-
+const viewImage = (img: string) => {
+    indexRef.value = lightboxImages.value.findIndex((image) => image === img);
     onShow();
 };
 </script>
