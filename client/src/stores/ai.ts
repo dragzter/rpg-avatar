@@ -67,8 +67,14 @@ export const useAiStore = defineStore("aiImages", {
                                     { task_id: taskIdResponse.data.task_id }
                                 );
 
-                                //If the task is complete, fetch the generated images
                                 if (
+                                    _resp.data.status === ApiTaskStatus.CANCELED
+                                ) {
+                                    clearInterval(pollInterval);
+                                    this.requestLoading = false;
+                                    this.imagesLoaded = false;
+                                    this.toastMessage = "Task was cancelled";
+                                } else if (
                                     _resp.data.status === ApiTaskStatus.COMPLETE
                                 ) {
                                     clearInterval(pollInterval);
@@ -92,6 +98,7 @@ export const useAiStore = defineStore("aiImages", {
                                     _resp.data.status === ApiTaskStatus.FAILED
                                 ) {
                                     clearInterval(pollInterval);
+                                    this.requestLoading = false;
                                 }
                             } catch (error) {
                                 console.error(
@@ -99,6 +106,7 @@ export const useAiStore = defineStore("aiImages", {
                                     error
                                 );
                                 clearInterval(pollInterval); // Stop polling on error
+                                this.requestLoading = false;
                             }
                         }, 1200);
                     };
