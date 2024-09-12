@@ -2,7 +2,7 @@ import express from "express"
 import cors from "cors"
 import router from "./router/index.js";
 import db from "./db/index.js"
-import stripeWebhookRouter from "./services/stripe-webhooks.js";
+import stripeWebhookRouter from "./utils/stripe-webhooks.js";
 
 const app = express()
 const port = process.env.PORT || 3000;

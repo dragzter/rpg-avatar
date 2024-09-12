@@ -1,7 +1,7 @@
 import express from "express"
 import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
-import taskManager, {ApiTaskStatus} from "../services/task-manager.js";
+import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
 
 const router = express.Router();
 
@@ -48,6 +48,9 @@ router.post("/api/task-image-v2", async (req, res) => {
 
         NovitaAiService.startTaskStatusPolling(response.task_id).then((_resp) => {
             taskManager.activeTasks[_resp.task_id].status = "complete";
+        }).catch((err) => {
+            console.log(err, "Task Status Polling Error")
+            taskManager.activeTasks[response.task_id].status = "failed";
         })
 
         if (response?.task_id) {

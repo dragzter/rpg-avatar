@@ -1,6 +1,6 @@
 import stripe from "stripe"
 import "../config.js"
-import checkoutSessionManager from "./checkout-session-manager.js";
+import checkoutSessionManager from "../utils/checkout-session-manager.js";
 import CodeRedemptionService from "./code-redemption-service.js";
 
 

@@ -1,5 +1,5 @@
 import {NovitaSDK, TaskStatus} from "novita-sdk";
-import taskManager, {ApiTaskStatus} from "./task-manager.js";
+import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
 import UserService from "./user-service.js";
 import "../config.js"
 
@@ -28,6 +28,8 @@ class NovitaAIService {
     portrait_specialized_Model_2 = "demonCORESFWNSFW_v22_135842.safetensors"
     character_specialized_Model_1 = "gleipnir_v20BF16_174601.safetensors"
     pixelArt_specialized_Model_1 = "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
+
+    promptA = "analog film photo Deep photo,gorgeous woman, very large breasts ,close up, depth of field,ferrania p30 film,shadows,messy hair,perfect face and body,dark,nighttime,dark photo,grainy,dimly lit,seductive smirk,harsh camera flash,. faded film, desaturated, 35mm photo, grainy, vignette, vintage, Kodachrome, Lomography, stained, highly detailed, found footage"
 
 
     constructor() {
@@ -137,14 +139,19 @@ class NovitaAIService {
             const check = async () => {
                 try {
                     const progress = await this.client.progressV3({task_id});
+                    const state = this.state.get(task_id)
 
                     const TaskSucceeded = progress.task.status === TaskStatus.SUCCEED;
                     const TaskFailed = progress.task.status === TaskStatus.FAILED;
                     const MaxAttemptsNotReached = attempt < maxAttempts;
 
+                    if (taskManager.isTaskCanceled(task_id)) {
+                        state.status = ApiTaskStatus.CANCELED;
+                    }
+
                     if (TaskSucceeded) {
                         await this.creditUserForImages(progress.images.length, task_id);
-                        const state = this.state.get(task_id)
+                        console.log("Task completed successfully.");
                         const user = state.user;
 
                         state["images"] = progress.images;
@@ -164,11 +171,20 @@ class NovitaAIService {
                         });
                     } else if (MaxAttemptsNotReached) {
                         attempt++
-                        const state = this.state.get(task_id)
 
                         // Retry after 1 second
                         console.log("Retry: " + attempt + " / " + maxAttempts + " | ", state.user?.nickname)
-                        setTimeout(() => check(), 1000);
+
+                        if (state.status !== ApiTaskStatus.CANCELED) {
+                            setTimeout(() => check(), 1000);
+                        } else {
+                            resolve({
+                                message: "Task canceled by user.",
+                                success: false,
+                                status: "canceled",
+                                task_id
+                            });
+                        }
                     } else {
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;
                         reject({
@@ -177,7 +193,6 @@ class NovitaAIService {
                         });
                     }
                 } catch (error) {
-                    console.log("BOOOM", error)
                     taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
                     reject({
                         message: "Error checking progress: " + error,

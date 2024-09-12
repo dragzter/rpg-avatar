@@ -1,5 +1,5 @@
 import express from "express";
-import StripeService from "./stripe-service.js";
+import StripeService from "../services/stripe-service.js";
 
 const stripeWebhookRouter = express.Router();
 
