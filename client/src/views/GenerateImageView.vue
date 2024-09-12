@@ -285,11 +285,7 @@
                                 <button
                                     class="btn action-btn btn-dark"
                                     @click="
-                                        downloadImage(
-                                            lightboxImages[
-                                                indexRef
-                                            ] as NovitaImg
-                                        )
+                                        downloadImage(lightboxImages[indexRef])
                                     "
                                 >
                                     <i
@@ -316,7 +312,7 @@ import SelectComponent from "@/components/global/SelectComponent.vue";
 import { archetypeOptions, styleOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import type { NovitaImg, UserAIPrompt } from "@/stores/types";
+import type { UserAIPrompt } from "@/stores/types";
 import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import CollapseComponent from "@/components/global/CollapseComponent.vue";
