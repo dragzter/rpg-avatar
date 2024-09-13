@@ -9,11 +9,13 @@ import GenerateImageView from "@/views/GenerateImageView.vue";
 import ProductView from "@/views/ProductView.vue";
 import ReturnPolicyView from "@/views/ReturnPolicyView.vue";
 import ProfileView from "@/views/ProfileView.vue";
-import { createAuthGuard } from "@auth0/auth0-vue";
+import { createAuthGuard, useAuth0, User } from "@auth0/auth0-vue";
 import GalleryView from "@/views/GalleryView.vue";
 import LoaderView from "@/views/LoaderView.vue";
 import AdminDashboard from "@/views/AdminDashboard.vue";
 import SupportView from "@/views/SupportView.vue";
+import { useUserStore } from "@/stores/user";
+import PageNotFound from "@/views/PageNotFound.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -47,10 +49,11 @@ export function createRouter(app: App): Router {
                 component: ProductView,
             },
             {
-                path: "/admin-dashboard",
+                path: "/dashboard",
                 name: "admin-dashboard",
                 component: AdminDashboard,
                 beforeEnter: createAuthGuard(app),
+                meta: { requiresAdmin: true, needAuth: true },
             },
             {
                 path: "/loaders",
@@ -73,7 +76,41 @@ export function createRouter(app: App): Router {
                 component: ProfileView,
                 beforeEnter: createAuthGuard(app),
             },
+            {
+                // Catch-all route for handling 404 pages
+                path: "/:pathMatch(.*)*",
+                name: "PageNotFound",
+                component: PageNotFound,
+            },
         ],
+    });
+
+    router.beforeEach(async (to, from, next) => {
+        const userStore = useUserStore();
+        const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
+        console.log(userStore.isAdmin, " is admin");
+
+        if (!isAuthenticated.value && to.meta.needAuth) {
+            try {
+                await getAccessTokenSilently(); // Attempt silent login
+            } catch (error) {
+                console.error(
+                    "User not authenticated or token fetch failed",
+                    error
+                );
+                return next({ name: "home" });
+            }
+
+            // If the user is authenticated, fetch the user data
+            await userStore.getUser(user.value as User);
+        }
+
+        if (to.meta.requiresAdmin && !userStore.isAdmin) {
+            console.log("not admin");
+            return next({ name: "home" });
+        }
+
+        next();
     });
 
     return router;

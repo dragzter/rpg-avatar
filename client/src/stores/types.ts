@@ -124,6 +124,7 @@ export interface RPGAvatarUser {
     disclaimer_signed_on_date: string;
 
     email_verified?: boolean;
+    passes?: string[];
     picture?: string;
     nickname?: string;
     custom_attributes?: Record<string, unknown>;
@@ -146,8 +147,11 @@ export interface RedeemAPIResponse {
     message: string;
     success: boolean;
     error?: string;
+    amount_redeemed?: number;
+    pass_redeemed?: string;
     token_balance?: number;
     nsfw_pass?: boolean;
+    passes?: string[];
 }
 
 export const RedemptionType = {
@@ -163,3 +167,17 @@ export type ContentItem = {
     buttonText?: string;
     imagePosition: string;
 };
+
+export interface CodesAddRequest {
+    code_list: string[];
+    admin_id: string;
+    type: string;
+    code_value: number;
+    pass_id: string;
+}
+
+export interface CodeRedeemRequest {
+    code: string;
+    user_id: string;
+    type: "pass" | "token";
+}

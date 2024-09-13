@@ -1,8 +1,12 @@
-import {defineStore} from "pinia";
-import type {RedeemAPIResponse, RPGAvatarUser} from "@/stores/types";
-import {User} from "@auth0/auth0-vue";
-import axios, {type AxiosResponse} from "axios";
-import {API} from "@/utils/";
+import { defineStore } from "pinia";
+import type {
+    CodeRedeemRequest,
+    RedeemAPIResponse,
+    RPGAvatarUser,
+} from "@/stores/types";
+import { User } from "@auth0/auth0-vue";
+import axios, { type AxiosResponse } from "axios";
+import { API } from "@/utils/";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -14,23 +18,25 @@ export const useUserStore = defineStore("user", {
         userError: false,
     }),
     actions: {
-        async redeemCode(userId: string, code: string, codeType: string) {
+        async redeemCodeV2(
+            redemptionData: CodeRedeemRequest = {
+                code: "",
+                user_id: "",
+                type: "token",
+            }
+        ) {
             // redeem code
             try {
                 this.userLoading = true;
                 const response: AxiosResponse<RedeemAPIResponse> =
-                    await axios.patch(API.redeem_code, {
-                        code,
-                        userId,
-                        codeType,
-                    });
+                    await axios.post(API.redeem_code_v2, redemptionData);
 
                 if (response.data?.token_balance) {
                     this.user.token_balance = response.data.token_balance;
                 }
 
-                if (response.data?.nsfw_pass) {
-                    this.user.nsfw_pass = response.data.nsfw_pass;
+                if (response.data?.passes) {
+                    this.user.passes = response.data.passes;
                 }
 
                 this.toastMessage = response.data?.message || "";
@@ -38,8 +44,6 @@ export const useUserStore = defineStore("user", {
             } catch (error) {
                 this.userError = true;
                 this.toastMessage = (error as any).response.data.message;
-            } finally {
-                this.userLoading = false;
             }
         },
 
@@ -68,6 +72,7 @@ export const useUserStore = defineStore("user", {
             try {
                 this.userLoaded = false;
                 this.userLoading = true;
+
                 const response = await axios.post(
                     API.get_user + `/${user.sub}`,
                     user
@@ -81,6 +86,12 @@ export const useUserStore = defineStore("user", {
             } finally {
                 this.userLoaded = false;
             }
+        },
+    },
+    getters: {
+        isAdmin: (state) => {
+            console.log(state.user.admin);
+            return state.user?.admin;
         },
     },
 });

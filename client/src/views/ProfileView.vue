@@ -74,29 +74,29 @@
 
                                 <div class="position-relative">
                                     <InputButtonSubmit
-                                        v-model="codeToRedeem"
+                                        v-model="tokenCodeToRedeem"
                                         accent-text="TOKEN CODE"
                                         button-text="Redeem"
                                         label-text="Redeem a "
                                         placeholder-text="Code"
                                         @button-click="
-                                            redeemCode(
-                                                RedemptionType.tokens,
-                                                codeToRedeem
+                                            redeemCodeV2(
+                                                'token',
+                                                tokenCodeToRedeem
                                             )
                                         "
                                     />
 
                                     <InputButtonSubmit
-                                        v-model="nsfwCode"
+                                        v-model="passCodeToRedeem"
                                         accent-text="CONTENT PASS CODE"
                                         button-text="Redeem"
                                         label-text="Redeem a "
                                         placeholder-text="Code"
                                         @button-click="
-                                            redeemCode(
-                                                RedemptionType.nsfw,
-                                                nsfwCode
+                                            redeemCodeV2(
+                                                'pass',
+                                                passCodeToRedeem
                                             )
                                         "
                                     />
@@ -183,14 +183,13 @@ import { useUserStore } from "@/stores/user";
 import { computed, ref, watch } from "vue";
 import InputButtonSubmit from "@/components/global/InputButtonSubmit.vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
-import { RedemptionType } from "@/stores/types";
 
 /**
  * DATA
  */
 const userStore = useUserStore();
-const codeToRedeem = ref("");
-const nsfwCode = ref("");
+const tokenCodeToRedeem = ref("");
+const passCodeToRedeem = ref("");
 const showToast = ref(false);
 
 /**
@@ -208,9 +207,9 @@ watch(
     () => [userError.value, loading.value],
     (newValues) => {
         if (!newValues[0] && !newValues[1]) {
-            codeToRedeem.value = "";
-            nsfwCode.value = "";
+            passCodeToRedeem.value = "";
             showToast.value = false;
+            tokenCodeToRedeem.value = "";
         }
     }
 );
@@ -218,9 +217,16 @@ watch(
 /**
  * HANDLERS
  */
-const redeemCode = async (codeType, code: string) => {
+
+const redeemCodeV2 = async (codeType: "token" | "pass", code: string) => {
     showToast.value = false;
-    await userStore.redeemCode(rpgUser.value.id, code, codeType);
+    await userStore.redeemCodeV2({
+        user_id: rpgUser.value.id,
+        code,
+        type: codeType,
+    });
     showToast.value = true;
+    passCodeToRedeem.value = "";
+    tokenCodeToRedeem.value = "";
 };
 </script>

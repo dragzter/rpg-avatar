@@ -1956,7 +1956,7 @@ html, body {
 }
 
 
-select, textarea, .collapse .card {
+select, textarea, input[type=text], input[type=number], .collapse .card {
     border: 2px solid #313151 !important;
     background: #1a1a29 !important;
 }

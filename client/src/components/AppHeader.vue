@@ -7,7 +7,6 @@
               class="brand-container d-flex align-items-center position-relative"
           >
             <router-link to="/">
-
               <img
                   id="main-logo"
                   alt="RPG Avatar"
@@ -16,10 +15,12 @@
               />
               <code>rpgavatar.com</code>
             </router-link>
-           
           </div>
 
-          <div id="nav-column" class="d-flex align-items-center d-none d-md-inline-flex">
+          <div
+              id="nav-column"
+              class="d-flex align-items-center d-none d-md-inline-flex"
+          >
             <router-link
                 aria-current="page"
                 class="nav-link mx-2"
@@ -40,12 +41,18 @@
 
           <div id="auth-column">
             <div v-if="isAuthenticated" class="mx-2 welcome-user">
-              <span class="me-2 border border-2 p-1 px-2" style="border-radius:5px;"><i
-                  class="fa-light fa-coin-vertical"
-                  style="color: goldenrod"></i> {{
-                  rpgUser.token_balance
+                            <span
+                                class="me-2 border border-2 p-1 px-2"
+                                style="border-radius: 5px"
+                            ><i
+                                class="fa-light fa-coin-vertical"
+                                style="color: goldenrod"
+                            ></i>
+                                {{ rpgUser.token_balance }}</span
+                            >
+              <span class="user-nickname text-white">{{
+                  user?.nickname
                 }}</span>
-              <span class="user-nickname text-white">{{ user?.nickname }}</span>
             </div>
             <button
                 v-if="!isAuthenticated"
@@ -77,6 +84,7 @@
                   >Profile
                   </router-link>
                 </li>
+
                 <li>
                   <router-link
                       class="dropdown-item"
@@ -94,6 +102,14 @@
                 </li>
                 <li>
                   <hr/>
+                  <li>
+                    <router-link
+                        v-if="rpgUser?.admin"
+                        class="dropdown-item text-bg-warning"
+                        to="dashboard"
+                    >Admin Dashboard
+                    </router-link>
+                  </li>
                   <button
                       class="dropdown-item"
                       @click="logOut"
@@ -137,7 +153,10 @@ const userStore = useUserStore();
 const rpgUser = computed(() => userStore.user);
 
 const login = () => {
-  loginWithRedirect({redirect_uri: window.location.href} as Record<string, string>);
+  loginWithRedirect({redirect_uri: window.location.href} as Record<
+      string,
+      string
+  >);
 };
 
 watch(

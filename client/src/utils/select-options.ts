@@ -85,6 +85,17 @@ export const archetypeOptions = [
     },
 ];
 
+export const codeTypeOptions = [
+    {
+        label: "Token",
+        value: "token",
+    },
+    {
+        label: "Content Pass",
+        value: "pass",
+    },
+];
+
 export const styleOptions = [
     {
         label: "Grunge",

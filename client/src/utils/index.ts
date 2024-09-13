@@ -8,12 +8,14 @@ export const API = {
         import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
     get_user: import.meta.env.VITE_APP_API_URL + "/api/user",
     redeem_code: import.meta.env.VITE_APP_API_URL + "/api/redeem",
+    redeem_code_v2: import.meta.env.VITE_APP_API_URL + "/api/redeem-v2",
     sign_disclaimer:
         import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
     cancel_task: import.meta.env.VITE_APP_API_URL + "/api/cancel-task",
     check_task_status: import.meta.env.VITE_APP_API_URL + "/api/task-status",
     start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     get_finished_images: import.meta.env.VITE_APP_API_URL + "/api/get-images",
+    admin_add_codes: import.meta.env.VITE_APP_API_URL + "/api/codes",
 };
 
 export const ApiTaskStatus = {
