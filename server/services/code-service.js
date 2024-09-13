@@ -104,8 +104,11 @@ class CodeService {
      */
     async redeemCode({code, user_id, type}) {
         try {
+            console.log({code, user_id, type}, "redeemCode");
             const user = await UserModel.findOne({id: user_id}).exec();
+
             if (!user) {
+                console.log("User not found");
                 return {
                     success: false,
                     message: "User not found."
@@ -117,6 +120,7 @@ class CodeService {
                     const code_doc = await TokenCodeModel.findOne({code}).exec();
 
                     if (!code_doc) {
+                        console.log("Token code not found");
                         return {
                             success: false,
                             message: "Token Code not found."
@@ -125,6 +129,7 @@ class CodeService {
 
 
                     if (code_doc?.redeemed) {
+                        console.log("Token code already redeemed");
                         const redemption_date = code_doc?.redeemed_at || "((an unknown date))";
 
                         return {
@@ -143,6 +148,7 @@ class CodeService {
                     // Save the user and the code
                     await Promise.all([user.save(), code_doc.save()]);
 
+                    console.log(`Redeemed ${code} for ${code_doc.token_value} tokens`);
                     return {
                         success: true,
                         token_balance: user.token_balance,
@@ -155,6 +161,7 @@ class CodeService {
                     const code_doc = await PassCodeModel.findOne({code}).exec();
 
                     if (!code_doc) {
+                        console.log("Pass code not found");
                         return {
                             success: false,
                             message: "Pass Code not found."
@@ -162,6 +169,7 @@ class CodeService {
                     }
 
                     if (code_doc?.redeemed) {
+                        console.log("Pass code already redeemed");
                         const redemption_date = code_doc?.redeemed_at || "((an unknown date))";
 
                         return {
@@ -199,6 +207,7 @@ class CodeService {
             if (type && code_redemption_operation[type]) {
                 return await code_redemption_operation[type]();
             } else {
+                console.log("Invalid code type.");
                 return {
                     success: false,
                     message: "Invalid code type."
@@ -206,6 +215,7 @@ class CodeService {
             }
 
         } catch (error) {
+            console.log("Server Error", error);
             return {
                 success: false,
                 message: "Error redeeming code.  This is likely an issue with the database."
