@@ -122,7 +122,7 @@ const addCodesFormValues = ref({
     type: "",
     codes: "",
     pass_id: "",
-    code_value_each: 0,
+    code_value_each: "",
 });
 
 const onAddCodesFormSubmit = async (e: Event) => {
@@ -131,9 +131,7 @@ const onAddCodesFormSubmit = async (e: Event) => {
 
     await adminStore.addCodes({
         code_list: codes,
-        code_value: parseInt(
-            addCodesFormValues.value.code_value_each.toString()
-        ),
+        code_value: parseInt(addCodesFormValues.value.code_value_each),
         type: addCodesFormValues.value.type,
         pass_id: addCodesFormValues.value.pass_id,
         admin_id: userId.value,
@@ -144,7 +142,7 @@ const onAddCodesFormSubmit = async (e: Event) => {
         type: "",
         codes: "",
         pass_id: "",
-        code_value_each: 0,
+        code_value_each: "",
     };
 };
 </script>
