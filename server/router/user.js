@@ -1,7 +1,6 @@
 import express from "express"
 import UserService from "../services/user-service.js";
 import {v4 as uuidv4} from "uuid"
-import CodeRedemptionService from "../services/code-redemption-service.js";
 
 const router = express.Router();
 
@@ -41,6 +40,7 @@ router.post("/api/user/:userId", async (req, res) => {
             const newUser = {
                 token_balance: 1,
                 nsfw_pass: false,
+                passes: [],
                 prompts: [],
                 disabled: false,
                 custom_attributes: {},
@@ -93,54 +93,5 @@ router.patch("/api/user/sign-disclaimer", async (req, res) => {
         return res.status(400).json("There was an error completing your request.")
     }
 })
-
-router.patch("/api/redeem", async (req, res) => {
-    const {code, userId, codeType} = req.body; // Assuming type is sent in the request
-
-    const TOKEN_AWARD = 100;
-
-    try {
-        const actions = {
-            tokens: async (id) => await CodeRedemptionService.assignTokensToUser(id, TOKEN_AWARD),
-            nsfw: async (id) => await CodeRedemptionService.grantNSFWAccess(id)
-        }
-
-        if (!code || code.trim() === "") { // Ensure code is not just empty spaces
-            return res.status(400).json({
-                message: "No code provided.",
-                success: false
-            });
-        }
-
-        if (!codeType || (codeType !== "tokens" && codeType !== "nsfw")) {
-            return res.status(400).json({
-                message: "Invalid or missing code type.",
-                success: false
-            });
-        }
-
-        // Check if the code is valid for the specified type and remove it if it is
-        const isValid = CodeRedemptionService.isValidCode(code, codeType);
-
-        if (!isValid) {
-            return res.status(400).json({
-                message: `The provided code '${code}' is invalid or already used.`,
-                success: false
-            });
-        }
-
-
-        const response = await actions[codeType](userId)
-
-        return res.status(200).json(response);
-    } catch (error) {
-        return res.status(500).json({
-            message: "Error redeeming code.",
-            error: error.message,
-            success: false
-        });
-    }
-});
-
 
 export {router}

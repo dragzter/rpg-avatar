@@ -151,14 +151,12 @@ class NovitaAIService {
 
                     if (TaskSucceeded) {
                         await this.creditUserForImages(progress.images.length, task_id);
-                        console.log("Task completed successfully.");
-                        const user = state.user;
 
                         state["images"] = progress.images;
                         state["success"] = true;
                         state["message"] = "Images successfully created.";
                         state["token_cost"] = progress.images.length;
-                        state["new_token_balance"] = user.token_balance;
+                        state["new_token_balance"] = state.user.token_balance;
                         state["status"] = ApiTaskStatus.COMPLETE;
                         state["task_id"] = task_id;
 
@@ -173,7 +171,10 @@ class NovitaAIService {
                         attempt++
 
                         // Retry after 1 second
-                        console.log("Retry: " + attempt + " / " + maxAttempts + " | ", state.user?.nickname)
+                        console.log(
+                            `Retry: ${attempt}/${maxAttempts} - (${state.user.nickname}) - Tokens: ${state.user.token_balance} - ${new Date().toLocaleString('en-US', {hour12: true})}`
+                        );
+
 
                         if (state.status !== ApiTaskStatus.CANCELED) {
                             setTimeout(() => check(), 1000);

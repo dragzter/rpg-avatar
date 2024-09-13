@@ -2,6 +2,23 @@ import mongoose from "mongoose";
 
 const {Schema} = mongoose;
 
+export const TokenCodeSchema = new Schema({
+    code: {type: String, required: true},
+    user_id: {type: String, required: false},
+    redeemed_at: {type: String, required: false},
+    redeemed: {type: Boolean, required: false},
+    token_value: {type: Number, required: false},
+}, {collection: "token_codes"});
+
+export const PassCodeSchema = new Schema({
+    code: {type: String, required: true},
+    user_id: {type: String, required: false},
+    redeemed_at: {type: String, required: false},
+    redeemed: {type: Boolean, required: true},
+    pass_id: {type: String, required: false},
+}, {collection: "pass_codes"});
+
+
 // This is based on a typescript type in types.ts in the client folder.
 export const PromptSchema = new Schema({
     prompt: {type: String, required: true},
@@ -18,6 +35,12 @@ export const PromptSchema = new Schema({
     adherence: {type: Number, required: false},
 }, {collection: "prompts"});
 
+export const PassSchema = new Schema({
+    id: {type: String, required: true},
+    name: {type: String, required: false},
+    description: {type: String, required: false},
+    price: {type: Number, required: false},
+})
 
 export const UserSchema = new Schema({
     name: {
@@ -39,6 +62,11 @@ export const UserSchema = new Schema({
     nsfw_pass: {
         type: Boolean,
         default: false,
+    },
+    passes: {
+        type: [PassSchema],
+        required: false,
+        default: []
     },
     email_verified: {
         type: Boolean,
@@ -73,4 +101,6 @@ export const UserSchema = new Schema({
         required: false,
     }
 }, {collection: "users"});
+
+
 

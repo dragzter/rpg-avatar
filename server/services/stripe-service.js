@@ -1,7 +1,7 @@
 import stripe from "stripe"
 import "../config.js"
 import checkoutSessionManager from "../utils/checkout-session-manager.js";
-import CodeRedemptionService from "./code-redemption-service.js";
+import CodeService from "./code-service.js";
 
 
 class StripeService {
@@ -94,11 +94,13 @@ class StripeService {
 
                         const product_types = {
                             currency: async () => {
-                                return await CodeRedemptionService.assignPurchasedTokensToUser(user_id, parseInt(product.metadata.token_award));
+                                const _cs = new CodeService()
+                                return await _cs.assignPurchasedTokensToUser(user_id, parseInt(product.metadata.token_award));
                             },
                             passes: async () => {
+                                const _cs = new CodeService()
                                 const passes_list = {
-                                    NSFW: async () => await CodeRedemptionService.grantNSFWAccess(user_id),
+                                    NSFW: async () => await _cs.grantNSFWAccess(user_id),
                                     FaceCrunch: () => ({}) // Todo: Implement FaceCrunch
                                 };
                                 return await passes_list[product.metadata.pass_id]();
