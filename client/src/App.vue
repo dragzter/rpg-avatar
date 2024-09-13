@@ -2,19 +2,25 @@
 import "./assets/main.css";
 import { RouterView } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
-import { onMounted } from "vue";
 import AppFooter from "@/components/AppFooter.vue";
+import { nextTick, onMounted } from "vue";
 import { Tooltip } from "bootstrap";
 
-onMounted(() => {
+onMounted(async () => {
+    await nextTick();
     const header = document.querySelector("#app-header-main") as HTMLElement;
 
     document.addEventListener("scroll", (e) => {
         const top = document.body.getClientRects()[0].top;
+
+        if (top === 0) {
+            header.classList.remove("is_scrolling");
+        } else {
+            header.classList.add("is_scrolling");
+        }
+
         header.style.background =
-            top !== 0
-                ? "linear-gradient(rgba(0, 0, 0, 0.9) 70%, rgba(17, 9, 25, 1) 100%) rgba(0, 0, 0, 0)"
-                : "rgba(0,0,0,0)";
+            top !== 0 ? "rgba(0,0,0,0.91)" : "rgba(0,0,0,0)";
     });
 
     new Tooltip(document.body, {
@@ -25,7 +31,9 @@ onMounted(() => {
 
 <template>
     <AppHeader />
-    <RouterView />
+    <main>
+        <RouterView />
+    </main>
     <AppFooter />
 </template>
 

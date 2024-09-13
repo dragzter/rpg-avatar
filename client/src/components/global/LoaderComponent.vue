@@ -5,14 +5,14 @@
             <div class="d-flex align-items-center" style="height: 120px">
                 <div :class="`rpg-loader-${loaderNumber} mx-auto`"></div>
             </div>
-            <button @click="randomizeLoader" class="btn btn-primary mt-4">
-                Click Me
+            <button class="btn btn-tertiary mt-4" @click="randomizeLoader">
+                Loader
             </button>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import { useAiStore } from "@/stores/ai";
 import { computed, ref } from "vue";
 

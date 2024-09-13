@@ -220,9 +220,9 @@
                                     :loading="loading"
                                 >
                                     <ButtonComponent
+                                        :button-type="'btn-dark'"
                                         :enable-tooltip="true"
-                                        button-classes="fs-5 bg-transparent border-0"
-                                        button-type="btn-dark"
+                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
                                         @click="downloadImage(image.image_url)"
                                     >
                                         <i
@@ -230,13 +230,24 @@
                                         ></i>
                                     </ButtonComponent>
                                     <ButtonComponent
+                                        :button-type="'btn-dark'"
                                         :enable-tooltip="true"
-                                        button-classes="fs-5 bg-transparent border-0"
-                                        button-type="btn-dark"
+                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
                                         tooltip-title="View"
                                         @click="viewImage(image.image_url)"
                                     >
                                         <i class="fa-solid fa-eye"></i>
+                                    </ButtonComponent>
+                                    <ButtonComponent
+                                        :button-type="'btn-dark'"
+                                        :enable-tooltip="true"
+                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
+                                        data-bs-target="#url-modal"
+                                        data-bs-toggle="modal"
+                                        tooltip-title="Copy URL"
+                                        @click="sharedImgUrl = image.image_url"
+                                    >
+                                        <i class="fa-regular fa-copy"></i>
                                     </ButtonComponent>
                                 </ActionOverlayComponent>
                                 <LoaderComponent />
@@ -302,6 +313,26 @@
                         :message="toastMessage"
                         :show="showToast"
                     />
+                    <modal-component
+                        id="url-modal"
+                        :success="copySuccess"
+                        wrapper-classes="copy-img-url-modal"
+                    >
+                        <div
+                            class="d-flex align-items-center justify-content-between flex-column flex-md-row"
+                        >
+                            <input-component
+                                id="share-img-input"
+                                v-model="sharedImgUrl"
+                            />
+                            <button
+                                class="btn btn-secondary copy-img-url-btn"
+                                @click="copyImgURL"
+                            >
+                                Copy
+                            </button>
+                        </div>
+                    </modal-component>
                 </div>
             </div>
         </div>
@@ -326,6 +357,7 @@ import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import axios from "axios";
+import ModalComponent from "@/components/global/ModalComponent.vue";
 
 /**
  * DATA
@@ -353,11 +385,13 @@ const { isAuthenticated, loginWithPopup } = useAuth0();
 const showToast = ref(false);
 const toastMessage = ref("");
 const isError = ref(false);
+const copySuccess = ref(false);
 
 // Ez-lightbox
 const visibleRef = ref(false);
 const indexRef = ref(0); // default 0 - only when using multiple images
 const imgsRef = ref([]);
+const sharedImgUrl = ref("");
 
 /**
  * COMPUTED
@@ -434,8 +468,6 @@ const downloadImage = async (url) => {
 
     await nextTick();
 
-    console.log(url);
-
     try {
         showToast.value = true;
         toastMessage.value = "Download in progress, enjoy!";
@@ -479,5 +511,17 @@ const onHide = () => (visibleRef.value = false);
 const viewImage = (img: string) => {
     indexRef.value = lightboxImages.value.findIndex((image) => image === img);
     onShow();
+};
+
+const copyImgURL = () => {
+    navigator.clipboard
+        .writeText(sharedImgUrl.value)
+        .then(() => {
+            console.log("Image URL copied to clipboard");
+            copySuccess.value = true;
+        })
+        .catch((err) => {
+            console.error("Failed to copy image URL to clipboard", err);
+        });
 };
 </script>

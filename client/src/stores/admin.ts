@@ -7,7 +7,7 @@ export const useAdminStore = defineStore("admin", {
     state: () => ({
         loading: false,
         toastMessage: "",
-        existing_codes: [],
+        existing_codes: {} as Record<string, any>,
         task_id: "",
     }),
     actions: {
@@ -37,11 +37,11 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         // TODO
-        async getAllCodes() {
+        async getAllTokenCodes() {
             try {
                 this.loading = true;
 
-                const response = await axios.get(API.admin_add_codes);
+                const response = await axios.get(API.admin_get_token_codes);
 
                 this.existing_codes = response.data;
             } catch (err) {
@@ -66,6 +66,14 @@ export const useAdminStore = defineStore("admin", {
             } finally {
                 this.loading = false;
             }
+        },
+    },
+    getters: {
+        availableCodes(state) {
+            return state.existing_codes?.codes?.codes?.unredeemed || [];
+        },
+        redeemedCodes(state) {
+            return state.existing_codes?.codes?.codes?.redeemed || [];
         },
     },
 });

@@ -1,9 +1,9 @@
 <template>
     <button
         :class="buttonClass"
-        @click="handleClick"
         :disabled="loading"
         v-bind="tooltipAttributes"
+        @click="handleClick"
     >
         <slot></slot>
     </button>
@@ -29,17 +29,6 @@ const props = defineProps({
     buttonType: {
         type: String,
         default: "btn-primary", // Default button type class
-        validator: (value) =>
-            [
-                "btn-primary",
-                "btn-secondary",
-                "btn-success",
-                "btn-danger",
-                "btn-warning",
-                "btn-info",
-                "btn-light",
-                "btn-dark",
-            ].includes(value),
     },
     buttonClasses: {
         type: String,
@@ -56,7 +45,7 @@ const handleClick = () => {
 
 // Compute the button class dynamically, incorporating additional classes
 const buttonClass = computed(() => {
-    return `btn ${props.buttonType} ${props.buttonClasses}`;
+    return `${props.buttonType} ${props.buttonClasses}`;
 });
 
 // Compute the tooltip attributes based on enableTooltip prop

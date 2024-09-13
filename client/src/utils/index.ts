@@ -16,6 +16,8 @@ export const API = {
     start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     get_finished_images: import.meta.env.VITE_APP_API_URL + "/api/get-images",
     admin_add_codes: import.meta.env.VITE_APP_API_URL + "/api/codes",
+    admin_get_token_codes:
+        import.meta.env.VITE_APP_API_URL + "/api/codes/token",
 };
 
 export const ApiTaskStatus = {

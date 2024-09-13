@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="col">
+            <div class="col-12">
                 <h1 class="title-2">Admin Dashboard</h1>
                 <div class="card">
                     <div class="card-header">
@@ -95,35 +95,142 @@
                 </div>
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title d-flex justify-content-between">
+                            Token Codes
+                            <span
+                                class="badge ms-2 rounded-pill text-bg-light"
+                                >{{ adminStore.availableCodes.length }}</span
+                            >
+                        </h5>
+                        <p class="text-muted mb-0">Unredeemed</p>
+                    </div>
+                    <div
+                        class="card-body overflow-auto"
+                        style="max-height: 380px; min-height: 380px"
+                    >
+                        <ul class="list-group list-group-flush">
+                            <template v-for="code in adminStore.availableCodes">
+                                <ButtonComponent
+                                    :enable-tooltip="true"
+                                    button-classes="coupon-list-item mb-1 px-2 border-1 rounded-5"
+                                    buttonType="list-group-item list-group-item-action "
+                                    tooltip-title="Click to copy code"
+                                    @click="copyCode(code.code)"
+                                >
+                                    <div
+                                        class="d-flex justify-content-between align-items-center"
+                                    >
+                                        <div>
+                                            <small
+                                                class="border rounded-5 border-1 px-2 py-1"
+                                                >Code:</small
+                                            >
+                                            <span
+                                                class="fs-6 ms-3 fw-bold py-1 px-3"
+                                                >{{ code.code }}</span
+                                            >
+                                        </div>
+                                        <div class="me-2">
+                                            <i class="fa-regular fa-copy"></i>
+                                        </div>
+                                    </div>
+                                </ButtonComponent>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title d-flex justify-content-between">
+                            Inactive Codes
+                            <span
+                                class="badge ms-2 rounded-pill text-bg-light"
+                                >{{ adminStore.redeemedCodes.length }}</span
+                            >
+                        </h5>
+                        <p class="text-muted mb-0">Redeemed</p>
+                    </div>
+                    <div
+                        class="card-body overflow-auto"
+                        style="max-height: 380px; min-height: 380px"
+                    >
+                        <ul class="list-group list-group-flush">
+                            <template v-for="code in adminStore.redeemedCodes">
+                                <ButtonComponent
+                                    :enable-tooltip="true"
+                                    button-classes="coupon-list-item text-bg-secondary rounded-5 mb-1 px-2 border-1"
+                                    buttonType="list-group-item list-group-item-action"
+                                    tooltip-title="Click to copy inactive code"
+                                    @click="copyCode(code.code)"
+                                >
+                                    <div
+                                        class="d-flex justify-content-between align-items-center"
+                                    >
+                                        <div>
+                                            <small
+                                                class="border rounded-5 border-1 px-2 py-1"
+                                                >Code:</small
+                                            >
+                                            <span
+                                                class="fs-6 ms-3 text-muted py-1 px-3"
+                                                >{{ code.code }}
+                                                <small class="text-warning"
+                                                    >(redeemed)</small
+                                                ></span
+                                            >
+                                        </div>
+                                        <div class="me-2">
+                                            <i class="fa-regular fa-copy"></i>
+                                        </div>
+                                    </div>
+                                </ButtonComponent>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
 import InputComponent from "@/components/global/InputComponent.vue";
 import SelectComponent from "@/components/global/SelectComponent.vue";
 import { codeTypeOptions } from "@/utils/select-options";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import { useAdminStore } from "@/stores/admin";
 import { useUserStore } from "@/stores/user";
+import ButtonComponent from "@/components/global/ButtonComponent.vue";
 
+// DATA
 const adminStore = useAdminStore();
 const userStore = useUserStore();
-
-const userId = computed(() => userStore.user.id);
-const loading = computed(() => adminStore.loading);
-
 const giftFormValues = ref({
     recipient_email: "",
     value: "",
     type: "",
 });
-
 const addCodesFormValues = ref({
     type: "",
     codes: "",
     pass_id: "",
     code_value_each: "",
 });
+
+// COMPUTED
+const userId = computed(() => userStore.user.id);
+const loading = computed(() => adminStore.loading);
+
+// HANDLERS
+const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+};
 
 const onAddCodesFormSubmit = async (e: Event) => {
     e.preventDefault();
@@ -145,4 +252,9 @@ const onAddCodesFormSubmit = async (e: Event) => {
         code_value_each: "",
     };
 };
+
+// LIFECYCLE HOOKS
+onMounted(async () => {
+    await adminStore.getAllTokenCodes();
+});
 </script>

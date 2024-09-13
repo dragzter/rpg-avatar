@@ -176,6 +176,8 @@ export interface CodesAddRequest {
     pass_id: string;
 }
 
+export interface TokenCodesResponse {}
+
 export interface CodeRedeemRequest {
     code: string;
     user_id: string;

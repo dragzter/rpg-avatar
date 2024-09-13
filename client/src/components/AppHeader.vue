@@ -23,19 +23,25 @@
           >
             <router-link
                 aria-current="page"
-                class="nav-link mx-2"
+                class="nav-link mx-1"
                 to="/"
             >HOME
             </router-link>
             <router-link
-                class="nav-link mx-2 btn-outline-special"
+                class="nav-link mx-1 btn-outline-special"
                 to="get-tokens"
             >BUY
             </router-link>
+
             <router-link
-                class="nav-link mx-2 accent-link"
+                class="nav-link mx-1 accent-link"
                 to="community-gallery"
             >GALLERY
+            </router-link>
+            <router-link
+                class="btn btn-secondary  mx-2"
+                to="generate-image"
+            >GENERATE
             </router-link>
           </div>
 
@@ -152,6 +158,7 @@ const userStore = useUserStore();
 
 const rpgUser = computed(() => userStore.user);
 
+
 const login = () => {
   loginWithRedirect({redirect_uri: window.location.href} as Record<
       string,
@@ -172,4 +179,6 @@ watch(
 
 const logOut = () =>
     logout({logoutParams: {returnTo: window.location.href}});
+
+
 </script>

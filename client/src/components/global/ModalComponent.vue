@@ -1,44 +1,58 @@
 <template>
     <!-- Modal -->
     <div
-        class="modal fade modal-lg view-image-modal"
         :id="id"
-        tabindex="-1"
-        aria-labelledby="exampleModalLabel"
+        :class="`modal fade modal-md view-image-modal ${wrapperClasses}`"
         aria-hidden="true"
+        aria-labelledby="exampleModalLabel"
+        tabindex="-1"
     >
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body">
-                    <img
-                        v-if="imgSrc"
-                        class="img-fluid"
-                        :src="imgSrc"
-                        alt="Viewing selected image"
-                    />
-                </div>
-                <div
-                    class="modal-footer d-flex align-items-center justify-content-center"
-                >
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal"
+                    <slot></slot>
+                    <div
+                        v-if="showSuccess"
+                        class="alert text-center alert-success mt-2 p-1 px-2 mb-0"
+                        role="alert"
                     >
-                        Close
-                    </button>
-                    <button type="button" class="btn btn-primary">
-                        Save changes
-                    </button>
+                        Copied!
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import { ref, watch } from "vue";
+
 const props = defineProps({
     id: String,
     imgSrc: String,
+    wrapperClasses: {
+        type: String,
+        default: "",
+    },
+    successMessage: {
+        type: String,
+        default: "", // Default success message
+    },
+    success: {
+        type: Boolean,
+        default: false,
+    },
 });
+
+const showSuccess = ref(props.success);
+
+watch(
+    () => props.success,
+    (value) => {
+        showSuccess.value = value;
+        setTimeout(() => {
+            showSuccess.value = false;
+        }, 2000);
+    }
+);
 </script>
