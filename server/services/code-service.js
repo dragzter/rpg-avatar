@@ -223,60 +223,28 @@ class CodeService {
         }
     }
 
-    async getCodes(type) {
+    async getTokenCodes() {
         try {
-            const code_retrieval_operation = {
-                token: async () => {
-                    try {
-                        // Find all token codes regardless of user
-                        const codes = await TokenCodeModel
-                            .find()
-                            .exec();
+            // Find all token codes regardless of user
+            const codes = await TokenCodeModel
+                .find()
+                .exec();
 
-                        console.log(codes);
-                        return {
-                            success: true,
-                            codes
-                        };
-                    } catch (error) {
-                        console.log(error);
-                        return {
-                            success: false,
-                            message: "Error retrieving token codes."
-                        };
-                    }
-                },
-                pass: async () => {
-                    try {
-                        // Find all pass codes regardless of user
-                        const codes = await PassCodeModel
-                            .find() // Retrieve only redeemed codes, if necessary
-                            .exec();
-
-                        console.log(codes);
-                        return {
-                            success: true,
-                            codes
-                        };
-                    } catch (error) {
-                        console.log(error);
-                        return {
-                            success: false,
-                            message: "Error retrieving pass codes."
-                        };
-                    }
+            console.log(codes, "codes");
+            const sorted_codes = codes.reduce((acc, code) => {
+                if (code.redeemed) {
+                    acc.redeemed.push(code);
+                } else {
+                    acc.unredeemed.push(code);
                 }
-            };
+                return acc;
+            }, {redeemed: [], unredeemed: []});
 
-            // Execute the operation based on type (either 'token' or 'pass')
-            if (code_retrieval_operation[type]) {
-                return await code_retrieval_operation[type]();
-            } else {
-                return {
-                    success: false,
-                    message: "Invalid code type provided."
-                };
-            }
+            return {
+                success: true,
+                message: "Token Codes successfully retrieved.",
+                codes: sorted_codes
+            };
 
         } catch (error) {
             console.error(error);

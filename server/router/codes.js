@@ -31,12 +31,12 @@ router.post("/api/redeem-v2", async (req, res) => {
     }
 })
 
-router.get("/api/codes/:type", async (req, res) => {
+router.get("/api/codes/token", async (req, res) => {
     try {
         const {type} = req.params;
         const _cs = new CodeService()
 
-        const codes = await _cs.getCodes(type);
+        const codes = await _cs.getTokenCodes();
         res.status(200).json({
             success: true,
             message: "Codes successfully retrieved.",
