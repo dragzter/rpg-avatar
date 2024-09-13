@@ -160,9 +160,12 @@ class NovitaAIService {
                         state["status"] = ApiTaskStatus.COMPLETE;
                         state["task_id"] = task_id;
 
+                        console.log("Successfully created: ", state.user.nickname)
+
                         resolve(state);
                     } else if (TaskFailed) {
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
+                        console.log("Task Failed: ", progress.task.reason)
                         reject({
                             message: "Task failed: " + progress.task.reason,
                             success: false
@@ -187,6 +190,7 @@ class NovitaAIService {
                             });
                         }
                     } else {
+                        console.log("Task timed out", state.user.nickname, progress.task?.reason)
                         taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;
                         reject({
                             message: "Task did not complete within the timeout period.",
