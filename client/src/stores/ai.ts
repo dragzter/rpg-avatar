@@ -84,7 +84,10 @@ export const useAiStore = defineStore("aiImages", {
                                         _resp.data?.images || [];
 
                                     // Update the token balance once successful
-                                    if (_resp.data?.new_token_balance) {
+                                    if (
+                                        _resp.data?.new_token_balance !==
+                                        undefined
+                                    ) {
                                         userStore.user.token_balance =
                                             _resp.data.new_token_balance;
                                     }
