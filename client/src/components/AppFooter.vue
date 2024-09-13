@@ -11,11 +11,11 @@
                             class="d-none d-sm-block accent-text ms-0 mb-0"
                             style="width: 100px"
                         >
-                            v0.4.0
+                            v0.41.1
                         </p>
                         <router-link class="ms-3" to="loaders"
-                            >Loaders</router-link
-                        >
+                            >Loaders
+                        </router-link>
                     </div>
                     <div class="w-100 text-end">&copy; 2024 WebTrek LLC</div>
                 </div>
