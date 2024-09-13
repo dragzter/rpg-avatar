@@ -18,11 +18,15 @@ router.post("/api/codes", async (req, res) => {
 router.post("/api/redeem-v2", async (req, res) => {
     try {
         const _cs = new CodeService()
+        console.log(req.body, "req.body redeem")
 
         const response = await _cs.redeemCode(req.body);
 
+        console.log(response, "response")
+
         res.status(200).json(response);
     } catch (error) {
+        console.log(error, "error 500")
         res.status(500).json(error);
     }
 })
