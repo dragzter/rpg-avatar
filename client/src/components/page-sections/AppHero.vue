@@ -13,16 +13,20 @@
                             bring your fantasy character to life in vivid
                             detail.
                         </p>
-                        <router-link
-                            class="btn btn-lg me-3 fw-normal btn-primary"
-                            to="generate-image"
-                            >GET STARTED
-                        </router-link>
-                        <router-link
-                            class="btn btn-lg fw-normal btn-info btn-special"
-                            to="generate-image"
-                            >LEARN MORE
-                        </router-link>
+                        <div
+                            class="d-flex justify-content-between justify-content-md-start"
+                        >
+                            <router-link
+                                class="btn btn-lg me-3 fw-normal btn-primary"
+                                to="generate-image"
+                                >GET STARTED
+                            </router-link>
+                            <router-link
+                                class="btn btn-lg fw-normal btn-info btn-special"
+                                to="generate-image"
+                                >LEARN MORE
+                            </router-link>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-6 text-center">

@@ -9,6 +9,15 @@
                     <h3 class="mt-4">
                         {{ title }}
                     </h3>
+                    <div class="text-center my-3 position-relative">
+                        <div class="faint-logo-line"></div>
+                        <img
+                            class="shadowed-logo"
+                            style="width: 40px; margin: auto"
+                            alt="logo"
+                            src="/assets/rpgavatarlogo.png"
+                        />
+                    </div>
                     <p>
                         {{ text }}
                     </p>
@@ -22,6 +31,15 @@
             <template v-else>
                 <div class="col-md-6 pr-47">
                     <h3>{{ title }}</h3>
+                    <div class="text-center my-3 position-relative">
+                        <div class="faint-logo-line"></div>
+                        <img
+                            class="shadowed-logo"
+                            style="width: 40px; margin: auto"
+                            alt="logo"
+                            src="/assets/rpgavatarlogo.png"
+                        />
+                    </div>
                     <p>
                         {{ text }}
                     </p>

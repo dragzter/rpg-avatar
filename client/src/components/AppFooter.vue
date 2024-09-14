@@ -17,7 +17,9 @@
                             >Loaders
                         </router-link>
                     </div>
-                    <div class="w-100 text-end">&copy; 2024 WebTrek LLC</div>
+                    <div class="w-100 text-end copy-right">
+                        &copy; 2024 WebTrek LLC
+                    </div>
                 </div>
             </div>
         </div>

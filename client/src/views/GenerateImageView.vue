@@ -204,7 +204,7 @@
                                     {
                                         'h-auto': loaded,
                                         'w-auto': loaded,
-                                        'images-loaded': loaded,
+                                        'images-loaded': loaded || !loading,
                                     },
                                 ]"
                                 @click="viewImage(image.image_url)"
@@ -475,6 +475,8 @@ const onShow = () => {
 const onHide = () => (visibleRef.value = false);
 
 const viewImage = (img: string) => {
+    if (loading.value) return;
+
     indexRef.value = lightboxImages.value.findIndex((image) => image === img);
     onShow();
 };
