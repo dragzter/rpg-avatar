@@ -105,8 +105,8 @@
                                     "
                                     :loading="loading"
                                     :max="
-                                        rpgUser.token_balance >= 4
-                                            ? 4
+                                        rpgUser.token_balance >= 8
+                                            ? 8
                                             : rpgUser.token_balance
                                     "
                                     :min="1"
@@ -207,6 +207,7 @@
                                         'images-loaded': loaded,
                                     },
                                 ]"
+                                @click="viewImage(image.image_url)"
                             >
                                 <img
                                     v-if="image?.image_url"
@@ -214,42 +215,6 @@
                                     alt="A generated Image"
                                     class="img-fluid"
                                 />
-                                <ActionOverlayComponent
-                                    v-if="loaded"
-                                    :class="`action-overlay-${index + 1}`"
-                                    :loading="loading"
-                                >
-                                    <ButtonComponent
-                                        :button-type="'btn-dark'"
-                                        :enable-tooltip="true"
-                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
-                                        @click="downloadImage(image.image_url)"
-                                    >
-                                        <i
-                                            class="fa-solid fa-arrow-down-to-bracket"
-                                        ></i>
-                                    </ButtonComponent>
-                                    <ButtonComponent
-                                        :button-type="'btn-dark'"
-                                        :enable-tooltip="true"
-                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
-                                        tooltip-title="View"
-                                        @click="viewImage(image.image_url)"
-                                    >
-                                        <i class="fa-solid fa-eye"></i>
-                                    </ButtonComponent>
-                                    <ButtonComponent
-                                        :button-type="'btn-dark'"
-                                        :enable-tooltip="true"
-                                        button-classes="overlay-button btn fs-5 bg-transparent border-0"
-                                        data-bs-target="#url-modal"
-                                        data-bs-toggle="modal"
-                                        tooltip-title="Copy URL"
-                                        @click="sharedImgUrl = image.image_url"
-                                    >
-                                        <i class="fa-regular fa-copy"></i>
-                                    </ButtonComponent>
-                                </ActionOverlayComponent>
                                 <LoaderComponent />
                             </div>
                         </template>
@@ -262,7 +227,24 @@
                         @hide="onHide"
                     >
                         <template v-slot:toolbar="{ toolbarMethods }">
-                            <div class="vel-toolbar view-image-actions">
+                            <div
+                                class="vel-toolbar view-image-actions overflow-visible"
+                            >
+                                <div
+                                    style="
+                                        position: absolute;
+                                        top: -47px;
+                                        left: 50%;
+                                        width: 200px;
+                                        transform: translate(-50%);
+                                    "
+                                    v-if="copySuccess"
+                                    class="alert text-center alert-success mt-2 p-1 px-2 mb-0"
+                                    role="alert"
+                                >
+                                    URL Copied!
+                                </div>
+
                                 <button
                                     class="btn action-btn btn-dark"
                                     @click="toolbarMethods.zoomIn"
@@ -303,6 +285,14 @@
                                         class="fa-solid fa-arrow-down-to-bracket"
                                     ></i>
                                 </button>
+                                <button
+                                    class="btn action-btn btn-dark"
+                                    @click="
+                                        copyImgURL(lightboxImages[indexRef])
+                                    "
+                                >
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
                             </div>
                         </template>
                     </vue-easy-lightbox>
@@ -313,26 +303,6 @@
                         :message="toastMessage"
                         :show="showToast"
                     />
-                    <modal-component
-                        id="url-modal"
-                        :success="copySuccess"
-                        wrapper-classes="copy-img-url-modal"
-                    >
-                        <div
-                            class="d-flex align-items-center justify-content-between flex-column flex-md-row"
-                        >
-                            <input-component
-                                id="share-img-input"
-                                v-model="sharedImgUrl"
-                            />
-                            <button
-                                class="btn btn-secondary copy-img-url-btn"
-                                @click="copyImgURL"
-                            >
-                                Copy
-                            </button>
-                        </div>
-                    </modal-component>
                 </div>
             </div>
         </div>
@@ -348,8 +318,6 @@ import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import CollapseComponent from "@/components/global/CollapseComponent.vue";
 import LoaderComponent from "@/components/global/LoaderComponent.vue";
-import ActionOverlayComponent from "@/components/global/ActionOverlayComponent.vue";
-import ButtonComponent from "@/components/global/ButtonComponent.vue";
 import RangeComponent from "@/components/global/RangeComponent.vue";
 import RadioGroupComponent from "@/components/global/RadioGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
@@ -357,7 +325,6 @@ import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import axios from "axios";
-import ModalComponent from "@/components/global/ModalComponent.vue";
 
 /**
  * DATA
@@ -390,7 +357,6 @@ const copySuccess = ref(false);
 // Ez-lightbox
 const visibleRef = ref(false);
 const indexRef = ref(0); // default 0 - only when using multiple images
-const imgsRef = ref([]);
 const sharedImgUrl = ref("");
 
 /**
@@ -513,12 +479,18 @@ const viewImage = (img: string) => {
     onShow();
 };
 
-const copyImgURL = () => {
+const copyImgURL = async (imgUrl: string) => {
+    await nextTick();
+    sharedImgUrl.value = imgUrl;
     navigator.clipboard
         .writeText(sharedImgUrl.value)
         .then(() => {
             console.log("Image URL copied to clipboard");
             copySuccess.value = true;
+
+            setTimeout(() => {
+                copySuccess.value = false;
+            }, 2000);
         })
         .catch((err) => {
             console.error("Failed to copy image URL to clipboard", err);
