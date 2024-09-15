@@ -2,6 +2,9 @@ import {NovitaSDK, TaskStatus} from "novita-sdk";
 import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
 import UserService from "./user-service.js";
 import "../config.js"
+import BackblazeStorageService from "./backblaze-storage-service.js";
+import axios from "axios";
+import {v4 as uuidv4} from "uuid";
 
 
 class NovitaAIService {
@@ -17,6 +20,7 @@ class NovitaAIService {
         "size",
         "negative_prompt",
         "steps",
+        "count",
         "adherence"
     ]
 
@@ -160,7 +164,12 @@ class NovitaAIService {
                         state["status"] = ApiTaskStatus.COMPLETE;
                         state["task_id"] = task_id;
 
-                        console.log("Successfully created: ", state.user.nickname)
+                        const image_urls = progress.images.map((obj) => obj.image_url)
+
+                        console.log("Task Succeeded: ", state.user.nickname)
+
+                        // This can keep going in the background
+                        this.downloadAndUploadImages(image_urls, task_id);
 
                         resolve(state);
                     } else if (TaskFailed) {
@@ -209,6 +218,61 @@ class NovitaAIService {
             // Start the first check
             await check();
         });
+    }
+
+    downloadAndUploadImages(imageUrls, task_id) {
+        const state = this.state.get(task_id)
+        console.log("Downloading and uploading images...");
+        const file_names = []
+        const thumbnail_file_names = []
+        const file_prefix = state?.user?.nickname || "user"
+
+        const uploadPromises = imageUrls.map(async (url) => {
+            try {
+                const response = await axios.get(url, {responseType: "arraybuffer"});
+                const imageBuffer = response.data;
+
+                const imageKey = `${state.user.id.replace("|", "")}/${file_prefix}-${Math.random().toString(36).substring(7)}.image.jpeg`;
+                const thumbnailKey = `${state.user.id.replace("|", "")}/thumbnails/${file_prefix}-${Math.random().toString(36).substring(7)}.thumbnail.jpeg`;
+
+                file_names.push(imageKey);
+                thumbnail_file_names.push(thumbnailKey);
+
+                await Promise.all([
+                    BackblazeStorageService.upload(imageBuffer, imageKey),
+                    BackblazeStorageService.createThumbnailAndUpload(imageBuffer, thumbnailKey)
+                ])
+
+                console.log(`Successfully uploaded: ${imageKey} and ${thumbnailKey}`);
+            } catch (error) {
+                console.error(`Failed to download or upload image from ${url}: `, error);
+            }
+        });
+
+        // Kick off the uploads and thumbnail generation concurrently without waiting for
+        // them to finish
+        Promise.all(uploadPromises)
+            .then(async () => {
+                console.log("All images and thumbnails uploaded successfully.");
+
+                const prompt_aggregate = {
+                    ...state.prompt,
+                    user_id: state.user.id,
+                    thumbnails: thumbnail_file_names,
+                    file_names: file_names,
+                    prompt_id: uuidv4(),
+                }
+
+                await UserService.savePrompt(prompt_aggregate);
+
+                // Update the user's image count
+                await UserService.updateUserImageCount(state.user.id);
+
+            })
+            .catch((error) => {
+                console.error("Error in async image upload tasks:", error);
+            });
+
     }
 }
 

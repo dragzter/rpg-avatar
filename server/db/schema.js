@@ -21,19 +21,37 @@ export const PassCodeSchema = new Schema({
 
 // This is based on a typescript type in types.ts in the client folder.
 export const PromptSchema = new Schema({
-    prompt: {type: String, required: true},
-    archetype: {type: String, required: true},
     user_id: {type: String, required: true},
+    prompt_id: {type: String, required: true},
+    prompt: {type: String, required: false},
+    archetype: {type: String, required: false},
     art_style: {type: String, required: false},
-    date: {type: String, required: true},
     size: {
         width: {type: Number, required: false},
         height: {type: Number, required: false},
     },
     negative_prompt: {type: String, required: false},
     steps: {type: Number, required: false},
+    file_names: {type: Array, required: false},
+    thumbnails: {type: Array, required: false},
     adherence: {type: Number, required: false},
+    created: {
+        type: String, default: () => new Date().toLocaleString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        })
+    }
 }, {collection: "prompts"});
+
+export const ImagesSchema = new Schema({
+    user_id: {type: String, required: true},
+    images: {type: Array, required: true},
+})
+
 
 export const PassSchema = new Schema({
     id: {type: String, required: true},
@@ -95,6 +113,10 @@ export const UserSchema = new Schema({
     disclaimer_signed: {
         type: Boolean,
         default: false
+    },
+    image_count: {
+        type: Number,
+        required: false,
     },
     disclaimer_signed_on_date: {
         type: String,

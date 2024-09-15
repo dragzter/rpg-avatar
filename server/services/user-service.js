@@ -23,6 +23,27 @@ class UserService {
         }
     }
 
+    async updateUserImageCount(user_id) {
+        try {
+            // Fetch all prompts for the user
+            const prompts = await PromptModel.find({user_id}).exec();
+
+            // Calculate the total number of images across all prompts
+            const image_count = prompts.reduce((total, promptItem) => {
+                return total + (promptItem.file_names?.length || 0);
+            }, 0);
+
+            // Patch the user with the new image count
+            console.log("Updating image count:", image_count);
+            await UserModel.updateOne(
+                {id: user_id},
+                {$set: {image_count}}
+            );
+        } catch (error) {
+            console.error("Error updating user image count:", error);
+        }
+    }
+
     async savePrompt(userPrompt) {
         try {
             const _prompt = new PromptModel(userPrompt)
