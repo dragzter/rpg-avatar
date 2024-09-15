@@ -1784,15 +1784,24 @@ main {
             text-align: center;
             max-width: 512px;
             aspect-ratio: 1 / 1;
+            overflow: hidden;
+
+            img {
+                transition: 0.5s;
+            }
 
             &.images-loaded {
                 cursor: pointer;
                 border-radius: 6px;
-                transition: 0.1s;
+                transition: 0.2s;
 
                 &:hover {
                     outline: 4px solid var(--lavender);
                     filter: brightness(0.8);
+
+                    img {
+                        transform: scale(1.1);
+                    }
                 }
 
                 img {
@@ -1963,9 +1972,11 @@ main {
 
 
     .loader-element {
-        padding: 40px;
+        padding: 30px;
+        transform: scale(0.8);
 
         .btn {
+            margin-top: 0 !important;
             padding: 4px 11px !important;
         }
     }

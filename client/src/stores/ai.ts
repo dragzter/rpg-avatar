@@ -92,7 +92,6 @@ export const useAiStore = defineStore("aiImages", {
                                             _resp.data.new_token_balance;
                                     }
 
-                                    // Set flags to update UI
                                     if (this.generatedImagesV2?.length) {
                                         this.imagesLoaded = true;
                                         this.requestLoading = false;

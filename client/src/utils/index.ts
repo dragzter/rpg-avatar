@@ -18,6 +18,7 @@ export const API = {
     admin_add_codes: import.meta.env.VITE_APP_API_URL + "/api/codes",
     admin_get_token_codes:
         import.meta.env.VITE_APP_API_URL + "/api/codes/token",
+    upload_images: import.meta.env.VITE_APP_API_URL + "/api/upload",
 };
 
 export const ApiTaskStatus = {
