@@ -24,6 +24,15 @@ class NovitaAIService {
         "adherence"
     ]
 
+    creatures_model = "crystalClearXL_ccxl_97637.safetensors"
+    portrait_model = "demonCORESFWNSFW_v22_135842.safetensors"
+    creatures_modeL_2 = "fenrisxl_V164fp16_191548.safetensors"
+    character_model = "gleipnir_v20BF16_174601.safetensors"
+    anime_model = "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors"
+    anime_model_2 = "animexlXuebimix_v20_109348.safetensors"
+    pixel_art_model = "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
+
+
     defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined"
 
     defaultModel = "gleipnir_v20BF16_174601.safetensors"
@@ -31,7 +40,6 @@ class NovitaAIService {
 
     portrait_specialized_Model_2 = "demonCORESFWNSFW_v22_135842.safetensors"
     character_specialized_Model_1 = "gleipnir_v20BF16_174601.safetensors"
-    pixelArt_specialized_Model_1 = "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
 
     promptA = "analog film photo Deep photo,gorgeous woman, very large breasts ,close up, depth of field,ferrania p30 film,shadows,messy hair,perfect face and body,dark,nighttime,dark photo,grainy,dimly lit,seductive smirk,harsh camera flash,. faded film, desaturated, 35mm photo, grainy, vignette, vintage, Kodachrome, Lomography, stained, highly detailed, found footage"
 
@@ -164,12 +172,16 @@ class NovitaAIService {
                         state["status"] = ApiTaskStatus.COMPLETE;
                         state["task_id"] = task_id;
 
-                        const image_urls = progress.images.map((obj) => obj.image_url)
+                        const image_urls = progress.images?.map((obj) => obj.image_url)
 
                         console.log("Task Succeeded: ", state.user.nickname)
 
-                        // This can keep going in the background
-                        this.downloadAndUploadImages(image_urls, task_id);
+                        try {
+                            // This can keep going in the background
+                            this.downloadAndUploadImages(image_urls, task_id);
+                        } catch (err) {
+                            console.log(err, "Error downloading and uploading images");
+                        }
 
                         resolve(state);
                     } else if (TaskFailed) {
@@ -225,25 +237,28 @@ class NovitaAIService {
         console.log("Downloading and uploading images...");
         const file_names = []
         const thumbnail_file_names = []
-        const file_prefix = state?.user?.nickname || "user"
+        const prefix = state?.user?.nickname || "user"
 
         const uploadPromises = imageUrls.map(async (url) => {
             try {
+                const folder = `${state.user.id.replace("|", "")}`
+                const file_key = `${prefix}-${Math.random().toString(36).substring(6)}`
+
                 const response = await axios.get(url, {responseType: "arraybuffer"});
-                const imageBuffer = response.data;
 
-                const imageKey = `${state.user.id.replace("|", "")}/${file_prefix}-${Math.random().toString(36).substring(7)}.image.jpeg`;
-                const thumbnailKey = `${state.user.id.replace("|", "")}/thumbnails/${file_prefix}-${Math.random().toString(36).substring(7)}.thumbnail.jpeg`;
+                const buffer = response.data;
+                const key = `${folder}/${file_key}.image.jpeg`;
+                const thumbnail = `${folder}/thumbnails/${file_key}.thumbnail.jpeg`;
 
-                file_names.push(imageKey);
-                thumbnail_file_names.push(thumbnailKey);
+                file_names.push(key);
+                thumbnail_file_names.push(thumbnail);
 
                 await Promise.all([
-                    BackblazeStorageService.upload(imageBuffer, imageKey),
-                    BackblazeStorageService.createThumbnailAndUpload(imageBuffer, thumbnailKey)
+                    BackblazeStorageService.upload(buffer, key),
+                    BackblazeStorageService.createThumbnailAndUpload(buffer, thumbnail)
                 ])
 
-                console.log(`Successfully uploaded: ${imageKey} and ${thumbnailKey}`);
+                console.log(`Successfully uploaded: ${key} and ${thumbnail}`);
             } catch (error) {
                 console.error(`Failed to download or upload image from ${url}: `, error);
             }
@@ -266,7 +281,7 @@ class NovitaAIService {
                 await UserService.savePrompt(prompt_aggregate);
 
                 // Update the user's image count
-                await UserService.updateUserImageCount(state.user.id);
+                await UserService.getAndUpdateUserImageCount(state.user.id);
 
             })
             .catch((error) => {

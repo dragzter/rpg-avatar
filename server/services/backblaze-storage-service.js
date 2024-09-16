@@ -1,4 +1,9 @@
-import {GetObjectCommand, PutObjectCommand, S3Client} from '@aws-sdk/client-s3';
+import {
+    GetObjectCommand,
+    ListObjectsV2Command,
+    PutObjectCommand,
+    S3Client
+} from '@aws-sdk/client-s3';
 import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import "../config.js"
 import express from "express"
@@ -48,13 +53,47 @@ class BackblazeStorageService {
     async createThumbnailAndUpload(imageBuffer, fileName) {
         try {
             const thumbnailBuffer = await sharp(imageBuffer)
-                .resize({width: 180})
+                .resize({width: 200})
                 .toBuffer();
 
             await this.upload(thumbnailBuffer, fileName);
         } catch (error) {
             console.error("Error creating thumbnail:", error);
         }
+    }
+
+    async getUserImageCount(user_id) {
+        try {
+            let isTruncated = true;
+            let continuationToken = null;
+            let imageCount = 0;
+            user_id = user_id.replace("|", ""); // Backblaze doesnt like pipes
+
+            while (isTruncated) {
+                const params = {
+                    Bucket: this.bucket_name,
+                    Prefix: `${user_id}/`,
+                    ContinuationToken: continuationToken,
+                };
+
+                const command = new ListObjectsV2Command(params);
+                const response = await this.s3_client.send(command);
+
+                if (response.Contents?.length) {
+                    const nonThumbnailObjects = response.Contents.filter(item => !item.Key.includes("/thumbnails/"));
+
+                    imageCount += nonThumbnailObjects.length;
+                }
+
+                console.log("Image count:", imageCount);
+                isTruncated = response.IsTruncated;
+                continuationToken = response.NextContinuationToken;
+            }
+            return imageCount;
+        } catch (error) {
+            console.error("Error getting user image count:", error);
+        }
+
     }
 }
 

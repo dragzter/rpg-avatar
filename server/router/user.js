@@ -35,10 +35,12 @@ router.post("/api/user/:userId", async (req, res) => {
                 return res.status(400).json({message: "User account is disabled"})
             }
 
+            await UserService.getAndUpdateUserImageCount(user.id)
+
             return res.status(200).json(user)
         } else {
             const newUser = {
-                token_balance: 1,
+                token_balance: 2,
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],
@@ -49,7 +51,8 @@ router.post("/api/user/:userId", async (req, res) => {
                 name: providedUser.name,
                 nickname: providedUser.nickname,
                 email_verified: providedUser.email_verified,
-                admin: false
+                admin: false,
+                image_count: 0
             }
 
             await UserService.saveUser(newUser)

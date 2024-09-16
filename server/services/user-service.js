@@ -1,4 +1,5 @@
 import {PromptModel, UserModel} from "../db/model.js";
+import BackblazeStorageService from "./backblaze-storage-service.js";
 
 class UserService {
     async getUserById(userId) {
@@ -23,8 +24,23 @@ class UserService {
         }
     }
 
+    async getAndUpdateUserImageCount(user_id) {
+        try {
+            const image_count = await BackblazeStorageService.getUserImageCount(user_id);
+            await UserModel.updateOne(
+                {id: user_id},
+                {$set: {image_count}}
+            );
+        } catch (error) {
+            console.error("Error updating user image count:", error);
+        }
+    }
+
+    // Deprecated - this is not a reliable way to get image counts.  Need to get from
+    // bucket
     async updateUserImageCount(user_id) {
         try {
+            console.log("updating images")
             // Fetch all prompts for the user
             const prompts = await PromptModel.find({user_id}).exec();
 
