@@ -183,3 +183,5 @@ export interface CodeRedeemRequest {
     user_id: string;
     type: "pass" | "token";
 }
+
+export type ModelSection = { label: string; img: string; value: string };

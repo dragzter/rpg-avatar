@@ -10,10 +10,7 @@
                         <div
                             class="title-row mb-3 d-flex justify-content-between align-items-center"
                         >
-                            <h5 class="mb-0">
-                                Prompt
-                                <span class="accent-link">Configuration</span>
-                            </h5>
+                            <h5 class="mb-0 text-white">Prompt</h5>
 
                             <div
                                 class="text-end"
@@ -53,6 +50,37 @@
                             </router-link>
                         </div>
 
+                        <div class="model-select-wrapper">
+                            <p
+                                class="mb-2"
+                                style="
+                                    padding: 4px 12px;
+                                    display: inline-block;
+                                    margin-left: 3px;
+                                    border-radius: 12px;
+                                    border-left: 7px solid var(--lavender);
+                                    border-right: 7px solid var(--lavender);
+                                "
+                            >
+                                <span class="accent-text">
+                                    Model Optimization</span
+                                >
+                            </p>
+                            <div
+                                id="model-select"
+                                :style="{
+                                    backgroundImage: `url(assets/${selected_model.img})`,
+                                }"
+                                class="d-flex align-items-end justify-content-end"
+                            >
+                                <div class="model-select-inner">
+                                    <h5 class="m-0">
+                                        {{ selected_model.label }}
+                                    </h5>
+                                </div>
+                            </div>
+                        </div>
+
                         <div
                             class="d-flex align-items-center justify-content-between gap-3"
                         >
@@ -69,7 +97,7 @@
                                 v-model="userSelections.archetype"
                                 :enable-tooltip="true"
                                 :loading="loading"
-                                :options="archetypeOptions"
+                                :options="characterTypes"
                                 class="w-100"
                                 label="Archetype"
                                 tooltip-text="Archetypes come with some presets about image settings, character placement and overall look and feel."
@@ -105,8 +133,8 @@
                                     "
                                     :loading="loading"
                                     :max="
-                                        rpgUser.token_balance >= 8
-                                            ? 8
+                                        rpgUser.token_balance >= 10
+                                            ? 10
                                             : rpgUser.token_balance
                                     "
                                     :min="1"
@@ -310,10 +338,10 @@
 </template>
 <script lang="ts" setup>
 import SelectComponent from "@/components/global/SelectComponent.vue";
-import { archetypeOptions, styleOptions } from "@/utils/select-options";
+import { characterTypes, styleOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import type { UserAIPrompt } from "@/stores/types";
+import type { ModelSection, UserAIPrompt } from "@/stores/types";
 import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import CollapseComponent from "@/components/global/CollapseComponent.vue";
@@ -331,7 +359,7 @@ import axios from "axios";
  */
 const userSelections = ref<UserAIPrompt>({
     archetype: "",
-    model: "",
+    model: "character_model",
     art_style: "",
     prompt: "",
     nsfw_pass: false,
@@ -358,6 +386,45 @@ const copySuccess = ref(false);
 const visibleRef = ref(false);
 const indexRef = ref(0); // default 0 - only when using multiple images
 const sharedImgUrl = ref("");
+
+const selected_model = ref<ModelSection>({
+    label: "Character",
+    img: "character_model.png",
+});
+
+const model_selection = ref<ModelSection[]>([
+    {
+        label: "Character",
+        img: "character_model.png",
+        value: "character_model",
+    },
+    {
+        label: "Portrait",
+        img: "portrait_model.png",
+        value: "portrait_model",
+    },
+    {
+        label: "Creatures",
+        img: "",
+        value: "creatures_model",
+    },
+    {
+        label: "Objects",
+        img: "",
+    },
+    {
+        label: "Cartoon",
+        img: "",
+    },
+    {
+        label: "Anime",
+        img: "",
+    },
+    {
+        label: "Pixel Art",
+        img: "",
+    },
+]);
 
 /**
  * COMPUTED
@@ -425,6 +492,10 @@ const handleSubmit = async () => {
 
 const cancelImageRequest = async () => {
     await aiStore.cancelImageGenerationTask();
+};
+
+const selectModel = (model: string) => {
+    console.log("Selecting model", model);
 };
 
 const downloadImage = async (url) => {

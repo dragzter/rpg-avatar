@@ -1,4 +1,4 @@
-export const archetypeOptions = [
+export const characterTypes = [
     {
         label: "Alchemist",
         value: "alchemist",
@@ -28,16 +28,16 @@ export const archetypeOptions = [
         value: "cleric",
     },
     {
+        label: "Death Knight",
+        value: "death-knight",
+    },
+    {
         label: "Druid",
         value: "druid",
     },
     {
         label: "Fighter",
         value: "fighter",
-    },
-    {
-        label: "Hunter",
-        value: "hunter",
     },
     {
         label: "Inquisitor",
@@ -68,20 +68,16 @@ export const archetypeOptions = [
         value: "shaman",
     },
     {
-        label: "Sorcerer",
-        value: "sorcerer",
-    },
-    {
         label: "Spellsword",
         value: "spellsword",
     },
     {
-        label: "Swashbuckler",
-        value: "swashbuckler",
-    },
-    {
         label: "Warlock",
         value: "warlock",
+    },
+    {
+        label: "Wizard",
+        value: "wizard",
     },
 ];
 
