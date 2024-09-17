@@ -172,7 +172,7 @@ const { loginWithRedirect, user, isAuthenticated, logout } = useAuth0();
 const userStore = useUserStore();
 
 const rpgUser = computed(() => userStore.user);
-const loading = computed(() => userStore.loading);
+const loading = computed(() => userStore.userLoading);
 
 const login = () => {
     loginWithRedirect({ redirect_uri: window.location.href } as Record<
@@ -193,7 +193,7 @@ watch(
 );
 
 const deleteAccount = async () => {
-    await userStore.deleteUserAccount({ userId: rpgUser.value.id as User });
+    await userStore.deleteUserAccount({ userId: rpgUser.value.id });
     await logOut();
 };
 
