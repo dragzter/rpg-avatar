@@ -2097,6 +2097,16 @@ main {
 
 }
 
+#privacy-policy-page {
+    ol li {
+        margin-bottom: 12px;
+
+        &::marker {
+            color: #d7b8f1;
+        }
+    }
+}
+
 .prompt-rpg-checkbox {
     height: 20px;
     width: 40px !important;

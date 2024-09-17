@@ -16,6 +16,7 @@ import AdminDashboard from "@/views/AdminDashboard.vue";
 import SupportView from "@/views/SupportView.vue";
 import { useUserStore } from "@/stores/user";
 import PageNotFound from "@/views/PageNotFound.vue";
+import PrivacyPolicy from "@/views/PrivacyPolicy.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -47,6 +48,11 @@ export function createRouter(app: App): Router {
                 path: "/get-tokens",
                 name: "get-tokens",
                 component: ProductView,
+            },
+            {
+                path: "/privacy-policy",
+                name: "privacy-policy",
+                component: PrivacyPolicy,
             },
             {
                 path: "/dashboard",

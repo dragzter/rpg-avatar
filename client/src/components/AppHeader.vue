@@ -105,6 +105,11 @@
                       to="return-policy"
                   >Refund Policy
                   </router-link>
+                    <router-link
+                        class="dropdown-item"
+                        to="privacy-policy"
+                    >Privacy Policy
+                    </router-link>
                 </li>
                 <li>
                   <hr/>
