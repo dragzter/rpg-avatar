@@ -2,6 +2,7 @@ import express from "express"
 import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
 import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
+import {promptConstructor} from "../utils/prompt-constructor.js";
 
 const router = express.Router();
 
@@ -42,9 +43,20 @@ router.post("/api/task-status", (req, res) => {
     }
 })
 
+router.post("/api/random-prompt", async (req, res) => {
+    try {
+        const response = promptConstructor(req.body, true);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error)
+        console.log(error)
+    }
+})
+
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
+        console.log(response, "response from NovitaAiService.startImageGeneration")
 
         NovitaAiService.startTaskStatusPolling(response.task_id).then((_resp) => {
             taskManager.activeTasks[_resp.task_id].status = "complete";

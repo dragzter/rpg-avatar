@@ -5,6 +5,7 @@ import "../config.js"
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import axios from "axios";
 import {v4 as uuidv4} from "uuid";
+import {promptConstructor} from "../utils/prompt-constructor.js";
 
 
 class NovitaAIService {
@@ -16,36 +17,44 @@ class NovitaAIService {
         "prompt",
         "archetype",
         "user_id",
+        "rpg_presets",
         "art_style",
         "size",
+        "nsfw_pass",
+        "randomize",
         "negative_prompt",
         "steps",
+        "model",
         "count",
         "adherence"
     ]
 
-    creatures_model = "crystalClearXL_ccxl_97637.safetensors"
-    portrait_model = "demonCORESFWNSFW_v22_135842.safetensors"
-    creatures_modeL_2 = "fenrisxl_V164fp16_191548.safetensors"
-    character_model = "gleipnir_v20BF16_174601.safetensors"
-    anime_model = "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors"
-    anime_model_2 = "animexlXuebimix_v20_109348.safetensors"
-    pixel_art_model = "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
+    defaultModel = "gleipnir_v20BF16_174601.safetensors"
+    model_selection  = {
+        character_model: "gleipnir_v20BF16_174601.safetensors",
+        creatures_model: "crystalClearXL_ccxl_97637.safetensors",
+        portrait_model: "demonCORESFWNSFW_v22_135842.safetensors",
+        anime_model: "animexlXuebimix_v20_109348.safetensors",
+        general_model: "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors",
+        pixel_model: "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
+    }
 
+    creatures_modeL_2 = "fenrisxl_V164fp16_191548.safetensors"
+    anime_model_2 = "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors"
 
     defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined"
-
-    defaultModel = "gleipnir_v20BF16_174601.safetensors"
     altModel = "dreamshaperXL09Alpha_alpha2Xl10_91562.safetensors"
-
-    portrait_specialized_Model_2 = "demonCORESFWNSFW_v22_135842.safetensors"
-    character_specialized_Model_1 = "gleipnir_v20BF16_174601.safetensors"
-
-    promptA = "analog film photo Deep photo,gorgeous woman, very large breasts ,close up, depth of field,ferrania p30 film,shadows,messy hair,perfect face and body,dark,nighttime,dark photo,grainy,dimly lit,seductive smirk,harsh camera flash,. faded film, desaturated, 35mm photo, grainy, vignette, vintage, Kodachrome, Lomography, stained, highly detailed, found footage"
-
 
     constructor() {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY)
+    }
+
+    truncateString(str, maxLength) {
+        if (str.length > maxLength) {
+            return str.substring(0, maxLength) + '...'; // Truncate and add ellipses
+        } else {
+            return str; // Return the string as-is if it's within the limit
+        }
     }
 
     async startImageGeneration(userData) {
@@ -69,16 +78,20 @@ class NovitaAIService {
         }
 
 
-        const configured_prompt = userData?.prompt || "a white rabbit";
+        let configuredPrompt = userData.prompt || "generate a random rpg character"
+        if (userData.rpg_presets) {
+            configuredPrompt = promptConstructor(userData, false);
+        }
+
         const r_width = userData?.size?.width || 1024;
         const r_height = userData?.size?.height || 1024;
-        const adherence = userData.adherence || 7.5;
+        const adherence = userData.adherence || 7;
         const negative_prompt = userData.negative_prompt || "none";
 
         const request = {
             request: {
-                model_name: this.defaultModel,
-                prompt: configured_prompt,
+                model_name: this.model_selection[userData.model] || this.defaultModel,
+                prompt: this.truncateString(configuredPrompt, 1000) || "generate a random rpg character",
                 negative_prompt: negative_prompt,
                 width: r_width,
                 height: r_height,
@@ -112,8 +125,8 @@ class NovitaAIService {
                 return {
                     task_id: response.task_id,
                     success: true,
-                    message: "Image generation started."
-                };
+                    message: "Image generation started.",
+                }
             }
         } catch (error) {
             // In case of error, wipe the state, new request will be needed.
@@ -199,10 +212,10 @@ class NovitaAIService {
                             `Retry: ${attempt}/${maxAttempts} - (${state.user.nickname}) - Tokens: ${state.user.token_balance} - ${new Date().toLocaleString('en-US', {hour12: true})}`
                         );
 
-
-                        if (state.status !== ApiTaskStatus.CANCELED) {
+                        if (taskManager.activeTasks[task_id].status !== ApiTaskStatus.CANCELED) {
                             setTimeout(() => check(), 1000);
                         } else {
+                            console.log("task is cancelled!")
                             resolve({
                                 message: "Task canceled by user.",
                                 success: false,

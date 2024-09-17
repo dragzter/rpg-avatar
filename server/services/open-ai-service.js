@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import {getRandomSetting} from "../utils/helpers.js";
 import "../config.js"
 
 dotenv.config();
@@ -42,7 +41,8 @@ class OpenAIService {
         }
 
         const {prompt, archetype, artStyle} = userRequest;
-        const archetypeContext = getRandomSetting(archetype);
+        //const archetypeContext = getRandomSetting(archetype);
+        const archetypeContext = "";
 
         console.log("starting ai prompt")
         const response = await this.openai.chat.completions.create({
