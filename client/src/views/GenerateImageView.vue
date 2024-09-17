@@ -476,6 +476,7 @@ const sharedImgUrl = ref("");
 const selected_model = ref<ModelSection>({
     label: "Character",
     img: "character_model.png",
+    value: "character_model",
 });
 
 /**
@@ -512,9 +513,7 @@ onMounted(async () => {
 
     aiStore.task_id = localStorage.getItem("task_id") || "";
     if (aiStore.task_id) {
-        await aiStore.cancelImageGenerationTask(
-            localStorage.getItem("task_id") || ""
-        );
+        await aiStore.cancelImageGenerationTask();
     }
 
     if (rpgUser.value) {
@@ -600,7 +599,7 @@ const cancelImageRequest = async () => {
     await aiStore.cancelImageGenerationTask();
 };
 
-const selectModel = (model: string) => {
+const selectModel = (model: ModelSection) => {
     console.log("Selecting model", model);
     selected_model.value = model;
     userSelections.value.model = model.value;

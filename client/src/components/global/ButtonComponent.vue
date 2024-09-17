@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { computed, defineEmits, defineProps } from "vue";
+import { computed } from "vue";
 
 // Define props and emits
 const props = defineProps({

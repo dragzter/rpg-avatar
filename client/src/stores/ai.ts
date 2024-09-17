@@ -82,7 +82,7 @@ export const useAiStore = defineStore("aiImages", {
                                 // Save the last task_id in localStorage
                                 localStorage.setItem(
                                     "task_id",
-                                    taskIdResponse.data.task_id
+                                    taskIdResponse.data.task_id as string
                                 );
 
                                 if (

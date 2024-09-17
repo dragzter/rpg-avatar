@@ -25,9 +25,7 @@ const props = defineProps<{
     };
 }>();
 
-const emit = defineEmits<{
-    select: () => void;
-}>();
+const emit = defineEmits(["select"]);
 
 const handleClick = () => {
     console.log("Model selected", props.model);
