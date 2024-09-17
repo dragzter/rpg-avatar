@@ -138,7 +138,7 @@
                                 :loading="loading"
                                 :options="characterTypes"
                                 class="w-100"
-                                label="Character Type"
+                                label="Character"
                                 tooltip-text="Character types come with some presets about image settings, character placement and overall look and feel."
                             />
                         </div>
