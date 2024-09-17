@@ -68,6 +68,23 @@ class UserService {
             console.log(err)
         }
     }
+
+    async deleteUser(userId) {
+        try {
+            console.log("Deleting user", userId)
+            return await UserModel.deleteOne({id: userId}).exec()
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    async deleteFBUser(userId) {
+        try {
+            return await UserModel.deleteOne({facebook_user_id: userId}).exec()
+        } catch (err) {
+            console.log(err)
+        }
+    }
 }
 
 export default new UserService()

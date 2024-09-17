@@ -60,10 +60,22 @@ export const PassSchema = new Schema({
     price: {type: Number, required: false},
 })
 
+export const DeletionRequestSchema = new mongoose.Schema({
+    confirmationCode: String,
+    userId: String,
+    status: { type: String, default: "Pending" }, // You can update this later as 'In Progress', 'Completed', etc.
+    createdAt: { type: Date, default: Date.now },
+});
+
+
 export const UserSchema = new Schema({
     name: {
         type: String,
         required: true,
+    },
+    facebook_user_id: {
+        type: String,
+        required: false,
     },
     id: {
         type: String,
@@ -71,7 +83,7 @@ export const UserSchema = new Schema({
     }, // The ID the user came with (auth0 user.sub, starts with auth0|...)
     email: {
         type: String,
-        required: true,
+        required: false,
     },
     token_balance: {
         type: Number,
