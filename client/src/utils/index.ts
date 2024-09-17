@@ -20,6 +20,10 @@ export const API = {
         import.meta.env.VITE_APP_API_URL + "/api/codes/token",
     upload_images: import.meta.env.VITE_APP_API_URL + "/api/upload",
     random_prompt: import.meta.env.VITE_APP_API_URL + "/api/random-prompt",
+    delete_user: import.meta.env.VITE_APP_API_URL + "/api/user/delete",
+    fb_test_delete_user:
+        import.meta.env.VITE_APP_API_URL +
+        "/api/facebook/data-deletion-callback",
 };
 
 export const ApiTaskStatus = {

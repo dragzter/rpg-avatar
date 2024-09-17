@@ -17,6 +17,7 @@ import SupportView from "@/views/SupportView.vue";
 import { useUserStore } from "@/stores/user";
 import PageNotFound from "@/views/PageNotFound.vue";
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue";
+import DeletionStatusView from "@/views/DeletionStatusView.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -43,6 +44,12 @@ export function createRouter(app: App): Router {
                 path: "/support",
                 name: "support",
                 component: SupportView,
+            },
+            {
+                path: "/deletion-status/:confirmationCode",
+                name: "DeletionStatus",
+                component: DeletionStatusView,
+                props: true,
             },
             {
                 path: "/get-tokens",

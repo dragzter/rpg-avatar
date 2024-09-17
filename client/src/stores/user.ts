@@ -47,6 +47,17 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async deleteUserAccount({ userId }) {
+            try {
+                this.userLoading = true;
+                await axios.post(API.delete_user, { userId });
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userLoading = false;
+            }
+        },
+
         async disableUser() {
             // TODO disable user (ui and api)
         },
@@ -72,6 +83,8 @@ export const useUserStore = defineStore("user", {
             try {
                 this.userLoaded = false;
                 this.userLoading = true;
+
+                console.log(user);
 
                 const response = await axios.post(
                     API.get_user + `/${user.sub}`,
