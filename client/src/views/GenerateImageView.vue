@@ -8,7 +8,7 @@
                         class="d-flex flex-column h-100"
                     >
                         <div
-                            class="title-row mb-3 d-flex justify-content-between align-items-center"
+                            class="prompt-header title-row mb-3 d-flex justify-content-between align-items-center"
                         >
                             <h5 class="mb-0 text-white">Prompt</h5>
 
@@ -51,22 +51,9 @@
                         </div>
 
                         <div class="model-select-wrapper">
-                            <p
-                                class="mb-2"
-                                style="
-                                    padding: 4px 12px;
-                                    display: inline-block;
-                                    margin-left: 3px;
-                                    border-radius: 12px;
-                                    border-left: 7px solid var(--lavender);
-                                    border-right: 7px solid var(--lavender);
-                                "
-                            >
-                                <span class="accent-text">
-                                    Model Optimization</span
-                                >
-                            </p>
                             <div
+                                data-bs-toggle="modal"
+                                data-bs-target="#model-selection-modal"
                                 id="model-select"
                                 :style="{
                                     backgroundImage: `url(assets/${selected_model.img})`,
@@ -77,11 +64,63 @@
                                     <h5 class="m-0">
                                         {{ selected_model.label }}
                                     </h5>
+
+                                    <p class="mb-2 model-select-label">
+                                        <span class="accent-text">
+                                            AI Model</span
+                                        >
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         <div
+                            :class="{
+                                'rpg-option-inactive': !isRPGChecked,
+                                'rpg-option-active': isRPGChecked,
+                            }"
+                            class="rpg-generator-option d-flex mb-3 justify-content-between align-items-center"
+                            @click="toggleStatus"
+                            style="cursor: pointer"
+                        >
+                            <p class="m-0">
+                                RPG Presets
+                                <ButtonComponent
+                                    button-type="btn-dark"
+                                    data-bs-placement="top"
+                                    :enable-tooltip="true"
+                                    tooltip-title="When active, RPG presets will apply to all AI-generated outputs."
+                                    button-classes="bg-transparent border-0 ps-1"
+                                >
+                                    <i class="fa-regular fa-circle-info"></i>
+                                </ButtonComponent>
+                            </p>
+                            <div
+                                class="form-check form-switch d-flex align-items-center"
+                            >
+                                <input
+                                    class="form-check-input prompt-rpg-checkbox"
+                                    type="checkbox"
+                                    id="rpg-generator-checkbox"
+                                    v-model="isRPGChecked"
+                                    @click.stop
+                                />
+                                <label
+                                    class="form-check-label text-end"
+                                    for="rpg-generator-checkbox"
+                                >
+                                    <span
+                                        class="accent-text"
+                                        v-if="isRPGChecked"
+                                        >Active</span
+                                    >
+                                    <span v-else>Inactive</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="isRPGChecked"
                             class="d-flex align-items-center justify-content-between gap-3"
                         >
                             <SelectComponent
@@ -99,8 +138,8 @@
                                 :loading="loading"
                                 :options="characterTypes"
                                 class="w-100"
-                                label="Archetype"
-                                tooltip-text="Archetypes come with some presets about image settings, character placement and overall look and feel."
+                                label="Character Type"
+                                tooltip-text="Character types come with some presets about image settings, character placement and overall look and feel."
                             />
                         </div>
 
@@ -119,7 +158,7 @@
                                 v-model="userSelections.size"
                                 :loading="loading"
                                 :options="ImageOptions"
-                                label="Image size (px)"
+                                label="Image Resolution (px)"
                             />
                             <div
                                 class="d-flex align-items-center justify-content-between flex-sm-row gap-3 flex-column"
@@ -175,24 +214,25 @@
                                 >
                                     Cancel
                                 </button>
-                                <!--                                <button-->
-                                <!--                                    :disabled="loading"-->
-                                <!--                                    class="btn accent-link-outline"-->
-                                <!--                                    @click="handleSubmit"-->
-                                <!--                                >-->
-                                <!--                                    <div class="d-flex align-items-center">-->
-                                <!--                                        <LoadSpinner-->
-                                <!--                                            v-if="loading"-->
-                                <!--                                            class="me-2"-->
-                                <!--                                        />-->
-                                <!--                                        Surprise Me-->
-                                <!--                                    </div>-->
-                                <!--                                </button>-->
+                                <button
+                                    v-if="isRPGChecked"
+                                    :disabled="loading"
+                                    class="btn accent-link-outline"
+                                    @click="generateRandomPrompt"
+                                >
+                                    <div class="d-flex align-items-center">
+                                        <LoadSpinner
+                                            v-if="loading"
+                                            class="me-2"
+                                        />
+                                        Surprise Me
+                                    </div>
+                                </button>
                                 <button
                                     :disabled="
                                         loading || rpgUser?.token_balance === 0
                                     "
-                                    class="btn btn-info btn-large ms-3"
+                                    class="btn btn-primary mt-1 btn-large ms-3"
                                     @click="handleSubmit"
                                 >
                                     <div class="d-flex align-items-center">
@@ -201,7 +241,7 @@
                                             class="me-2"
                                         />
 
-                                        Submit
+                                        Generate
                                     </div>
                                 </button>
                             </span>
@@ -334,6 +374,23 @@
                 </div>
             </div>
         </div>
+        <modal-component id="model-selection-modal" size="md">
+            <h3>
+                Select
+                <span class="accent-text">AI Model</span>
+            </h3>
+
+            <div class="model-grid">
+                <template v-for="model in model_selection">
+                    <div class="model-grid-item">
+                        <ModelUIComponent
+                            :model="model"
+                            @select="selectModel"
+                        />
+                    </div>
+                </template>
+            </div>
+        </modal-component>
     </div>
 </template>
 <script lang="ts" setup>
@@ -353,27 +410,14 @@ import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import axios from "axios";
+import ModalComponent from "@/components/global/ModalComponent.vue";
+import ModelUIComponent from "@/components/ModelUIComponent.vue";
+import ButtonComponent from "@/components/global/ButtonComponent.vue";
 
 /**
  * DATA
  */
-const userSelections = ref<UserAIPrompt>({
-    archetype: "",
-    model: "character_model",
-    art_style: "",
-    prompt: "",
-    nsfw_pass: false,
-    count: 1,
-    negative_prompt:
-        "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined",
-    user_id: "",
-    adherence: 7.5,
-    size: {
-        width: 1024,
-        height: 1024,
-    },
-});
-
+const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
 const aiStore = useAiStore();
 const userStore = useUserStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
@@ -382,14 +426,23 @@ const toastMessage = ref("");
 const isError = ref(false);
 const copySuccess = ref(false);
 
-// Ez-lightbox
-const visibleRef = ref(false);
-const indexRef = ref(0); // default 0 - only when using multiple images
-const sharedImgUrl = ref("");
-
-const selected_model = ref<ModelSection>({
-    label: "Character",
-    img: "character_model.png",
+const userSelections = ref<UserAIPrompt>({
+    archetype: "fighter",
+    model: "character_model",
+    art_style: "stylized_realism",
+    randomize: false,
+    prompt: "",
+    nsfw_pass: false,
+    rpg_presets: true,
+    count: 2,
+    negative_prompt:
+        "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined",
+    user_id: "",
+    adherence: 7,
+    size: {
+        width: 1024,
+        height: 1024,
+    },
 });
 
 const model_selection = ref<ModelSection[]>([
@@ -405,26 +458,25 @@ const model_selection = ref<ModelSection[]>([
     },
     {
         label: "Creatures",
-        img: "",
+        img: "creatures_model.png",
         value: "creatures_model",
     },
     {
-        label: "Objects",
-        img: "",
-    },
-    {
-        label: "Cartoon",
-        img: "",
-    },
-    {
         label: "Anime",
-        img: "",
-    },
-    {
-        label: "Pixel Art",
-        img: "",
+        img: "anime_model.png",
+        value: "anime_model",
     },
 ]);
+
+// Ez-lightbox
+const visibleRef = ref(false);
+const indexRef = ref(0); // default 0 - only when using multiple images
+const sharedImgUrl = ref("");
+
+const selected_model = ref<ModelSection>({
+    label: "Character",
+    img: "character_model.png",
+});
 
 /**
  * COMPUTED
@@ -454,7 +506,17 @@ const imagesV2 = computed(() => {
 /**
  * LIFE-CYCLE
  */
-onMounted(() => {
+onMounted(async () => {
+    userSelections.value.rpg_presets =
+        localStorage.getItem("rpg_presets") === "true";
+
+    aiStore.task_id = localStorage.getItem("task_id") || "";
+    if (aiStore.task_id) {
+        await aiStore.cancelImageGenerationTask(
+            localStorage.getItem("task_id") || ""
+        );
+    }
+
     if (rpgUser.value) {
         userSelections.value.nsfw_pass = rpgUser.value.nsfw_pass;
         userSelections.value.user_id = rpgUser.value.id;
@@ -473,6 +535,13 @@ watch(
     }
 );
 
+watch(
+    () => aiStore.random_ai_prompt,
+    (newPrompt) => {
+        userSelections.value.prompt = newPrompt;
+    }
+);
+
 /**
  * HANDLERS
  */
@@ -480,14 +549,51 @@ const resetImages = () => {
     aiStore.generatedImagesV2 = [];
 };
 
+const toggleStatus = (event) => {
+    isRPGChecked.value = !isRPGChecked.value;
+    userSelections.value.rpg_presets = isRPGChecked.value;
+    localStorage.setItem("rpg_presets", isRPGChecked.value.toString());
+};
+
+const generateRandomPrompt = async () => {
+    userSelections.value.archetype =
+        characterTypes[
+            Math.floor(Math.random() * characterTypes.length)
+        ]?.value;
+
+    userSelections.value.art_style =
+        styleOptions[Math.floor(Math.random() * styleOptions.length)]?.value;
+
+    await aiStore.getRandomPrompt({
+        archetype: userSelections.value.archetype,
+        art_style: userSelections.value.art_style,
+    });
+    await handleSubmit();
+};
+
 const handleSubmit = async () => {
+    // Reset the images
     resetImages();
+    showToast.value = false;
+    toastMessage.value = "";
+
+    await nextTick();
+
+    if (userSelections.value.prompt?.length === 0) {
+        const confirmation = confirm(
+            "You have not provided a prompt. Continue Anyway?"
+        );
+
+        if (!confirmation) {
+            return;
+        }
+    }
+
     if (!isAuthenticated.value) {
         await loginWithPopup();
     } else {
         await aiStore.getImageV2(userSelections.value);
     }
-    //await aiStore.generateImageWithUserData(userSelections.value);
 };
 
 const cancelImageRequest = async () => {
@@ -496,6 +602,8 @@ const cancelImageRequest = async () => {
 
 const selectModel = (model: string) => {
     console.log("Selecting model", model);
+    selected_model.value = model;
+    userSelections.value.model = model.value;
 };
 
 const downloadImage = async (url) => {

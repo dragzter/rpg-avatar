@@ -1,5 +1,5 @@
 <template>
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
         <label v-if="label" :for="cssId">
             {{ label }}
 

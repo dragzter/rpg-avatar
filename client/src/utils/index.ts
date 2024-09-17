@@ -19,6 +19,7 @@ export const API = {
     admin_get_token_codes:
         import.meta.env.VITE_APP_API_URL + "/api/codes/token",
     upload_images: import.meta.env.VITE_APP_API_URL + "/api/upload",
+    random_prompt: import.meta.env.VITE_APP_API_URL + "/api/random-prompt",
 };
 
 export const ApiTaskStatus = {

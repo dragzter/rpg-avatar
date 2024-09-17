@@ -66,6 +66,8 @@ export interface UserAIPrompt {
     nsfw_pass: boolean;
     user_id: string;
 
+    rpg_presets?: boolean;
+    randomize?: boolean;
     art_style?: string;
     model?: string;
     count?: number;
@@ -112,6 +114,7 @@ export interface ImageTaskStartedResponse {
     task_id?: string;
     success: boolean;
     message: string;
+    generated_prompt?: string;
 }
 
 export interface RPGAvatarUser {

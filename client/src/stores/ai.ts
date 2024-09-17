@@ -15,6 +15,7 @@ export const useAiStore = defineStore("aiImages", {
         generatedImagesV2: [] as NovitaImg[],
         imagesLoaded: false,
         toastMessage: "",
+        random_ai_prompt: "",
         task_id: "",
     }),
     actions: {
@@ -37,7 +38,18 @@ export const useAiStore = defineStore("aiImages", {
                 });
 
                 // TODO update toast message to show task was cancelled
-                console.log(response);
+                this.task_id = "";
+                localStorage.removeItem("task_id");
+                console.log(response.data);
+            } catch (err) {
+                console.log(err);
+            }
+        },
+        async getRandomPrompt(userData) {
+            try {
+                const response = await axios.post(API.random_prompt, userData);
+
+                this.random_ai_prompt = response.data;
             } catch (err) {
                 console.log(err);
             }
@@ -65,6 +77,12 @@ export const useAiStore = defineStore("aiImages", {
                                 const _resp = await axios.post(
                                     API.check_task_status,
                                     { task_id: taskIdResponse.data.task_id }
+                                );
+
+                                // Save the last task_id in localStorage
+                                localStorage.setItem(
+                                    "task_id",
+                                    taskIdResponse.data.task_id
                                 );
 
                                 if (

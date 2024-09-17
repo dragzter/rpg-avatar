@@ -16,7 +16,7 @@ export const characterTypes = [
         value: "bard",
     },
     {
-        label: "Beastmaster",
+        label: "Beast Master",
         value: "beastmaster",
     },
     {
@@ -29,7 +29,7 @@ export const characterTypes = [
     },
     {
         label: "Death Knight",
-        value: "death-knight",
+        value: "death_knight",
     },
     {
         label: "Druid",
@@ -98,11 +98,7 @@ export const styleOptions = [
         value: "grunge",
     },
     {
-        label: "Polygon",
-        value: "polygon",
-    },
-    {
-        label: "Watercolor",
+        label: "Watercolor", // Keep
         value: "watercolor",
     },
     {
@@ -119,14 +115,10 @@ export const styleOptions = [
     },
     {
         label: "Stylized Realism",
-        value: "stylized-realism",
+        value: "stylized_realism",
     },
     {
-        label: "Abstract",
-        value: "abstract",
-    },
-    {
-        label: "Vintage",
+        label: "Vintage", // Keep
         value: "vintage",
     },
     {
@@ -134,32 +126,16 @@ export const styleOptions = [
         value: "cyberpunk",
     },
     {
-        label: "Surreal",
-        value: "surreal",
-    },
-    {
         label: "Pixel Art",
-        value: "pixel-art",
+        value: "pixel_art",
     },
     {
         label: "Futuristic",
         value: "futuristic",
     },
     {
-        label: "Impressionist",
-        value: "impressionist",
-    },
-    {
-        label: "Low Poly",
-        value: "low-poly",
-    },
-    {
         label: "Pop Art",
-        value: "pop-art",
-    },
-    {
-        label: "Expressionist",
-        value: "expressionist",
+        value: "pop_art",
     },
     {
         label: "Gothic",
@@ -168,6 +144,10 @@ export const styleOptions = [
     {
         label: "Minimalist",
         value: "minimalist",
+    },
+    {
+        label: "Anime",
+        value: "anime",
     },
     {
         label: "Retro",

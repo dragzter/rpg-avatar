@@ -1,19 +1,23 @@
 <template>
     <div v-if="inputType === 'textarea'">
-        <div class="form-floating mb-3">
+        <div class="form-floating mb-2">
             <textarea
                 :value="internalValue"
                 class="form-control"
                 :disabled="loading"
+                :maxlength="maxlength"
                 :placeholder="placeholder"
                 :id="id"
                 :style="`height: ${height}; max-height: 200px !important`"
                 @input="handleInput"
             ></textarea>
+            <small class="w-100 d-inline-block text-end ms-auto mt-1">
+                {{ internalValue.length }}/{{ maxlength }}
+            </small>
             <label :for="id">{{ label }}</label>
         </div>
     </div>
-    <div v-else class="mb-3">
+    <div v-else class="mb-2">
         <label :for="id" class="form-label">{{ label }}</label>
         <input
             :type="inputType"
@@ -23,6 +27,7 @@
             @input="handleInput"
             :disabled="loading"
             :placeholder="placeholder"
+            :maxlength="maxlength"
         />
     </div>
 </template>
@@ -54,6 +59,10 @@ const props = defineProps({
     height: {
         type: String,
         default: "120px",
+    },
+    maxlength: {
+        type: Number,
+        default: 600,
     },
     loading: Boolean,
 });

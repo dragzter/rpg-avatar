@@ -2,7 +2,7 @@
     <!-- Modal -->
     <div
         :id="id"
-        :class="`modal fade modal-md view-image-modal ${wrapperClasses}`"
+        :class="`modal fade modal-${size} view-image-modal ${wrapperClasses}`"
         aria-hidden="true"
         aria-labelledby="exampleModalLabel"
         tabindex="-1"
@@ -33,6 +33,10 @@ const props = defineProps({
     wrapperClasses: {
         type: String,
         default: "",
+    },
+    size: {
+        type: String,
+        default: "md",
     },
     successMessage: {
         type: String,

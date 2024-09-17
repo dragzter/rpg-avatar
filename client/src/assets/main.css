@@ -181,6 +181,7 @@ body {
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 1.5;
+    padding-right: 0 !important;
     font-weight: 400;
     /*background: linear-gradient(to bottom, #09050e 50%, #110919 90%);*/
     background: var(--dark-900);
@@ -1757,13 +1758,52 @@ main {
     );
 }
 
+.model-selection-modal {
+    &.show {
+        padding: 0 !important;
+    }
+}
+
+.model-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+
+    @media (max-width: 991px) {
+        grid-template-columns: repeat(1, 1fr);
+        gap: 10px;
+    }
+}
+
+.model-grid-item {
+    height: 75px;
+    width: 100%;
+}
+
+#model-select-modal{
+    height: 70px;
+    h5 {
+        font-size: 16px;
+    }
+}
+
 #model-select {
-    height: 90px;
+    height: 100px;
+}
+
+.model-select-label {
+    position: absolute;
+    top: 6px;
+    right: 10px;
+}
+
+
+#model-select, #model-select-modal {
     background: var(--dark-900);
     border-radius: 8px;
     padding: 12px;
     cursor: pointer;
-    margin: 0 0 35px;
+    margin: 0 0 20px;
     transition: 0.3s;
     overflow-x: hidden;
     position: relative;
@@ -1781,20 +1821,36 @@ main {
         background: linear-gradient(to right, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.4) 30%, rgba(0, 0, 0, 1) 55%);
     }
 
+    &:after {
+        content: " ";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        background-repeat: no-repeat;
+        background-position: center right;
+        background-size: contain;
+        background-image: url("assets/header-shape2.png");
+    }
 
     &:hover {
         outline: 3px solid var(--lavender);
+        z-index: 1; /* Set to a higher value instead of -1 */
     }
 
     h5 {
-        background: var(--dark-500);
+        background: #3333a6;
         color: #fff;
         padding: 5px 10px;
         position: absolute;
         bottom: 0;
         right: 0;
+        z-index: 1;
     }
 }
+
 
 #image-load-section {
     width: 100%;
@@ -2021,16 +2077,76 @@ main {
     }
 }
 
+.rpg-generator-option {
+    background: var(--dark-600);
+    padding: 8px;
+    border-radius: 8px;
+    transition: 0.3s;
+
+    label {
+        min-width: 70px;
+        margin: 0;
+    }
+
+    &.rpg-option-inactive {
+        background: var(--dark-800) !important;
+        border: 2px solid var(--dark-600) !important;
+
+    }
+
+
+}
+
+.prompt-rpg-checkbox {
+    height: 20px;
+    width: 40px !important;
+    transition: 0.3s;
+
+    /*&:before {*/
+    /*    content: " ";*/
+    /*    position: absolute;*/
+    /*    top: 0;*/
+    /*    left: 0;*/
+    /*    right: 0;*/
+    /*    bottom: 0;*/
+    /*    background: linear-gradient(to right, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.4) 30%, rgba(0, 0, 0, 1) 55%);*/
+    /*}*/
+
+    /*&:after {*/
+    /*    content: " ";*/
+    /*    position: absolute;*/
+    /*    top: 0;*/
+    /*    left: 0;*/
+    /*    right: 0;*/
+    /*    bottom: 0;*/
+    /*    z-index: 0;*/
+    /*    background-repeat: no-repeat;*/
+    /*    background-position: center right;*/
+    /*    background-size: contain;*/
+    /*    background-image: url("assets/header-shape2.png");*/
+    /*}*/
+}
+
+
+.prompt-rpg-checkbox:checked {
+    background-color: var(--lavender) !important;
+    border-color: var(--lavender) !important;
+}
+
 .prompt-builder {
     background-color: var(--dark-800);
-    padding: 20px;
+    padding: 17px;
     z-index: 0;
     border-radius: 6px;
     border: 2px solid var(--dark-600);
     max-width: 500px;
     margin: auto auto 30px auto;
     position: relative !important;
-    min-height: 650px;
+    min-height: 510px;
+
+    .prompt-header {
+        height: 45px;
+    }
 
     @media (max-width: 991px) {
         padding: 15px;
@@ -2098,7 +2214,7 @@ main {
 }
 
 
-select, textarea, input[type=text], input[type=number], .collapse .card {
+select, textarea, input[type=text], .rpg-generator-option, input[type=number], .collapse .card {
     border: 2px solid #313151 !important;
     background: #1a1a29 !important;
 }
