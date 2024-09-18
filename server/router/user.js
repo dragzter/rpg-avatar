@@ -41,9 +41,13 @@ function base64UrlDecode(input) {
 router.post("/api/facebook/data-deletion-callback", async (req, res) => {
     const { signed_request } = req.body;
 
+    console.log("Data deletion request received:", signed_request, req.body);
+
     try {
         // Step 1: Parse the signed request to get the Facebook user ID
         const data = parseSignedRequest(signed_request);
+
+        console.log(data, "data")
 
         if (!!data?.user_id) {
             return res.status(400).json({ message: "Invalid request" });
