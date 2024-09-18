@@ -1,4 +1,5 @@
 <template>
+    <MobileMenu />
     <section id="app-header-main">
         <div class="container">
             <div class="row">
@@ -148,8 +149,7 @@
                                 aria-expanded="false"
                                 aria-label="Toggle navigation"
                                 class="navbar-toggler d-md-none ms-4 mt-1"
-                                data-bs-target="#navbarText"
-                                data-bs-toggle="collapse"
+                                @click="openMobileMenu"
                                 type="button"
                             >
                                 <i class="fa-solid fs-2 fa-bars"></i>
@@ -164,12 +164,17 @@
 
 <script lang="ts" setup>
 import { useAuth0, type User } from "@auth0/auth0-vue";
-import { computed, watch } from "vue";
-import { useUserStore } from "@/stores/user"; // DATA
+import { computed, onMounted, ref, watch } from "vue";
+import { useUserStore } from "@/stores/user";
+import MobileMenu from "@/components/MobileMenu.vue"; // DATA
+import { Modal } from "bootstrap";
+import { useRouter } from "vue-router"; // Import Bootstrap
 
 // DATA
 const { loginWithRedirect, user, isAuthenticated, logout } = useAuth0();
 const userStore = useUserStore();
+const router = useRouter();
+const modalInstance = ref(null);
 
 const rpgUser = computed(() => userStore.user);
 const loading = computed(() => userStore.userLoading);
@@ -199,4 +204,28 @@ const deleteAccount = async () => {
 
 const logOut = () =>
     logout({ logoutParams: { returnTo: window.location.href } });
+
+// Initialize the modal instance
+const initializeModal = () => {
+    const modalElement = document.getElementById("mobile-menu");
+    if (modalElement) {
+        modalInstance.value =
+            Modal.getInstance(modalElement) || new Modal(modalElement);
+    }
+};
+
+const openMobileMenu = () => {
+    modalInstance?.value?.show();
+};
+
+const closeModal = () => {
+    modalInstance?.value?.hide();
+};
+
+onMounted(() => {
+    initializeModal();
+    router.afterEach(() => {
+        closeModal();
+    });
+});
 </script>

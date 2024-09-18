@@ -1,7 +1,7 @@
 <template>
     <div id="generate-image" class="container-fluid">
         <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-5">
+            <div class="col-sm-12 col-md-12 col-lg-4">
                 <div class="prompt-builder">
                     <div
                         id="prompt-builder-inner"
@@ -172,8 +172,8 @@
                                     "
                                     :loading="loading"
                                     :max="
-                                        rpgUser.token_balance >= 10
-                                            ? 10
+                                        rpgUser.token_balance >= 8
+                                            ? 8
                                             : rpgUser.token_balance
                                     "
                                     :min="1"
@@ -258,17 +258,17 @@
             </div>
             <!-- image generation column-->
             <div
-                class="col-sm-12 col-lg-7 col-md-12 d-flex align-items-md-start align-items-center image-generation-column"
+                class="col-sm-12 col-lg-8 col-md-12 d-flex align-items-md-start align-items-center image-generation-column"
             >
                 <div
                     id="image-load-section"
-                    class="position-relative mx-auto mt-0"
+                    class="position-relative ms-0 mt-0"
                 >
                     <div :class="` output-images-container ${gridCount}`">
                         <template v-for="(image, index) in imagesV2">
                             <div
                                 :class="[
-                                    `image-grid-block gblock-${index + 1}`,
+                                    `image-grid-block mx-auto ms-lg-0  w-100 gblock-${index + 1}`,
                                     {
                                         'h-auto': loaded,
                                         'w-auto': loaded,
