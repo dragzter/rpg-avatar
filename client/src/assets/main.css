@@ -1525,6 +1525,13 @@ main {
     color: #2b153f;
 }
 
+#token-code-submit,
+#pass-code-submit {
+    .input-group {
+        z-index: 0;
+    }
+}
+
 #mobile-menu {
     .modal-content {
         background: var(--dark-900);

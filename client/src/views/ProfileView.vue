@@ -74,6 +74,7 @@
 
                                 <div class="position-relative">
                                     <InputButtonSubmit
+                                        id="token-code-submit"
                                         v-model="tokenCodeToRedeem"
                                         accent-text="TOKEN CODE"
                                         button-text="Redeem"
@@ -88,6 +89,7 @@
                                     />
 
                                     <InputButtonSubmit
+                                        id="pass-code-submit"
                                         v-model="passCodeToRedeem"
                                         accent-text="CONTENT PASS CODE"
                                         button-text="Redeem"
