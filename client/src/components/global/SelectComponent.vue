@@ -32,14 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-    defineEmits,
-    defineProps,
-    onMounted,
-    type PropType,
-    ref,
-    watch,
-} from "vue";
+import { onMounted, type PropType, ref, watch } from "vue";
 import ButtonComponent from "@/components/global/ButtonComponent.vue";
 
 export type Option = { value: string; label: string };

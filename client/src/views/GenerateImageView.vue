@@ -59,6 +59,7 @@
                                     backgroundImage: `url(assets/${selected_model.img})`,
                                 }"
                                 class="d-flex align-items-end justify-content-end"
+                                :class="{ is_disabled: loading }"
                             >
                                 <div class="model-select-inner">
                                     <h5 class="m-0">
@@ -78,6 +79,7 @@
                             :class="{
                                 'rpg-option-inactive': !isRPGChecked,
                                 'rpg-option-active': isRPGChecked,
+                                is_disabled: loading,
                             }"
                             class="rpg-generator-option d-flex mb-3 justify-content-between align-items-center"
                             @click="toggleStatus"
@@ -208,13 +210,6 @@
                         <div class="mt-auto ms-auto button-action-row">
                             <span v-if="rpgUser.token_balance > 0">
                                 <button
-                                    v-if="loading"
-                                    class="btn me-2"
-                                    @click="cancelImageRequest"
-                                >
-                                    Cancel
-                                </button>
-                                <button
                                     v-if="isRPGChecked"
                                     :disabled="loading"
                                     class="btn accent-link-outline"
@@ -233,7 +228,7 @@
                                         loading || rpgUser?.token_balance === 0
                                     "
                                     class="btn btn-primary mt-1 btn-large ms-3"
-                                    @click="handleSubmit"
+                                    @click="() => handleSubmit(false)"
                                 >
                                     <div class="d-flex align-items-center">
                                         <LoadSpinner
@@ -243,6 +238,13 @@
 
                                         Generate
                                     </div>
+                                </button>
+                                <button
+                                    v-if="loading"
+                                    class="btn me-2 btn-warning"
+                                    @click="cancelImageRequest"
+                                >
+                                    Cancel
                                 </button>
                             </span>
                             <span v-else>
@@ -417,6 +419,7 @@ import ButtonComponent from "@/components/global/ButtonComponent.vue";
 /**
  * DATA
  */
+const useV2Prompt = ref(true);
 const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
 const aiStore = useAiStore();
 const userStore = useUserStore();
@@ -563,20 +566,28 @@ const generateRandomPrompt = async () => {
     userSelections.value.art_style =
         styleOptions[Math.floor(Math.random() * styleOptions.length)]?.value;
 
-    await aiStore.getRandomPrompt({
-        archetype: userSelections.value.archetype,
-        art_style: userSelections.value.art_style,
-    });
-    await handleSubmit();
+    if (useV2Prompt.value) {
+        await aiStore.getRandomPromptV2({
+            archetype: userSelections.value.archetype,
+            art_style: userSelections.value.art_style,
+        });
+    } else {
+        await aiStore.getRandomPrompt({
+            archetype: userSelections.value.archetype,
+            art_style: userSelections.value.art_style,
+        });
+    }
+    await handleSubmit(true);
 };
 
-const handleSubmit = async () => {
+const handleSubmit = async (randomize: boolean) => {
     // Reset the images
     resetImages();
     showToast.value = false;
     toastMessage.value = "";
 
     await nextTick();
+    userSelections.value.randomize = randomize;
 
     if (userSelections.value.prompt?.length === 0) {
         const confirmation = confirm(

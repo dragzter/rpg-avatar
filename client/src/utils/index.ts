@@ -24,6 +24,7 @@ export const API = {
     fb_test_delete_user:
         import.meta.env.VITE_APP_API_URL +
         "/api/facebook/data-deletion-callback",
+    surprise_prompt: import.meta.env.VITE_APP_API_URL + "/api/surprise-prompt",
 };
 
 export const ApiTaskStatus = {

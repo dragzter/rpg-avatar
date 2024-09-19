@@ -49,7 +49,6 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const selectOption = (option) => {
-    console.log(option, props.modelValue);
     emit("update:modelValue", option.size);
 };
 </script>

@@ -23,13 +23,10 @@ export const useAdminStore = defineStore("admin", {
             try {
                 this.loading = true;
 
-                console.log(requestData);
                 const response = await axios.post(
                     API.admin_add_codes,
                     requestData
                 );
-
-                console.log(response.data);
             } catch (err) {
                 console.log(err);
             } finally {

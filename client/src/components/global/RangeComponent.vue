@@ -32,7 +32,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineEmits, defineProps } from "vue";
 import ButtonComponent from "@/components/global/ButtonComponent.vue";
 
 const props = defineProps({

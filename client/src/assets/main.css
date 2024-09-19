@@ -1859,6 +1859,11 @@ main {
 
 #model-select {
     height: 100px;
+
+    &.is_disabled {
+        pointer-events: none;
+        filter: grayscale(0.8);
+    }
 }
 
 .model-select-label {
@@ -2155,6 +2160,11 @@ main {
     border-radius: 8px;
     transition: 0.3s;
 
+    &.is_disabled {
+        pointer-events: none !important;
+        filter: grayscale(0.8) !important;
+    }
+
     label {
         min-width: 70px;
         margin: 0;
@@ -2258,7 +2268,7 @@ main {
         }
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1500px) {
         .button-action-row {
             margin: 0 !important;
 

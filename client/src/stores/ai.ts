@@ -54,6 +54,22 @@ export const useAiStore = defineStore("aiImages", {
                 console.log(err);
             }
         },
+        async getRandomPromptV2(userData) {
+            try {
+                this.requestLoading = true;
+
+                const response = await axios.post(
+                    API.surprise_prompt,
+                    userData
+                );
+
+                this.random_ai_prompt = response.data;
+            } catch (err) {
+                console.log(err);
+            } finally {
+                this.requestLoading = false;
+            }
+        },
         async getImageV2(userData: UserAIPrompt) {
             try {
                 const userStore = useUserStore();

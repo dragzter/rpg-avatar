@@ -101,7 +101,6 @@ export function createRouter(app: App): Router {
     router.beforeEach(async (to, from, next) => {
         const userStore = useUserStore();
         const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
-        console.log(userStore.isAdmin, " is admin");
 
         if (!isAuthenticated.value && to.meta.needAuth) {
             try {
