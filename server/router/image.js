@@ -53,6 +53,20 @@ router.post("/api/random-prompt", async (req, res) => {
     }
 })
 
+router.post("/api/surprise-prompt", async (req, res) => {
+    try {
+        console.log(req.body, "route: /api/surprise-prompt")
+        const {archetype, art_style} = req.body
+
+        const response = await OpenAiService.requestAiPromptV2({archetype, art_style});
+
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(error)
+    }
+})
+
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);

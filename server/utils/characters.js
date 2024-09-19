@@ -8,25 +8,30 @@ export const alchemist = {
         "Campsite, cooking by fire, makeshift lab."
     ],
     physical_appearance: [
-        "Lean, wiry, gray hair, short beard.",
-        "Slim, glasses, messy hair, focused.",
-        "Hunched, stained fingers, wild eyes.",
-        "Tall, singed robes, dark circles.",
-        "Short, stocky, potion burns, intense."
+        "Lean male, wiry, gray hair, short beard.",
+        "Slim male, glasses, messy brown hair, focused.",
+        "Slim female, young, attractive, glasses, messy golden hair, focused.",
+        "Slim female, young, attractive, glasses, messy brown hair, focused.",
+        "Slim female, young, attractive, glasses, messy and curly red hair, focused.",
+        "Old lady, stained fingers, wild eyes.",
+        "Old man, stained fingers, wild eyes.",
+        "Tall man, singed robes, dark circles, stains on face.",
+        "Short, stocky man, potion burns, intense.",
     ],
     details: [
-        "Mixing ingredients into a bubbling potion.",
-        "Carefully labeling a bottle of elixir.",
-        "Scribbling notes into a worn journal.",
-        "Heating a flask over a small flame.",
-        "Measuring powders into a small vial."
+        "The Alchemist is Mixing ingredients into a bubbling potion.",
+        "The Alchemist is carefully labeling a bottle of elixir.",
+        "The Alchemist is scribbling notes into a worn journal.",
+        "The AlchemistHeating a flask over a small flame.",
+        "The Alchemist is measuring powders into a small vial.",
+        "The Alchemist is pouring a glowing liquid into a vial."
     ],
     attire: [
-        "Leather coat, many pockets, worn, stained.",
-        "Simple robes, apron, burns and stains.",
-        "Heavy gloves, sturdy boots, potion bottles.",
-        "Patchwork clothes, stained, goggles on head.",
-        "Dark cloak, flask belt, stained fingers."
+        "A leather coat, many pockets, worn, stained.",
+        "A  simple robes, apron, burns and stains.",
+        "heavy gloves, sturdy boots, potion bottles.",
+        "patchwork clothes, stained, goggles on head.",
+        "A dark cloak, flask belt, stained fingers."
     ]
 };
 
@@ -34,6 +39,8 @@ export const alchemist = {
 export const artificer = {
     settings: [
         "Crowded workshop, gears, tools, dim lighting.",
+        "Steam-powered airship, gears, pipes, steam.",
+        "Underground lab, glowing crystals, hidden.",
         "Royal forge, glowing embers, organized chaos.",
         "Battlefield workshop, repairing constructs, tools scattered.",
         "Underground lab, experimental devices, hidden, dim.",
@@ -41,14 +48,15 @@ export const artificer = {
         "Campsite, tinkering with gadgets, relaxed, fire-lit."
     ],
     physical_appearance: [
-        "Hunched, goggles on forehead, focused.",
-        "Slim, oil-streaked clothes, sharp gaze.",
-        "Stocky, muscular arms, covered in soot.",
-        "Tall, wiry, quick fingers, darting eyes.",
-        "Short, stout, heavy gauntlets, mechanical backpack."
+        "Hunched old man, goggles on forehead, focused.",
+        "Slim, attractive, brunette, oil-streaked clothes, sharp gaze.",
+        "Stocky man, muscular arms, covered in soot, smiling.",
+        "Tall man, wiry, quick fingers, darting eyes.",
+        "Short attractive blonde."
     ],
     details: [
         "Tightening bolts on a mechanical device.",
+        "Mixing bolts in a bucket.",
         "Sketching designs for a new invention.",
         "Welding pieces of metal together for a contraption.",
         "Adjusting gears on a small mechanical construct.",
@@ -72,21 +80,25 @@ export const barbarian = {
         "Burning village, smoke rising, debris everywhere."
     ],
     physical_appearance: [
-        "Muscular, scarred arms, wild hair.",
-        "Tall, broad, tribal tattoos, intense gaze.",
+        "Muscular woman, scarred arms, wild red hair.",
+        "Muscular man, scarred arms, wild red hair.",
+        "Tall man, broad, tribal tattoos, intense gaze.",
         "Rugged face, braided beard, thick arms.",
         "Scarred torso, wild eyes, war paint.",
+        "Gorgeous, fit brunette, perfect face.",
+        "Gorgeous, fit blonde, perfect face.",
         "Massive stature, unkempt hair, broad shoulders."
     ],
     details: [
-        "Swinging a large axe.",
-        "Sharpening a blade quietly.",
-        "Roaring in anger, fists clenched.",
-        "Staring down an opponent.",
-        "Lifting a heavy stone."
+        "The barbarian is swinging a large axe.",
+        "The barbarian is sharpening a blade quietly.",
+        "The barbarian is roaring in anger, fists clenched.",
+        "The barbarian is staring down an opponent.",
+        "The barbarian is fighting another man."
     ],
     attire: [
         "Fur cloak, leather straps, large belt.",
+        "Bare chest, fur leggings, armored boots.",
         "Minimal armor, furs and leather.",
         "Ragged furs, animal pelts, bracers.",
         "Bare chest, fur boots, leather guards.",
@@ -117,11 +129,11 @@ export const bard = {
         "Talking their way out of a situation."
     ],
     attire: [
-        "Bright tunic, feathered hat, leather boots.",
-        "Elegant cloak, colorful scarf, polished shoes.",
-        "Velvet vest, leather pants, lute on back.",
-        "Loose shirt, ornate vest, satchel of notes.",
-        "Fashionable coat, flowing sleeves, embroidered."
+        "A bright tunic, feathered hat, leather boots.",
+        "An legant cloak, colorful scarf, polished shoes.",
+        "A velvet vest, leather pants, lute on back.",
+        "A loose shirt, ornate vest, satchel of notes.",
+        "A fashionable coat, flowing sleeves, embroidered."
     ]
 };
 
@@ -148,11 +160,12 @@ export const beastmaster = {
         "Feeding an animal companion by a campfire."
     ],
     attire: [
-        "Leather armor, fur and feathers, totems on belt.",
-        "Rugged clothing, animal hides, beast fur cloak.",
-        "Leather tunic, small bones, animal pelt cloak.",
-        "Durable clothing, hide boots, beast-handling tools.",
-        "Layered leathers, tribal markings, fur cloak."
+        "a leather armor, fur and feathers, totems on belt.",
+        "rugged clothing, animal hides, beast fur cloak.",
+        "a leather tunic, small bones, animal pelt cloak.",
+        "durable clothing, hide boots, beast-handling tools.",
+        "layered leathers, tribal markings, fur cloak.",
+        "leather armor, fur and feathers, totems around neck.",
     ]
 };
 
@@ -169,7 +182,8 @@ export const berserker = {
         "Scarred, disheveled hair, intimidating posture.",
         "Rough build, veins bulging, ready for a fight.",
         "Calloused hands, strong jaw, relentless gaze.",
-        "Tall, scarred, constantly prepared for battle."
+        "Tall, scarred, constantly prepared for battle.",
+        "Attractive brunette, fit, perfect face.",
     ],
     details: [
         "Wielding a heavy weapon, ready to charge.",
@@ -196,25 +210,28 @@ export const cleric = {
         "Underground crypt, ancient stone, dim lighting, eerie."
     ],
     physical_appearance: [
-        "Calm, modest robe, holy symbol in hand.",
+        "Beautiful brunette, perfect physical proportions, modest robe, holy symbol in hand.",
+        "Beautiful blonde, perfect physical proportions, modest blue robe, holy symbol in hand.",
         "Tall, ceremonial robes, glowing divine aura.",
-        "Slender, soft-spoken, robes with gold trim.",
-        "Sturdy, armored with divine symbols, focused.",
-        "Serene, pristine robes, silver staff, glowing hands."
+        "Slender brunette, white robes with gold trim.",
+        "Sturdy male, stocky build.",
+        "Serene, calm expression, eyes filled with compassion.",
     ],
     details: [
         "Reading from a prayer book, murmuring softly.",
+        "Administering healing magic to a wounded soldier.",
         "Holding a vial of holy water, preparing for a ritual.",
+        "Blessing a fallen comrade, eyes closed in prayer.",
         "Healing a wounded ally with glowing hands.",
         "Offering counsel to a troubled companion.",
         "Blessing a group of soldiers before battle."
     ],
     attire: [
-        "White and gold robes, embroidered holy symbols.",
-        "Ceremonial armor with sacred runes, battle-ready.",
-        "Simple brown robes, worn sandals, leather staff.",
-        "Chainmail, white cloak, deity symbol on shield.",
-        "Silver armor, religious engravings, flowing cape."
+        "white and gold robes, embroidered holy symbols.",
+        "ceremonial armor with sacred runes, battle-ready.",
+        "simple brown robes, worn sandals, leather staff.",
+        "chainmail, white cloak, deity symbol on shield.",
+        "silver armor, religious engravings, flowing cape."
     ]
 };
 
@@ -259,25 +276,29 @@ export const fighter = {
         "Village ruins, burnt homes, fighter on guard."
     ],
     physical_appearance: [
-        "Broad shoulders, muscular, scarred torso.",
-        "Tall, battle-worn frame, sun-worn skin.",
-        "Rough skin, deep scars, calloused hands.",
-        "Square-jawed, strong build, stern gaze.",
-        "Well-built, muscular, unwavering eyes."
+        "Male, attractive, broad shoulders, muscular, scarred torso, bearded.",
+        "Tall man, battle-worn frame, sun-worn skin.",
+        "Lean brunette, beautiful, agile, eyes always scanning.",
+        "SLim, attractive blonde, beautiful, agile, eyes always scanning.",
+        "Male, rough skin, deep scars, calloused hands.",
+        "Square-jawed man, strong build, stern gaze.",
+        "Well-built man, muscular, unwavering eyes."
     ],
     details: [
         "Sharpening a sword, focused.",
         "Striking a dummy with precision.",
         "Surveying the battlefield, calculating.",
         "Raising shield, bracing for attack.",
-        "Leading comrades forward, determined."
+        "Leading comrades forward, determined.",
+        "Laughing heartily",
+        "Wiping blood from a blade, victorious."
     ],
     attire: [
-        "Chainmail, broadsword at side.",
-        "Battered plate armor, battle marks.",
-        "Leather armor, longsword and dagger.",
-        "Polished gauntlets, sword, and shield.",
-        "Tabard over chainmail, worn sword."
+        "chainmail, broadsword at side.",
+        "battered plate armor, battle marks.",
+        "leather armor, longsword and dagger.",
+        "polished gauntlets, sword, and shield.",
+        "a tabard over chainmail, worn sword."
     ]
 };
 
@@ -287,7 +308,7 @@ export const inquisitor = {
         "Alley, cobblestone streets, narrow passages, hidden corners.",
         "Cathedral, towering pillars, stained glass, dim light, solemn.",
         "Interrogation chamber, cold stone, wooden table, shackles.",
-        "Abandoned village, broken buildings, eerie silence, overgrown."
+        "Abandoned village, broken buildings, overgrown."
     ],
     physical_appearance: [
         "Sharp eyes, stern expression, always alert, commanding presence.",

@@ -5,7 +5,7 @@ import "../config.js"
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import axios from "axios";
 import {v4 as uuidv4} from "uuid";
-import {promptConstructor} from "../utils/prompt-constructor.js";
+import {promptEnhance} from "../utils/prompt-constructor.js";
 
 
 class NovitaAIService {
@@ -77,11 +77,17 @@ class NovitaAIService {
             }
         }
 
+        let configuredPrompt = userData.prompt.replace('"', "") || "generate a random rpg character"
 
-        let configuredPrompt = userData.prompt || "generate a random rpg character"
-        if (userData.rpg_presets) {
-            configuredPrompt = promptConstructor(userData, false);
+        if (userData.randomize && userData.rpg_presets) {
+            configuredPrompt = promptEnhance(userData.prompt)
         }
+
+        // if (userData.rpg_presets) {
+        //     configuredPrompt = promptConstructor(userData, false);
+        // }
+
+        console.log(configuredPrompt, "configuredPrompt")
 
         const r_width = userData?.size?.width || 1024;
         const r_height = userData?.size?.height || 1024;

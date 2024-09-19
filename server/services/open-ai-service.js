@@ -6,7 +6,7 @@ dotenv.config();
 
 class OpenAIService {
     openai = {};
-    MAX_TOKEN = 200
+    MAX_TOKEN = 500
 
     MODEL = {
         Gpt35: "gpt-3.5-turbo-0125",
@@ -33,6 +33,42 @@ class OpenAIService {
             apiKey: process.env.OPENAI_API_KEY,
             project: process.env.OPEN_AI_PROJECT_ID,
         });
+    }
+
+    /**
+     * Request AI prompt for a given archetype
+     * @param userRequest {Object: {archetype: string, art_style: string}}
+     * @returns {Promise<void>}
+     */
+    async requestAiPromptV2(userRequest) {
+        const {archetype, art_style} = userRequest;
+
+        const gender = Math.random() < 0.5 ? "Male" : "Female";
+
+        const attractivenessNote = gender === 'female'
+            ? "Additionally, ensure the character is very attractive, with perfect facial features and body proportions, alluring, gorgeous and captivating."
+            : "";
+
+        try {
+            const response = await this.openai.chat.completions.create({
+                model: this.MODEL.Gpt4oMini,
+                messages: [
+                    {
+                        role: "user",
+                        content: `Use this example to create a prompt in the same style using the provided archetype, art style, and gender. Do not follow structure verbatim, switch it up but stay within the spirit of the request and add in elements appropriate to the archetype.
+                        Example:"High fantasy art style (brunette rogue), (alluring figure), intricate costume design with dark leather and silver accents, sly expression, perfect face, striking pose, dynamic foreground with magical elements, ethereal lighting, mesmerizing colors capturing a sense of adventure, mythical background landscape, enchanted atmosphere, ultra-detailed, vibrant colors, fantasy world flair, dramatic ambiance."
+                        Now, generate a prompt with the following archetype: ${archetype}, art style: ${art_style}, and gender: ${gender} (always include the gender in the final prompt) set in an RPG/fantasy world. ${attractivenessNote}`
+                    }
+                ],
+                max_tokens: this.MAX_TOKEN
+            });
+
+            return response?.choices[0]?.message?.content || "No response from AI";
+
+        } catch (error) {
+            console.error("Error in requestAiPromptV2: ", error)
+        }
+
     }
 
     async requestAiPrompt(userRequest) {
