@@ -209,16 +209,19 @@ const logOut = () =>
 const initializeModal = () => {
     const modalElement = document.getElementById("mobile-menu");
     if (modalElement) {
+        // @ts-ignore
         modalInstance.value =
             Modal.getInstance(modalElement) || new Modal(modalElement);
     }
 };
 
 const openMobileMenu = () => {
+    // @ts-ignore
     modalInstance?.value?.show();
 };
 
 const closeModal = () => {
+    // @ts-ignore
     modalInstance?.value?.hide();
 };
 
