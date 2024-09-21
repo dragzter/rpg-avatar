@@ -1,4 +1,5 @@
 import {
+    DeleteObjectCommand,
     GetObjectCommand,
     ListObjectsV2Command,
     PutObjectCommand,
@@ -8,6 +9,7 @@ import {getSignedUrl} from "@aws-sdk/s3-request-presigner";
 import "../config.js"
 import express from "express"
 import sharp from "sharp";
+import UserService from "./user-service.js";
 
 const router = express.Router();
 
@@ -23,6 +25,51 @@ class BackblazeStorageService {
                 secretAccessKey: process.env.BACKBLAZE_APP_KEY,
             },
         });
+    }
+
+    async deleteImageAndThumbnail(fileName, userId) {
+        const deleteImageParams = {
+            Bucket: this.bucket_name,
+            Key: fileName,
+        };
+
+        // image is userid/f45jk2h.image.jpeg
+        // thumbnail is userid/thumbnails/f45jk2h.thumbnail.jpeg
+        let thumbnailKey = fileName.replace("/", "/thumbnails/");
+        thumbnailKey = thumbnailKey.replace(".image.", ".thumbnail.");
+        const deleteThumbnailParams = {
+            Bucket: this.bucket_name,
+            Key: thumbnailKey,
+        }
+
+        try {
+            const commandImageDelete = new DeleteObjectCommand(deleteImageParams);
+            const commandThumbnailDelete = new DeleteObjectCommand(deleteThumbnailParams);
+
+            const [image, thumbnail] = await Promise.all(
+                [
+                    this.s3_client.send(commandImageDelete),
+                    this.s3_client.send(commandThumbnailDelete)
+                ]);
+
+            const image_count = await UserService.getAndUpdateUserImageCount(userId);
+
+
+            // TODO delete the associated prompt
+
+            return {
+                success: true,
+                message: "File deleted successfully",
+                image_count,
+            };
+        } catch (error) {
+            console.error("Error deleting file:", error);
+            return {
+                success: false,
+                message: "Error deleting file",
+                error,
+            };
+        }
     }
 
     async getPresignedUrl(fileName) {

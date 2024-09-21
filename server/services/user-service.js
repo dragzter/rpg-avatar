@@ -31,6 +31,8 @@ class UserService {
                 {id: user_id},
                 {$set: {image_count}}
             );
+            
+            return image_count
         } catch (error) {
             console.error("Error updating user image count:", error);
         }

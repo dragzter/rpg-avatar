@@ -154,7 +154,6 @@ router.post("/api/user/:userId", async (req, res) => {
     try {
         const user = await UserService.getUserById(userId)
 
-
         if (user) {
             if (user.disabled) {
                 console.log("User is disabled", user.id)
@@ -162,8 +161,6 @@ router.post("/api/user/:userId", async (req, res) => {
             }
 
             await UserService.getAndUpdateUserImageCount(user.id)
-
-
 
             return res.status(200).json(user)
         } else {

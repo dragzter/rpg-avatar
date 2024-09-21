@@ -106,6 +106,24 @@ router.get("/download-image", async (req, res) => {
     }
 });
 
+// DELETE endpoint for deleting an image and its thumbnail
+router.post("/api/image/delete", async (req, res) => {
+    const {file_key, user_id} = req.body;  // Extract the file name from the request
+
+    try {
+        const response = await BackblazeStorageService.deleteImageAndThumbnail(file_key, user_id);
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({
+            message: "Internal server error while deleting the full-size image or thumbnail",
+            success: false,
+            error: error.message,
+        });
+    }
+});
+
+
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
