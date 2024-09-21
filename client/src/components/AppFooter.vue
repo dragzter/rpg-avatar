@@ -13,7 +13,7 @@
                             class="d-none d-sm-block accent-text ms-0 mb-0"
                             style="width: 100px"
                         >
-                            v0.5.1
+                            v0.6.0
                         </p>
                         <router-link class="ms-3" to="loaders"
                             >Loaders
