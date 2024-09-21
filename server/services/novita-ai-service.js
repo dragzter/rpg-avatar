@@ -87,8 +87,6 @@ class NovitaAIService {
         //     configuredPrompt = promptConstructor(userData, false);
         // }
 
-        console.log(configuredPrompt, "configuredPrompt")
-
         const r_width = userData?.size?.width || 1024;
         const r_height = userData?.size?.height || 1024;
         const adherence = userData.adherence || 7;
@@ -256,28 +254,27 @@ class NovitaAIService {
         console.log("Downloading and uploading images...");
         const file_names = []
         const thumbnail_file_names = []
-        const prefix = state?.user?.nickname || "user"
 
         const uploadPromises = imageUrls.map(async (url) => {
             try {
                 const folder = `${state.user.id.replace("|", "")}`
-                const file_key = `${prefix}-${Math.random().toString(36).substring(6)}`
+                const file_key = Math.random().toString(36).substring(6)
 
                 const response = await axios.get(url, {responseType: "arraybuffer"});
 
                 const buffer = response.data;
-                const key = `${folder}/${file_key}.image.jpeg`;
+                const image_key = `${folder}/${file_key}.image.jpeg`;
                 const thumbnail = `${folder}/thumbnails/${file_key}.thumbnail.jpeg`;
 
-                file_names.push(key);
+                file_names.push(image_key);
                 thumbnail_file_names.push(thumbnail);
 
                 await Promise.all([
-                    BackblazeStorageService.upload(buffer, key),
+                    BackblazeStorageService.upload(buffer, image_key),
                     BackblazeStorageService.createThumbnailAndUpload(buffer, thumbnail)
                 ])
 
-                console.log(`Successfully uploaded: ${key} and ${thumbnail}`);
+                console.log(`Successfully uploaded: ${image_key} and ${thumbnail}`);
             } catch (error) {
                 console.error(`Failed to download or upload image from ${url}: `, error);
             }

@@ -3,6 +3,8 @@ import OpenAiService from "../services/open-ai-service.js";
 import NovitaAiService from "../services/novita-ai-service.js";
 import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
 import {promptConstructor} from "../utils/prompt-constructor.js";
+import BackblazeStorageService from "../services/backblaze-storage-service.js";
+import axios from "axios";
 
 const router = express.Router();
 
@@ -53,9 +55,20 @@ router.post("/api/random-prompt", async (req, res) => {
     }
 })
 
+router.get("/api/images/:user_id", async (req, res) => {
+    try {
+        const user_id = req.params.user_id
+
+        const response = await BackblazeStorageService.fetchImages(user_id)
+        return res.status(200).json(response)
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(error)
+    }
+})
+
 router.post("/api/surprise-prompt", async (req, res) => {
     try {
-        console.log(req.body, "route: /api/surprise-prompt")
         const {archetype, art_style} = req.body
 
         const response = await OpenAiService.requestAiPromptV2({archetype, art_style});
@@ -67,10 +80,35 @@ router.post("/api/surprise-prompt", async (req, res) => {
     }
 })
 
+router.get("/download-image", async (req, res) => {
+    try {
+        const imageUrl = req.query.url;
+        const response = await axios({
+            url: imageUrl,
+            method: "GET",
+            responseType: "arraybuffer"
+        });
+
+        if (response.status !== 200) {
+            return res.status(response.status).send("Error fetching image");
+        }
+
+        const contentType = response.headers["content-type"];
+        const fileName = imageUrl.split("/").pop();
+
+        res.setHeader("Content-Type", contentType);
+        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+        return res.send(response.data);
+    } catch (err) {
+        console.error("Error fetching the image:", err.message);
+        return res.status(500).send("Error fetching the image");
+    }
+});
+
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
-        console.log(response, "response from NovitaAiService.startImageGeneration")
 
         NovitaAiService.startTaskStatusPolling(response.task_id).then((_resp) => {
             taskManager.activeTasks[_resp.task_id].status = "complete";

@@ -180,7 +180,8 @@ router.post("/api/user/:userId", async (req, res) => {
                 nickname: providedUser.nickname,
                 email_verified: providedUser.email_verified,
                 admin: false,
-                image_count: 0
+                image_count: 0,
+                image_storage_cap: 300
             }
 
             if (providedUser.sub.includes("facebook")) {

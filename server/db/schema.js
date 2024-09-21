@@ -85,6 +85,11 @@ export const UserSchema = new Schema({
         type: String,
         required: false,
     },
+    image_storage_cap: {
+        type: Number,
+        required: false,
+        default: 300
+    },
     token_balance: {
         type: Number,
         required: true,
