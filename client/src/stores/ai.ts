@@ -4,9 +4,10 @@ import type {
     NovitaImg,
     UserAIPrompt,
 } from "@/stores/types";
-import { API, ApiTaskStatus } from "@/utils/";
+import { API, ApiTaskStatus, STORAGE_KEYS } from "@/utils/";
 import axios, { type AxiosResponse } from "axios";
 import { useUserStore } from "@/stores/user";
+import { storage } from "@/utils/storage";
 
 export const useAiStore = defineStore("aiImages", {
     state: () => ({
@@ -39,8 +40,7 @@ export const useAiStore = defineStore("aiImages", {
 
                 // TODO update toast message to show task was cancelled
                 this.task_id = "";
-                localStorage.removeItem("task_id");
-                console.log(response.data);
+                storage.rm(STORAGE_KEYS.task_id);
             } catch (err) {
                 console.log(err);
             }
@@ -96,8 +96,8 @@ export const useAiStore = defineStore("aiImages", {
                                 );
 
                                 // Save the last task_id in localStorage
-                                localStorage.setItem(
-                                    "task_id",
+                                storage.s(
+                                    STORAGE_KEYS.task_id,
                                     taskIdResponse.data.task_id as string
                                 );
 
@@ -108,6 +108,7 @@ export const useAiStore = defineStore("aiImages", {
                                     this.requestLoading = false;
                                     this.imagesLoaded = false;
                                     this.toastMessage = "Task was cancelled";
+                                    storage.rm(STORAGE_KEYS.task_id);
                                 } else if (
                                     _resp.data.status === ApiTaskStatus.COMPLETE
                                 ) {
@@ -129,6 +130,12 @@ export const useAiStore = defineStore("aiImages", {
                                     if (this.generatedImagesV2?.length) {
                                         this.imagesLoaded = true;
                                         this.requestLoading = false;
+
+                                        storage.s(
+                                            STORAGE_KEYS.new_images,
+                                            true
+                                        );
+                                        storage.rm(STORAGE_KEYS.task_id);
                                     }
                                 } else if (
                                     _resp.data.status === ApiTaskStatus.FAILED

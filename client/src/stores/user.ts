@@ -3,10 +3,13 @@ import type {
     CodeRedeemRequest,
     RedeemAPIResponse,
     RPGAvatarUser,
+    UserImage,
+    UserImageResponse,
 } from "@/stores/types";
 import { User } from "@auth0/auth0-vue";
 import axios, { type AxiosResponse } from "axios";
-import { API } from "@/utils/";
+import { API, STORAGE_KEYS } from "@/utils/";
+import { storage } from "@/utils/storage";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -16,6 +19,8 @@ export const useUserStore = defineStore("user", {
         auth0User: {} as User,
         toastMessage: "",
         userError: false,
+        imageThumbnails: [] as UserImage[],
+        images: [] as UserImage[],
     }),
     actions: {
         async redeemCodeV2(
@@ -47,6 +52,36 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async fetchImages(user_id) {
+            try {
+                this.userLoading = true;
+                const response: AxiosResponse<UserImageResponse> =
+                    await axios.get(API.get_images + `/${user_id}`);
+
+                this.imageThumbnails = response.data?.thumbnails as UserImage[];
+                this.images = response.data?.images as UserImage[];
+
+                if (this.imageThumbnails?.length || this.images?.length) {
+                    storage.s(STORAGE_KEYS.thumbnails, {
+                        thumbnails: this.imageThumbnails,
+                    });
+
+                    storage.s(STORAGE_KEYS.images, {
+                        images: this.images,
+                    });
+
+                    storage.s(
+                        STORAGE_KEYS.images_requested_on,
+                        response.data?.requested_on || new Date().toISOString()
+                    );
+                }
+
+                storage.rm(STORAGE_KEYS.new_images);
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
         async deleteUserAccount({ userId }) {
             try {
                 this.userLoading = true;
@@ -63,7 +98,6 @@ export const useUserStore = defineStore("user", {
         },
 
         async signPurchaseDisclaimer(userId: string) {
-            console.log("patching dat disclaimer dawg!");
             try {
                 const response = await axios.patch(API.sign_disclaimer, {
                     userId,
@@ -84,14 +118,11 @@ export const useUserStore = defineStore("user", {
                 this.userLoaded = false;
                 this.userLoading = true;
 
-                console.log(user);
-
                 const response = await axios.post(
                     API.get_user + `/${user.sub}`,
                     user
                 );
 
-                console.log(response.data);
                 this.user = response.data;
                 this.userLoaded = true;
             } catch (err) {
@@ -103,7 +134,6 @@ export const useUserStore = defineStore("user", {
     },
     getters: {
         isAdmin: (state) => {
-            console.log(state.user.admin);
             return state.user?.admin;
         },
     },

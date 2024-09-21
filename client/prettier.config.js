@@ -3,5 +3,5 @@ export default {
     singleQuote: false, // Use double quotes for strings
     trailingComma: "es5", // Add trailing commas where valid in ES5
     semi: true, // Use semicolons
-    printWidth: 80, // Max line width
+    printWidth: 90, // Max line width
 };

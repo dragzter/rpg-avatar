@@ -68,7 +68,7 @@
 
                                     <p class="mb-2 model-select-label">
                                         <span class="accent-text">
-                                            AI Model</span
+                                            AI Optimization</span
                                         >
                                     </p>
                                 </div>
@@ -210,6 +210,13 @@
                         <div class="mt-auto ms-auto button-action-row">
                             <span v-if="rpgUser.token_balance > 0">
                                 <button
+                                    v-if="loading"
+                                    class="btn me-2 btn-tertiary"
+                                    @click="cancelImageRequest"
+                                >
+                                    Cancel
+                                </button>
+                                <button
                                     v-if="isRPGChecked"
                                     :disabled="loading"
                                     class="btn accent-link-outline"
@@ -227,7 +234,7 @@
                                     :disabled="
                                         loading || rpgUser?.token_balance === 0
                                     "
-                                    class="btn btn-primary mt-1 btn-large ms-3"
+                                    class="btn btn-primary ms-2"
                                     @click="() => handleSubmit(false)"
                                 >
                                     <div class="d-flex align-items-center">
@@ -238,13 +245,6 @@
 
                                         Generate
                                     </div>
-                                </button>
-                                <button
-                                    v-if="loading"
-                                    class="btn me-2 btn-warning"
-                                    @click="cancelImageRequest"
-                                >
-                                    Cancel
                                 </button>
                             </span>
                             <span v-else>
@@ -290,82 +290,13 @@
                         </template>
                     </div>
 
-                    <vue-easy-lightbox
-                        :imgs="lightboxImages"
+                    <LightboxComponent
+                        :images="lightboxImages"
                         :index="indexRef"
-                        :visible="visibleRef"
-                        @hide="onHide"
-                    >
-                        <template v-slot:toolbar="{ toolbarMethods }">
-                            <div
-                                class="vel-toolbar view-image-actions overflow-visible"
-                            >
-                                <div
-                                    style="
-                                        position: absolute;
-                                        top: -47px;
-                                        left: 50%;
-                                        width: 200px;
-                                        transform: translate(-50%);
-                                    "
-                                    v-if="copySuccess"
-                                    class="alert text-center alert-success mt-2 p-1 px-2 mb-0"
-                                    role="alert"
-                                >
-                                    URL Copied!
-                                </div>
-
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="toolbarMethods.zoomIn"
-                                >
-                                    <i
-                                        class="fa-regular fa-magnifying-glass-plus"
-                                    ></i>
-                                </button>
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="toolbarMethods.zoomOut"
-                                >
-                                    <i
-                                        class="fa-regular fa-magnifying-glass-minus"
-                                    ></i>
-                                </button>
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="toolbarMethods.rotateLeft"
-                                >
-                                    <i
-                                        class="fa-regular fa-arrows-rotate-reverse"
-                                    ></i>
-                                </button>
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="toolbarMethods.rotateRight"
-                                >
-                                    <i class="fa-regular fa-arrows-rotate"></i>
-                                </button>
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="
-                                        downloadImage(lightboxImages[indexRef])
-                                    "
-                                >
-                                    <i
-                                        class="fa-solid fa-arrow-down-to-bracket"
-                                    ></i>
-                                </button>
-                                <button
-                                    class="btn action-btn btn-dark"
-                                    @click="
-                                        copyImgURL(lightboxImages[indexRef])
-                                    "
-                                >
-                                    <i class="fa-regular fa-copy"></i>
-                                </button>
-                            </div>
-                        </template>
-                    </vue-easy-lightbox>
+                        :show="showLightbox"
+                        @toast-message="onToastMessage"
+                        @update:show="showLightbox = false"
+                    />
                     <ToastComponent
                         :autoClose="true"
                         :autoCloseDelay="3000"
@@ -411,14 +342,15 @@ import { useUserStore } from "@/stores/user";
 import { ImageOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
-import axios from "axios";
 import ModalComponent from "@/components/global/ModalComponent.vue";
 import ModelUIComponent from "@/components/ModelUIComponent.vue";
 import ButtonComponent from "@/components/global/ButtonComponent.vue";
+import LightboxComponent from "@/components/global/LightboxComponent.vue";
 
 /**
- * DATA
+ * =*'^'*= DATA =*'^'*=
  */
+const indexRef = ref(0);
 const useV2Prompt = ref(true);
 const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
 const aiStore = useAiStore();
@@ -427,7 +359,6 @@ const { isAuthenticated, loginWithPopup } = useAuth0();
 const showToast = ref(false);
 const toastMessage = ref("");
 const isError = ref(false);
-const copySuccess = ref(false);
 
 const userSelections = ref<UserAIPrompt>({
     archetype: "fighter",
@@ -471,11 +402,6 @@ const model_selection = ref<ModelSection[]>([
     },
 ]);
 
-// Ez-lightbox
-const visibleRef = ref(false);
-const indexRef = ref(0); // default 0 - only when using multiple images
-const sharedImgUrl = ref("");
-
 const selected_model = ref<ModelSection>({
     label: "Character",
     img: "character_model.png",
@@ -483,15 +409,17 @@ const selected_model = ref<ModelSection>({
 });
 
 /**
- * COMPUTED
+ * =*'^'*= COMPUTED =*'^'*=
  */
+const lightboxImages = computed(() =>
+    aiStore.generatedImagesV2.map((img) => img.image_url)
+);
 const loading = computed(() => aiStore.requestLoading);
 const loaded = computed(() => aiStore.imagesLoaded);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
 const rpgUser = computed(() => userStore.user || { token_balance: 0 });
-const lightboxImages = computed(() =>
-    aiStore.generatedImagesV2.map((img) => img.image_url)
-);
+const showLightbox = ref(false);
+
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
     const desiredCount = userSelections.value.count || 1;
@@ -508,7 +436,7 @@ const imagesV2 = computed(() => {
 });
 
 /**
- * LIFE-CYCLE
+ * =*'^'*= LIFE-CYCLE =*'^'*=
  */
 onMounted(async () => {
     userSelections.value.rpg_presets =
@@ -526,9 +454,8 @@ onMounted(async () => {
 });
 
 /**
- * WATCHERS
+ * =*'^'*= WATCHERS =*'^'*=
  */
-
 watch(
     () => rpgUser.value,
     (newRgpUser) => {
@@ -545,10 +472,22 @@ watch(
 );
 
 /**
- * HANDLERS
+ * =*'^'*= METHODS =*'^'*=
  */
 const resetImages = () => {
     aiStore.generatedImagesV2 = [];
+};
+
+const onToastMessage = (message) => {
+    showToast.value = true;
+    userStore.toastMessage = message;
+};
+
+const viewImage = (img: string) => {
+    if (loading.value || !img) return;
+
+    indexRef.value = lightboxImages.value.findIndex((image) => image === img);
+    showLightbox.value = true;
 };
 
 const toggleStatus = (event) => {
@@ -614,77 +553,5 @@ const selectModel = (model: ModelSection) => {
     console.log("Selecting model", model);
     selected_model.value = model;
     userSelections.value.model = model.value;
-};
-
-const downloadImage = async (url) => {
-    isError.value = false;
-    showToast.value = false;
-    toastMessage.value = "";
-
-    await nextTick();
-
-    try {
-        showToast.value = true;
-        toastMessage.value = "Download in progress, enjoy!";
-
-        // Fetch the image using Axios and get the image as a blob
-        const response = await axios.get(url, {
-            responseType: "blob", // This ensures we get the image as a binary blob
-        });
-
-        // Create a URL for the Blob object
-        const blobUrl = URL.createObjectURL(new Blob([response.data]));
-
-        // Create a link element for download
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = `rpgavatar.com-${rpgUser.value.nickname}-image.jpeg`; // Set the desired file name
-
-        // Trigger the download
-        document.body.appendChild(link);
-        link.click();
-
-        // Clean up the Blob URL
-        URL.revokeObjectURL(blobUrl);
-        document.body.removeChild(link);
-
-        toastMessage.value = "Download completed!";
-    } catch (err) {
-        console.error(err);
-        showToast.value = true;
-        isError.value = true;
-        toastMessage.value = "Download failed.";
-    }
-};
-
-const onShow = () => {
-    visibleRef.value = true;
-};
-
-const onHide = () => (visibleRef.value = false);
-
-const viewImage = (img: string) => {
-    if (loading.value) return;
-
-    indexRef.value = lightboxImages.value.findIndex((image) => image === img);
-    onShow();
-};
-
-const copyImgURL = async (imgUrl: string) => {
-    await nextTick();
-    sharedImgUrl.value = imgUrl;
-    navigator.clipboard
-        .writeText(sharedImgUrl.value)
-        .then(() => {
-            console.log("Image URL copied to clipboard");
-            copySuccess.value = true;
-
-            setTimeout(() => {
-                copySuccess.value = false;
-            }, 2000);
-        })
-        .catch((err) => {
-            console.error("Failed to copy image URL to clipboard", err);
-        });
 };
 </script>

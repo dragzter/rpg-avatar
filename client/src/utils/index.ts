@@ -25,6 +25,16 @@ export const API = {
         import.meta.env.VITE_APP_API_URL +
         "/api/facebook/data-deletion-callback",
     surprise_prompt: import.meta.env.VITE_APP_API_URL + "/api/surprise-prompt",
+    get_images: import.meta.env.VITE_APP_API_URL + "/api/images",
+};
+
+export const STORAGE_KEYS = {
+    thumbnails: "thumbnails",
+    images: "images",
+    user: "user",
+    task_id: "task_id",
+    images_requested_on: "images_requested_on",
+    new_images: "new_images",
 };
 
 export const ApiTaskStatus = {

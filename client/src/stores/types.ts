@@ -126,6 +126,8 @@ export interface RPGAvatarUser {
     disclaimer_signed: boolean;
     disclaimer_signed_on_date: string;
 
+    image_storage_cap?: number;
+    image_count?: number;
     email_verified?: boolean;
     passes?: string[];
     picture?: string;
@@ -186,5 +188,18 @@ export interface CodeRedeemRequest {
     user_id: string;
     type: "pass" | "token";
 }
+
+export interface UserImage {
+    url: string;
+    key: string;
+    requested_on: string;
+}
+
+export type UserImageResponse = {
+    images?: UserImage[];
+    thumbnails?: UserImage[];
+    requested_on?: string;
+    success: boolean;
+};
 
 export type ModelSection = { label: string; img: string; value: string };

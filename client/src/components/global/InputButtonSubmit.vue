@@ -5,7 +5,7 @@
             <span v-if="accentText" class="accent-text">{{ accentText }}</span>
         </label>
 
-        <div class="input-group mb-3" style="max-width: 400px">
+        <div class="input-group mb-3">
             <input
                 :id="inputId"
                 :aria-label="placeholderText"

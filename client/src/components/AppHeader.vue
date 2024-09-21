@@ -115,14 +115,6 @@
                                     </router-link>
                                 </li>
                                 <hr />
-                                <li>
-                                    <router-link
-                                        v-if="rpgUser?.admin"
-                                        class="dropdown-item text-bg-warning"
-                                        to="dashboard"
-                                        >Admin Dashboard
-                                    </router-link>
-                                </li>
                                 <li v-if="rpgUser?.id">
                                     <button
                                         class="dropdown-item text-danger"
@@ -131,6 +123,16 @@
                                         Delete Account
                                     </button>
                                 </li>
+                                <hr />
+                                <li>
+                                    <router-link
+                                        v-if="rpgUser?.admin"
+                                        class="dropdown-item text-bg-warning"
+                                        to="dashboard"
+                                        >Admin Dashboard
+                                    </router-link>
+                                </li>
+
                                 <li>
                                     <button
                                         class="dropdown-item"
@@ -198,8 +200,14 @@ watch(
 );
 
 const deleteAccount = async () => {
-    await userStore.deleteUserAccount({ userId: rpgUser.value.id });
-    await logOut();
+    const confirmation = confirm(
+        "Are you sure you want to delete your account? This action is irreversible."
+    );
+
+    if (confirmation) {
+        await userStore.deleteUserAccount({ userId: rpgUser.value.id });
+        await logOut();
+    }
 };
 
 const logOut = () =>
