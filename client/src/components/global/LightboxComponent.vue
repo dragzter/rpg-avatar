@@ -36,18 +36,6 @@
                 </button>
                 <button
                     class="btn action-btn btn-dark"
-                    @click="toolbarMethods.rotateLeft"
-                >
-                    <i class="fa-regular fa-arrows-rotate-reverse"></i>
-                </button>
-                <button
-                    class="btn action-btn btn-dark"
-                    @click="toolbarMethods.rotateRight"
-                >
-                    <i class="fa-regular fa-arrows-rotate"></i>
-                </button>
-                <button
-                    class="btn action-btn btn-dark"
                     @click="downloadImage(images[index])"
                 >
                     <i class="fa-solid fa-arrow-down-to-bracket"></i>
@@ -58,6 +46,12 @@
                 >
                     <i class="fa-regular fa-copy"></i>
                 </button>
+                <button
+                    class="btn action-btn btn-dark"
+                    @click="deleteImage(images[index])"
+                >
+                    <i class="fa-regular fa-trash"></i>
+                </button>
             </div>
         </template>
     </vue-easy-lightbox>
@@ -65,16 +59,21 @@
 <script setup lang="ts">
 import { nextTick, type PropType, ref } from "vue";
 import axios from "axios";
+import { useUserStore } from "@/stores/user";
+import type { UserImage } from "@/stores/types"; // Ez-lightbox
 
 // Ez-lightbox
 const sharedImgUrl = ref("");
 const copySuccess = ref(false);
+
+const userStore = useUserStore(); // The user store will always have the images, so it's ok to hardcode here.
 
 const emit = defineEmits([
     "update:show",
     "downloadSuccess",
     "toastMessage",
     "error",
+    "deleteImage",
 ]);
 
 const props = defineProps({
@@ -128,6 +127,25 @@ const downloadImage = async (url) => {
         console.log("Error details:", err.response ? err.response : err);
         emit("error", err);
         emit("toastMessage", "Download failed");
+    }
+};
+
+const deleteImage = async (imgUrl: string) => {
+    await nextTick();
+    // Targeting the specific image to delete using the provided index.  The order of images form backblaze is stable.
+    try {
+        if (userStore?.images[props.index]?.key) {
+            emit(
+                "deleteImage",
+                (userStore.images[props.index] as UserImage).key
+            );
+
+            emit("toastMessage", "Image deleted");
+        }
+    } catch (err) {
+        console.error("Failed to delete image", err);
+        emit("error", err);
+        emit("toastMessage", "Failed to delete image");
     }
 };
 

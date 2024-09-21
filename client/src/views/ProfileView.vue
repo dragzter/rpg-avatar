@@ -63,7 +63,7 @@
                                 <!-- User summary row-->
                                 <div class="row pt-4 mb-3">
                                     <div class="col">
-                                        <h5>
+                                        <h5 class="user-greeting">
                                             Welcome,
                                             <span class="user-nickname">{{
                                                 rpgUser.nickname
@@ -302,6 +302,7 @@
             :index="lightboxIndex"
             @toast-message="onToastMessage"
             @update:show="showLightbox = false"
+            @delete-image="onDeleteImage"
         />
 
         <ToastComponent
@@ -347,7 +348,7 @@ const lightboxImages = computed(() => userStore.images.map((img) => img.url));
 const toastMessage = computed(() => userStore.toastMessage);
 
 /**
- * WATCHERS
+ * =*'^'*= WATCHERS =*'^'*=
  */
 watch(
     () => [userError.value, loading.value],
@@ -401,6 +402,23 @@ const redeemCodeV2 = async (codeType: "token" | "pass", code: string) => {
     tokenCodeToRedeem.value = "";
 };
 
+const onDeleteImage = async (imageKey) => {
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this image?"
+    );
+    if (!confirmDelete) {
+        return;
+    }
+
+    if (rpgUser.value.id) {
+        await userStore.deleteImage({
+            file_key: imageKey,
+            user_id: rpgUser.value.id,
+        });
+        showLightbox.value = false;
+    }
+};
+
 const fetchOrLoadExisting = async (userId) => {
     const stored_images = storage.g(STORAGE_KEYS.images);
     const stored_thumbnails = storage.g(STORAGE_KEYS.thumbnails);
@@ -428,7 +446,9 @@ const fetchOrLoadExisting = async (userId) => {
  * =*'^'*= LIFE-CYCLE =*'^'*=
  */
 onMounted(async () => {
-    await userStore.getUser(user.value as User);
+    if (!rpgUser.value.id) {
+        await userStore.getUser(user.value as User);
+    }
 
     if (rpgUser.value.id) {
         await fetchOrLoadExisting(rpgUser.value.id);
@@ -438,28 +458,31 @@ onMounted(async () => {
 <style scoped>
 #user-media-library {
     padding: 12px;
+
+    @media (max-width: 768px) {
+        padding: 5px;
+    }
 }
 
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+    grid-template-columns: repeat(2, 1fr);
     gap: 6px;
-    grid-auto-rows: 1fr; /* Ensures all rows are of equal height */
-    align-items: center; /* Centers the items vertically within their grid area */
+    grid-auto-rows: 1fr;
+    align-items: center;
+
+    @media (min-width: 276px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
 
     @media (min-width: 768px) {
-        grid-template-columns: repeat(
-            auto-fill,
-            minmax(150px, 2fr)
-        ); /* Flexible columns on larger screens */
+        grid-template-columns: repeat(auto-fill, minmax(150px, 2fr));
         gap: 4px;
     }
 
     @media (min-width: 1024px) {
-        grid-template-columns: repeat(
-            auto-fill,
-            minmax(160px, 1fr)
-        ); /* Adjust columns for even larger screens */
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 6px;
     }
 }

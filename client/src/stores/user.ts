@@ -52,6 +52,44 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async deleteImage({ file_key, user_id }) {
+            try {
+                this.userLoading = true;
+                const response = await axios.post(API.delete_image, {
+                    file_key,
+                    user_id,
+                });
+
+                this.images = this.images.filter(
+                    (image) => image.key !== file_key
+                );
+
+                let thumbnailKey = file_key.replace("/", "/thumbnails/");
+                thumbnailKey = thumbnailKey.replace(".image.", ".thumbnail.");
+
+                this.imageThumbnails = this.imageThumbnails.filter(
+                    (image) => image.key !== thumbnailKey
+                );
+
+                storage.s(STORAGE_KEYS.thumbnails, {
+                    thumbnails: this.imageThumbnails,
+                });
+                storage.s(STORAGE_KEYS.images, {
+                    images: this.images,
+                });
+
+                if (response.data?.success === true) {
+                    this.user.image_count = response.data.image_count;
+                }
+
+                this.toastMessage = response.data.message;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userLoading = false;
+            }
+        },
+
         async fetchImages(user_id) {
             try {
                 this.userLoading = true;

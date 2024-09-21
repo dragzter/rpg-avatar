@@ -178,7 +178,7 @@ Index
  *  01. Common
 /* ====================================== */
 body {
-    min-width: 380px;
+    min-width: 370px;
     font-family: 'Inter', sans-serif;
     font-size: 16px;
     line-height: 1.5;
@@ -275,14 +275,14 @@ input::placeholder {
 .btn-primary {
     border: 1px solid var(--pink);
     background: var(--gradient-lavender-pink-peach);
-    padding: 8px 20px;
+    padding: 12px 20px;
     color: var(--light);
 }
 
 .btn-tertiary {
     border: 1px solid var(--dark-600);
     background: var(--dark-800);
-    padding: 8px 20px;
+    padding: 12px 20px;
     color: var(--light-600);
 }
 
@@ -1607,6 +1607,14 @@ main {
     transition: background-color 0.5s;
     min-width: 370px;
 
+    #auth-column .dropdown .dropdown-menu {
+        background: #0f0f19 !important;
+
+        .dropdown-item:hover {
+            background: var(--dark-400) !important;
+        }
+    }
+
     &.is_scrolling {
         outline: rgb(11, 11, 11) solid 2px;
         box-shadow: rgba(0, 0, 0, 0.4) 0px 6px 24px 10px;
@@ -2384,6 +2392,12 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
             color: #c0c0ff;
         }
 
+        .user-greeting {
+            @media (max-width: 768px) {
+                font-size: 14px;
+            }
+        }
+
         dl {
             padding: 18px 10px;
 
@@ -2391,6 +2405,12 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
                 background: var(--dark-600);
                 padding: 4px 10px;
                 border-radius: 8px;
+            }
+
+            @media (max-width: 768px) {
+                dd p {
+                    font-size: 15px !important;
+                }
             }
         }
     }
