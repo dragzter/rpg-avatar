@@ -47,10 +47,11 @@
                     <i class="fa-regular fa-copy"></i>
                 </button>
                 <button
+                    v-if="allowDelete"
                     class="btn action-btn btn-dark"
                     @click="deleteImage(images[index])"
                 >
-                    <i class="fa-regular fa-trash"></i>
+                    <i class="fa-regular fa-trash-alt"></i>
                 </button>
             </div>
         </template>
@@ -88,6 +89,10 @@ const props = defineProps({
     index: {
         type: Number,
         default: 0,
+    },
+    allowDelete: {
+        type: Boolean,
+        default: false,
     },
 });
 

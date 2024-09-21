@@ -303,6 +303,7 @@
             @toast-message="onToastMessage"
             @update:show="showLightbox = false"
             @delete-image="onDeleteImage"
+            :allow-delete="true"
         />
 
         <ToastComponent
@@ -427,6 +428,7 @@ const fetchOrLoadExisting = async (userId) => {
     if (!stored_images || !stored_thumbnails || have_new_images === true) {
         console.log("fetching images");
         await userStore.fetchImages(userId);
+        await userStore.getUser(user.value as User);
         return;
     }
 
@@ -434,6 +436,7 @@ const fetchOrLoadExisting = async (userId) => {
 
     if (isMoreThan24Hours(lastRequested)) {
         await userStore.fetchImages(userId);
+        await userStore.getUser(user.value as User);
     } else {
         userStore.imageThumbnails = storage.g(
             STORAGE_KEYS.thumbnails
@@ -446,10 +449,6 @@ const fetchOrLoadExisting = async (userId) => {
  * =*'^'*= LIFE-CYCLE =*'^'*=
  */
 onMounted(async () => {
-    if (!rpgUser.value.id) {
-        await userStore.getUser(user.value as User);
-    }
-
     if (rpgUser.value.id) {
         await fetchOrLoadExisting(rpgUser.value.id);
     }
