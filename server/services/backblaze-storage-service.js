@@ -128,14 +128,21 @@ class BackblazeStorageService {
             const image_command = new ListObjectsV2Command(params);
             const image_contents_response = await this.s3_client.send(image_command)
 
-            // sort the images into their own arrays
-            image_contents_response.Contents.forEach(obj => {
+            console.log(image_contents_response.Contents, "image_contents_response.Contents")
+
+            const sortedContents = image_contents_response.Contents.sort((a, b) =>
+                new Date(b.LastModified) - new Date(a.LastModified)
+            );
+
+            // Sort the images and thumbnails into their own arrays
+            sortedContents.forEach(obj => {
                 if (obj.Key.includes("thumbnails/")) {
                     thumbnail_response.push(obj.Key);
                 } else {
                     image_response.push(obj.Key);
                 }
             });
+
 
         } catch (error) {
             console.log(error)
