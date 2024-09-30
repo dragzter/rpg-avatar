@@ -505,17 +505,12 @@ const generateRandomPrompt = async () => {
     userSelections.value.art_style =
         styleOptions[Math.floor(Math.random() * styleOptions.length)]?.value;
 
-    if (useV2Prompt.value) {
-        await aiStore.getRandomPromptV2({
-            archetype: userSelections.value.archetype,
-            art_style: userSelections.value.art_style,
-        });
-    } else {
-        await aiStore.getRandomPrompt({
-            archetype: userSelections.value.archetype,
-            art_style: userSelections.value.art_style,
-        });
-    }
+    await aiStore.getRandomPromptV2({
+        archetype: userSelections.value.archetype,
+        art_style: userSelections.value.art_style,
+        nsfw_pass: userSelections.value.nsfw_pass,
+    });
+
     await handleSubmit(true);
 };
 
