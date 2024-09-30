@@ -41,27 +41,34 @@ class OpenAIService {
      * @returns {Promise<void>}
      */
     async requestAiPromptV2(userRequest) {
-        const {archetype, art_style} = userRequest;
+        const {archetype, art_style, nsfw_pass} = userRequest;
 
         const gender = Math.random() < 0.5 ? "Male" : "Female";
 
-        const attractivenessNote = gender === 'female'
+        const attractivenessNote = (gender === 'female' && nsfw_pass)
             ? "Additionally, ensure the character is very attractive, with perfect facial features and body proportions, alluring, gorgeous and captivating."
             : "";
+
+        let requestMessages = [
+            {
+                role: "user",
+                content: `Use this example to create a prompt in the same style using the provided archetype, art style, and gender. Do not follow structure verbatim, switch it up but stay within the spirit of the request and add in elements appropriate to the archetype.
+                        Example:"High fantasy art style (brunette rogue), (alluring figure), intricate costume design with dark leather and silver accents, sly expression, perfect face, striking pose, dynamic foreground with magical elements, ethereal lighting, mesmerizing colors capturing a sense of adventure, mythical background landscape, enchanted atmosphere, ultra-detailed, vibrant colors, fantasy world flair, dramatic ambiance."
+                        Now, generate a prompt with the following archetype: ${archetype}, art style: ${art_style}, and gender: ${gender} (always include the gender in the final prompt) set in an RPG/fantasy world. ${attractivenessNote}`
+            }
+        ]
+
+        if (!nsfw_pass) {
+            requestMessages.content = requestMessages.content + "  **IMPORTANT** Ensure the prompt is safe for work while keeping within the spirit of the prompt."
+        }
 
         try {
             const response = await this.openai.chat.completions.create({
                 model: this.MODEL.Gpt4oMini,
-                messages: [
-                    {
-                        role: "user",
-                        content: `Use this example to create a prompt in the same style using the provided archetype, art style, and gender. Do not follow structure verbatim, switch it up but stay within the spirit of the request and add in elements appropriate to the archetype.
-                        Example:"High fantasy art style (brunette rogue), (alluring figure), intricate costume design with dark leather and silver accents, sly expression, perfect face, striking pose, dynamic foreground with magical elements, ethereal lighting, mesmerizing colors capturing a sense of adventure, mythical background landscape, enchanted atmosphere, ultra-detailed, vibrant colors, fantasy world flair, dramatic ambiance."
-                        Now, generate a prompt with the following archetype: ${archetype}, art style: ${art_style}, and gender: ${gender} (always include the gender in the final prompt) set in an RPG/fantasy world. ${attractivenessNote}`
-                    }
-                ],
+                messages: requestMessages,
                 max_tokens: this.MAX_TOKEN
             });
+
 
             return response?.choices[0]?.message?.content || "No response from AI";
 
@@ -80,7 +87,6 @@ class OpenAIService {
         //const archetypeContext = getRandomSetting(archetype);
         const archetypeContext = "";
 
-        console.log("starting ai prompt")
         const response = await this.openai.chat.completions.create({
             model: this.MODEL.Gpt4oMini,
             messages: [
@@ -91,6 +97,23 @@ class OpenAIService {
             ],
             max_tokens: this.MAX_TOKEN
         });
+
+        return response.choices[0].message.content;
+    }
+
+    async stripNSFW(prompt) {
+        const response = await this.openai.chat.completions.create({
+            model: this.MODEL.Gpt4oMini,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Clean this prompt up and make it Safe For Work while keeping within the spirit of the prompt: " + prompt
+                }
+            ],
+            max_tokens: this.MAX_TOKEN
+        });
+
+        console.log(response.choices[0].message.content, "response from AI")
 
         return response.choices[0].message.content;
     }

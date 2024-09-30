@@ -5,7 +5,8 @@ import "../config.js"
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import axios from "axios";
 import {v4 as uuidv4} from "uuid";
-import {promptEnhance} from "../utils/prompt-constructor.js";
+import {promptConstructorV2, promptEnhance} from "../utils/prompt-constructor.js";
+import OpenAiService from "./open-ai-service.js";
 
 
 class NovitaAIService {
@@ -77,15 +78,29 @@ class NovitaAIService {
             }
         }
 
-        let configuredPrompt = userData.prompt.replace('"', "") || "generate a random rpg character"
+        let configuredPrompt
 
-        if (userData.randomize && userData.rpg_presets && userData.nsfw_pass) {
-            configuredPrompt = promptEnhance(userData.prompt)
+        if (userData.rpg_presets) {
+            configuredPrompt = userData.prompt.replace('"', "") || "generate a random rpg character"
+
+            if (userData.randomize && userData.nsfw_pass) {
+                configuredPrompt = promptEnhance(userData.prompt);
+            } else if (!userData.randomize && userData.nsfw_pass) {
+                configuredPrompt = promptConstructorV2(userData.prompt);
+            } else if (!userData.randomize && !userData.nsfw_pass) {
+                configuredPrompt = await OpenAiService.stripNSFW(promptConstructorV2(userData));
+            } else if (userData.randomize && !userData.nsfw_pass) {
+                configuredPrompt = userData.prompt; // This has already been cleaned up
+            }
+        } else {
+
+            if (!userData.nsfw_pass) {
+                configuredPrompt = await OpenAiService.stripNSFW(userData.prompt) || "generate something beautiful or interesting"
+            } else {
+                configuredPrompt = userData.prompt || "generate something beautiful or interesting"
+            }
         }
 
-        // if (userData.rpg_presets) {
-        //     configuredPrompt = promptConstructor(userData, false);
-        // }
 
         const r_width = userData?.size?.width || 1024;
         const r_height = userData?.size?.height || 1024;
@@ -101,7 +116,7 @@ class NovitaAIService {
                 height: r_height,
                 sampler_name: "DPM++ 2S a Karras",
                 guidance_scale: adherence,
-                steps: 26,
+                steps: 25,
                 image_num: userData.count || 1,
                 clip_skip: 1,
                 seed: -1,

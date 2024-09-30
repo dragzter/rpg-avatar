@@ -70,9 +70,13 @@ router.get("/api/images/:user_id", async (req, res) => {
 
 router.post("/api/surprise-prompt", async (req, res) => {
     try {
-        const {archetype, art_style} = req.body
+        const {archetype, art_style, nsfw_pass} = req.body
 
-        const response = await OpenAiService.requestAiPromptV2({archetype, art_style});
+        const response = await OpenAiService.requestAiPromptV2({
+            archetype,
+            art_style,
+            nsfw_pass
+        });
 
         return res.status(200).json(response);
     } catch (error) {
