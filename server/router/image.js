@@ -45,6 +45,7 @@ router.post("/api/task-status", (req, res) => {
     }
 })
 
+// Deprecated 9/17/2024
 router.post("/api/random-prompt", async (req, res) => {
     try {
         const response = promptConstructor(req.body, true);

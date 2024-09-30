@@ -79,7 +79,7 @@ class NovitaAIService {
 
         let configuredPrompt = userData.prompt.replace('"', "") || "generate a random rpg character"
 
-        if (userData.randomize && userData.rpg_presets) {
+        if (userData.randomize && userData.rpg_presets && userData.nsfw_pass) {
             configuredPrompt = promptEnhance(userData.prompt)
         }
 
@@ -294,6 +294,7 @@ class NovitaAIService {
                     prompt_id: uuidv4(),
                 }
 
+                // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);
 
                 // Update the user's image count
