@@ -172,85 +172,85 @@
                 </template>
             </div>
 
-            <!--            <div class="text-center my-5">-->
-            <!--                <img alt="logo" src="/assets/rpgavatarlogo.png" />-->
-            <!--            </div>-->
-            <!--            <ProductTitle-->
-            <!--                :wrapper-css-classes="['mt-5']"-->
-            <!--                css-id="product-currency-title"-->
-            <!--                size="h2"-->
-            <!--                sub-text="Take advantage of other types of content and services with passes."-->
-            <!--                titleHTML="Content <span>Passes</span>"-->
-            <!--            />-->
-            <!--            -->
-            <!--            <div id="product-passes" class="row">-->
-            <!--                <template v-for="(product, index) in productsEnhanced">-->
-            <!--                    <div-->
-            <!--                        v-if="product?.metadata?.type === 'passes'"-->
-            <!--                        :key="`product-offer-${product.name + index}`"-->
-            <!--                        :class="{ 'client-purchased': rpgUser.nsfw_pass }"-->
-            <!--                        class="product-card-item product-passes"-->
-            <!--                    >-->
-            <!--                        <div class="pricing-item">-->
-            <!--                            <h3 style="color: goldenrod">-->
-            <!--                                {{ product.name }}-->
+            <div class="text-center my-5">
+                <img alt="logo" src="/assets/rpgavatarlogo.png" />
+            </div>
+            <ProductTitle
+                :wrapper-css-classes="['mt-5']"
+                css-id="product-currency-title"
+                size="h2"
+                sub-text="Take advantage of other types of content and services with passes."
+                titleHTML="Content <span>Passes</span>"
+            />
 
-            <!--                                <span class="fs-6 text-white">-->
-            <!--                                    <Popper :hover="true" placement="top">-->
-            <!--                                        <i-->
-            <!--                                            v-if="-->
-            <!--                                                product.metadata?.limited_notice-->
-            <!--                                            "-->
-            <!--                                            class="fa-regular fa-circle-question"-->
-            <!--                                        ></i>-->
-            <!--                                        <template #content-->
-            <!--                                            ><p class="m-0">-->
-            <!--                                                {{-->
-            <!--                                                    product.metadata-->
-            <!--                                                        ?.limited_notice-->
-            <!--                                                }}-->
-            <!--                                            </p>-->
-            <!--                                        </template>-->
-            <!--                                    </Popper>-->
-            <!--                                </span>-->
-            <!--                            </h3>-->
-            <!--                            <hr />-->
-            <!--                            <p class="fs-4 product-description">-->
-            <!--                                {{ product.description }}-->
-            <!--                            </p>-->
+            <div id="product-passes" class="row">
+                <template v-for="(product, index) in productsEnhanced">
+                    <div
+                        v-if="product?.metadata?.type === 'passes'"
+                        :key="`product-offer-${product.name + index}`"
+                        :class="{ 'client-purchased': rpgUser.nsfw_pass }"
+                        class="product-card-item product-passes"
+                    >
+                        <div class="pricing-item">
+                            <h3 style="color: goldenrod">
+                                {{ product.name }}
 
-            <!--                            <h4>-->
-            <!--                                <span>{{ product.price }}</span>-->
-            <!--                            </h4>-->
-            <!--                            <ul v-if="product.metadata?.type === 'passes'">-->
-            <!--                                <li class="pb-0">-->
-            <!--                                    <span style="color: goldenrod"-->
-            <!--                                        ><i class="fa-solid fa-check"></i-->
-            <!--                                    ></span>-->
-            <!--                                    <p class="mb-0 pb-0">-->
-            <!--                                        {{-->
-            <!--                                            product.metadata.item-->
-            <!--                                                ? product.metadata.item-->
-            <!--                                                : product.name-->
-            <!--                                        }}-->
-            <!--                                    </p>-->
-            <!--                                </li>-->
-            <!--                            </ul>-->
-            <!--                            <div-->
-            <!--                                v-if="!rpgUser.nsfw_pass"-->
-            <!--                                class="pricing-button"-->
-            <!--                            >-->
-            <!--                                <button @click="buy(product)">Buy Now</button>-->
-            <!--                            </div>-->
-            <!--                            <span-->
-            <!--                                v-else-->
-            <!--                                class="badge w-100 fs-4 mt-2 text-bg-info"-->
-            <!--                                >Purchased</span-->
-            <!--                            >-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </template>-->
-            <!--            </div>-->
+                                <span class="fs-6 text-white">
+                                    <Popper :hover="true" placement="top">
+                                        <i
+                                            v-if="
+                                                product.metadata?.limited_notice
+                                            "
+                                            class="fa-regular fa-circle-question"
+                                        ></i>
+                                        <template #content
+                                            ><p class="m-0">
+                                                {{
+                                                    product.metadata
+                                                        ?.limited_notice
+                                                }}
+                                            </p>
+                                        </template>
+                                    </Popper>
+                                </span>
+                            </h3>
+                            <hr />
+                            <p class="fs-4 product-description">
+                                {{ product.description }}
+                            </p>
+
+                            <h4>
+                                <span>{{ product.price }}</span>
+                            </h4>
+                            <ul v-if="product.metadata?.type === 'passes'">
+                                <li class="pb-0">
+                                    <span style="color: goldenrod"
+                                        ><i class="fa-solid fa-check"></i
+                                    ></span>
+                                    <p class="mb-0 pb-0">
+                                        {{
+                                            product.metadata.item
+                                                ? product.metadata.item
+                                                : product.name
+                                        }}
+                                    </p>
+                                </li>
+                            </ul>
+                            <div
+                                v-if="!rpgUser.nsfw_pass"
+                                class="pricing-button"
+                            >
+                                <button @click="buy(product)">Buy Now</button>
+                            </div>
+                            <span
+                                v-else
+                                class="badge w-100 fs-4 mt-2 text-bg-info"
+                                >Purchased</span
+                            >
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </template>
