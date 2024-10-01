@@ -26,3 +26,7 @@ export const SolutionContentItems: ContentItem[] = [
         routerTo: "community-gallery",
     },
 ];
+
+export function excerpt(text: string, length: number): string {
+    return text.length > length ? text.substring(0, length) + "..." : text;
+}

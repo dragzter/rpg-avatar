@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import type {
     CodeRedeemRequest,
+    PromptHistoryItem,
+    QuickPromptHistory,
     RedeemAPIResponse,
     RPGAvatarUser,
     UserImage,
@@ -21,6 +23,9 @@ export const useUserStore = defineStore("user", {
         userError: false,
         imageThumbnails: [] as UserImage[],
         images: [] as UserImage[],
+        promptsHistory: [] as PromptHistoryItem[],
+        quickHistory: [] as QuickPromptHistory[],
+        userPromptsLoading: false,
     }),
     actions: {
         async redeemCodeV2(
@@ -117,6 +122,44 @@ export const useUserStore = defineStore("user", {
                 storage.rm(STORAGE_KEYS.new_images);
             } catch (error) {
                 console.log(error);
+            }
+        },
+
+        async fetchQuickPromptsHistory(userId: string) {
+            try {
+                this.userPromptsLoading = true;
+                const response = await axios.get(
+                    API.get_user_prompts + `/${userId}`
+                );
+
+                if (response.data?.length) {
+                    const thumbnails = storage.g(STORAGE_KEYS.thumbnails);
+
+                    for (const prompt of response.data) {
+                        const urls = [];
+                        if (!prompt.thumbnails) continue;
+
+                        for (const thumbnail of prompt.thumbnails) {
+                            const url = thumbnails.thumbnails.find(
+                                (t) => t.key === thumbnail
+                            );
+                            if (url) {
+                                urls.push(url.url);
+                            }
+                        }
+
+                        prompt.urls = urls;
+                    }
+                }
+
+                this.quickHistory = response.data.filter(
+                    (prompt_item) => prompt_item.urls.length
+                );
+                console.log(this.quickHistory);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userPromptsLoading = false;
             }
         },
 

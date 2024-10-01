@@ -203,3 +203,30 @@ export type UserImageResponse = {
 };
 
 export type ModelSection = { label: string; img: string; value: string };
+
+export interface PromptHistoryItem {
+    user_id: string;
+    prompt_id: string;
+    prompt: string;
+    archetype?: string;
+    art_style?: string;
+    created?: string;
+    size?: {
+        width: number;
+        height: number;
+    };
+    negative_prompt?: string;
+    thumbnails?: string[];
+    file_names?: string[];
+}
+
+// Initial response in the profile page
+// All that is needed to create the grid.  Clicking on a grid item fetches the metadata.
+export interface QuickPromptHistory {
+    prompt_id: string;
+    prompt_excerpt: string;
+    created?: string;
+    thumbnails?: string[];
+    urls?: string[];
+}
+

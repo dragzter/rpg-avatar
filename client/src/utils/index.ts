@@ -27,6 +27,7 @@ export const API = {
     surprise_prompt: import.meta.env.VITE_APP_API_URL + "/api/surprise-prompt",
     get_images: import.meta.env.VITE_APP_API_URL + "/api/images",
     delete_image: import.meta.env.VITE_APP_API_URL + "/api/image/delete",
+    get_user_prompts: import.meta.env.VITE_APP_API_URL + "/api/user/prompts",
 };
 
 export const STORAGE_KEYS = {

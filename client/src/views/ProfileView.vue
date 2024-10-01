@@ -38,6 +38,23 @@
                                     }}</small
                                 >
                             </button>
+
+                            <button
+                                class="nav-link ms-1"
+                                id="nav-prompt-history-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#nav-prompt-history"
+                                type="button"
+                                role="tab"
+                                aria-controls="nav-prompt-history"
+                                aria-selected="false"
+                            >
+                                Prompt History
+                                <small class="image-cap-indicator">{{
+                                    userStore.quickHistory?.length || 0
+                                }}</small>
+                            </button>
+
                             <!--                            <button-->
                             <!--                                class="nav-link ms-1"-->
                             <!--                                id="nav-passes-tab"-->
@@ -53,6 +70,7 @@
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
+                        <!-- TAB - user details -->
                         <div
                             class="tab-pane show active container-fluid user-details"
                             id="nav-profile"
@@ -202,11 +220,12 @@
                             </div>
                         </div>
 
+                        <!-- TAB - media lib -->
                         <div
                             class="tab-pane"
                             id="nav-media-library"
                             role="tabpanel"
-                            aria-labelledby="nav-profile-tab"
+                            aria-labelledby="nav-media-lib-tab"
                         >
                             <div class="p-3">
                                 <div id="user-media-library" class="image-grid">
@@ -225,6 +244,89 @@
                             </div>
                         </div>
 
+                        <!-- TAB - prompt history -->
+                        <div
+                            class="tab-pane"
+                            id="nav-prompt-history"
+                            role="tabpanel"
+                            aria-labelledby="nav-prompt-history"
+                        >
+                            <div class="p-3">
+                                <div id="prompt-history" class="prompt-grid">
+                                    <template
+                                        v-for="item in userStore.quickHistory"
+                                    >
+                                        <div class="card">
+                                            <div class="row g-0">
+                                                <div
+                                                    v-if="item.urls?.length"
+                                                    class="col-md-4 position-relative"
+                                                >
+                                                    <div
+                                                        class="overflow-hidden w-100 h-100 position-relative"
+                                                    >
+                                                        <img
+                                                            :src="item.urls[0]"
+                                                            alt="image"
+                                                            class="object-fit-cover w-100 h-100"
+                                                        />
+                                                        <small
+                                                            style="
+                                                                left: 5px;
+                                                                bottom: 3px;
+                                                                right: 5px;
+                                                                background: rgba(
+                                                                    0,
+                                                                    0,
+                                                                    0,
+                                                                    0.5
+                                                                );
+                                                            "
+                                                            class="position-absolute text-center w-auto"
+                                                            >First Image</small
+                                                        >
+                                                    </div>
+                                                    <span
+                                                        class="position-absolute top-0 start-100 translate-middle badge bg-primary"
+                                                    >
+                                                        {{
+                                                            (
+                                                                item.urls as string[]
+                                                            ).length
+                                                        }}
+
+                                                        <span
+                                                            class="visually-hidden"
+                                                            >images
+                                                            available</span
+                                                        >
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="card-body">
+                                                        <p class="card-text">
+                                                            {{
+                                                                item.prompt_excerpt
+                                                            }}
+                                                        </p>
+                                                        <p class="card-text">
+                                                            <small
+                                                                class="text-muted"
+                                                                >{{
+                                                                    item.created
+                                                                }}</small
+                                                            >
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB - content passes -->
                         <div
                             class="tab-pane"
                             id="nav-passes"
@@ -366,6 +468,7 @@ watch(
     () => rpgUser.value.id,
     async (newId) => {
         await fetchOrLoadExisting(newId);
+        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
 );
 
@@ -451,6 +554,9 @@ const fetchOrLoadExisting = async (userId) => {
 onMounted(async () => {
     if (rpgUser.value.id) {
         await fetchOrLoadExisting(rpgUser.value.id);
+
+        console.log("fetching prompts history");
+        await userStore.fetchPromptsHistory(rpgUser.value.id);
     }
 });
 </script>
@@ -460,6 +566,19 @@ onMounted(async () => {
 
     @media (max-width: 768px) {
         padding: 5px;
+    }
+}
+
+.prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    grid-auto-rows: 1fr;
+    align-items: start;
+    cursor: pointer;
+
+    .card img {
+        transition: 0.2s ease-in-out;
     }
 }
 
@@ -504,7 +623,8 @@ onMounted(async () => {
     border-radius: 6px;
 }
 
-.image-grid > div:hover {
+.image-grid > div:hover,
+.prompt-grid > div:hover {
     outline: 4px solid var(--lavender);
 
     img {
