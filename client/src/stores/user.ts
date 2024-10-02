@@ -58,6 +58,45 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async deleteManyPrompts({ prompt_ids, user_id }) {
+            try {
+                this.userPromptsLoading = true;
+                // expected:  const { user_id, prompt_ids, file_keys } = req.body;
+                const response = await axios.post(API.delete_many_prompts, {
+                    prompt_ids,
+                    user_id,
+                });
+
+                if (response.data.success) {
+                    this.toastMessage = response.data.message;
+                    this.images = this.images.filter((image) => {
+                        return !response.data.deleted_files.includes(image.key);
+                    });
+                    this.imageThumbnails = this.imageThumbnails.filter(
+                        (image) => {
+                            return !response.data.deleted_files.includes(
+                                image.key
+                            );
+                        }
+                    );
+
+                    storage.s(STORAGE_KEYS.thumbnails, {
+                        thumbnails: this.imageThumbnails,
+                    });
+                    storage.s(STORAGE_KEYS.images, { images: this.images });
+                    this.user.image_count = response.data.image_count;
+                    this.selectedPrompt = {} as PromptHistoryItem;
+                    this.quickHistory = this.quickHistory.filter(
+                        (item) => !prompt_ids.includes(item.prompt_id)
+                    );
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userPromptsLoading = false;
+            }
+        },
+
         async deletePrompt(prompt) {
             try {
                 const response = await axios.post(API.delete_prompt, {

@@ -256,17 +256,65 @@
                             aria-labelledby="nav-prompt-history"
                         >
                             <div class="p-3">
+                                <div class="container">
+                                    <div class="row py-2">
+                                        <div
+                                            class="col px-0 d-flex align-items-center"
+                                        >
+                                            <button
+                                                :disabled="startSelect"
+                                                @click="startSelect = true"
+                                                class="btn btn-secondary"
+                                            >
+                                                <i
+                                                    class="fa-light fa-grid-2-plus"
+                                                ></i>
+                                                Select
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr />
                                 <div id="prompt-history" class="prompt-grid">
                                     <template
                                         v-for="item in userStore.quickHistory"
                                     >
                                         <div
-                                            class="card"
-                                            @click="getPrompt(item.prompt_id)"
-                                            data-bs-target="#prompt-selected"
-                                            data-bs-toggle="modal"
+                                            class="card prompt-item"
+                                            :class="{
+                                                'prompt-selected':
+                                                    promptSelection.includes(
+                                                        item.prompt_id
+                                                    ),
+                                                'is-selectable': startSelect,
+                                            }"
+                                            @click="getPrompt(item)"
                                         >
-                                            <div class="row g-0">
+                                            <div class="position-relative">
+                                                <div
+                                                    v-if="startSelect"
+                                                    style="top: 3px; right: 3px"
+                                                    class="position-absolute display-inline-block"
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        class="form-check"
+                                                        :checked="
+                                                            promptSelection.includes(
+                                                                item.prompt_id
+                                                            )
+                                                        "
+                                                        style="
+                                                            width: 18px;
+                                                            height: 18px;
+                                                            pointer-events: none;
+                                                        "
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div class="row h-100">
                                                 <div
                                                     v-if="item.urls?.length"
                                                     class="col-md-4 position-relative"
@@ -329,7 +377,10 @@
                                                             <small
                                                                 class="text-muted"
                                                                 >{{
-                                                                    item.created
+                                                                    niceDate(
+                                                                        item.created ||
+                                                                            ("" as string)
+                                                                    )
                                                                 }}</small
                                                             >
                                                         </p>
@@ -478,6 +529,42 @@
                         <label for="floatingTextarea">Adherence</label>
                     </div>
 
+                    <div
+                        v-if="selectedPrompt?.model"
+                        class="form-floating mb-2"
+                    >
+                        <input
+                            readonly
+                            class="form-control read-only"
+                            id="floatingTextarea"
+                            :value="selectedPrompt.model"
+                        />
+                        <label for="floatingTextarea">Model</label>
+                    </div>
+
+                    <div
+                        v-if="selectedPrompt?.rpg_presets"
+                        class="form-floating mb-2"
+                    >
+                        <input
+                            readonly
+                            class="form-control read-only"
+                            id="floatingTextarea"
+                            :value="selectedPrompt.rpg_presets.toString()"
+                        />
+                        <label for="floatingTextarea">RPG Presets</label>
+                    </div>
+
+                    <p
+                        v-if="selectedPrompt?.count"
+                        class="mb-1 rounded-3 p-2"
+                        style="background: var(--dark-600)"
+                    >
+                        {{ selectedPrompt?.count }}
+                        {{ selectedPrompt.count > 1 ? "images" : "image" }}
+                        prompted
+                    </p>
+
                     <p
                         class="mb-1 rounded-3 p-2"
                         style="background: var(--dark-600)"
@@ -534,6 +621,51 @@
                 </button>
             </template>
         </ModalComponent>
+
+        <div
+            v-if="startSelect"
+            class="bulk-delete-toolbar position-fixed rounded-3 p-2 text-center"
+            style="
+                bottom: 15px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--dark-800);
+                max-width: 400px;
+                min-width: 360px;
+                width: auto;
+                outline: 2px solid var(--dark-100);
+            "
+        >
+            <button
+                @click="cancelSelections"
+                class="btn btn-tertiary"
+                v-if="startSelect"
+            >
+                Cancel
+            </button>
+            <div v-if="startSelect" class="ms-3 badge badge-info">
+                Selected:
+                {{ promptSelection.length }}
+            </div>
+            <button
+                :disabled="!promptSelection.length"
+                @click="deleteSelections"
+                class="btn btn-danger ms-3 position-relative"
+            >
+                <i
+                    v-if="!userStore.userPromptsLoading"
+                    class="fa-regular fa-trash-can"
+                ></i>
+                <load-spinner v-if="userStore.userPromptsLoading" />
+                Delete
+                <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
+                >
+                    {{ promptSelection.length }}
+                    <span class="visually-hidden">delete selected</span>
+                </span>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -542,13 +674,14 @@ import { useUserStore } from "@/stores/user";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import InputButtonSubmit from "@/components/global/InputButtonSubmit.vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
-import { isMoreThan24Hours } from "@/utils/date-utils";
+import { isMoreThan24Hours, niceDate } from "@/utils/date-utils";
 import { STORAGE_KEYS } from "@/utils";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { storage } from "@/utils/storage";
 import { useAuth0, type User } from "@auth0/auth0-vue";
 import ModalComponent from "@/components/global/ModalComponent.vue";
 import { Modal } from "bootstrap";
+import LoadSpinner from "@/components/global/LoadSpinner.vue";
 
 const { user } = useAuth0();
 
@@ -564,6 +697,8 @@ const lightboxIndex = ref(0);
 const showThumbnailLightBox = ref(false);
 const lightboxThumbnailIndex = ref(0);
 const modalInstance = ref<Modal | null>(null);
+const startSelect = ref(false);
+const promptSelection = ref<string[]>([]);
 
 /**
  * =*'^'*= COMPUTED =*'^'*=
@@ -608,18 +743,23 @@ const deletePrompt = async () => {
     if (confirm) {
         await userStore.deletePrompt(selectedPrompt.value);
 
-        const modalElement = document.getElementById("prompt-selected");
-        if (modalElement) {
-            // @ts-ignore
-            modalInstance.value =
-                Modal.getInstance(modalElement) || new Modal(modalElement);
-        }
         modalInstance.value?.hide();
     }
 };
 
-const getPrompt = async (promptId) => {
-    await userStore.fetchPromptByPromptId(promptId);
+const getPrompt = async (prompt) => {
+    if (startSelect.value) {
+        if (promptSelection.value.includes(prompt.prompt_id)) {
+            promptSelection.value = promptSelection.value.filter(
+                (id) => id !== prompt.prompt_id
+            );
+        } else {
+            promptSelection.value.push(prompt.prompt_id);
+        }
+    } else {
+        await userStore.fetchPromptByPromptId(prompt.prompt_id);
+        modalInstance.value?.show();
+    }
 };
 const openLightbox = async (imageKey) => {
     const imgId = imageKey.split("/thumbnails/")[1].split(".")[0];
@@ -632,6 +772,25 @@ const openLightbox = async (imageKey) => {
 
     if (lightboxIndex.value > -1) {
         showLightbox.value = true;
+    }
+};
+
+const cancelSelections = () => {
+    startSelect.value = false;
+    promptSelection.value = [];
+};
+
+const deleteSelections = async () => {
+    const confirm = window.confirm(
+        "Are you sure you want to delete these prompts? You will also lose all associated images."
+    );
+
+    if (confirm) {
+        await userStore.deleteManyPrompts({
+            prompt_ids: promptSelection.value,
+            user_id: rpgUser.value.id,
+        });
+        promptSelection.value = [];
     }
 };
 
@@ -733,6 +892,13 @@ onMounted(async () => {
         await fetchOrLoadExisting(rpgUser.value.id);
         await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
+
+    const modalElement = document.getElementById("prompt-selected");
+    if (modalElement) {
+        // @ts-ignore
+        modalInstance.value =
+            Modal.getInstance(modalElement) || new Modal(modalElement);
+    }
 });
 </script>
 <style scoped>
@@ -748,8 +914,11 @@ onMounted(async () => {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 12px;
-    grid-auto-rows: 1fr;
-    align-items: start;
+    grid-auto-rows: minmax(
+        120px,
+        auto
+    ); /* Set a minimum height for each grid item */
+    align-items: stretch; /* Ensures all grid items stretch to the same height */
     cursor: pointer;
 
     .card img {
@@ -828,5 +997,14 @@ onMounted(async () => {
     border-radius: 8px;
     padding: 10px;
     border: 1px solid var(--dark-500);
+}
+
+.is-selectable {
+    background: var(--dark-600);
+}
+
+.prompt-selected {
+    outline: 4px solid lavender;
+    background: var(--dark-650);
 }
 </style>

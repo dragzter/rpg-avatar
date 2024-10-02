@@ -30,6 +30,8 @@ export const API = {
     get_user_prompts: import.meta.env.VITE_APP_API_URL + "/api/user/prompts",
     get_prompt: import.meta.env.VITE_APP_API_URL + "/api/prompt",
     delete_prompt: import.meta.env.VITE_APP_API_URL + "/api/prompt/delete",
+    delete_many_prompts:
+        import.meta.env.VITE_APP_API_URL + "/api/prompts/delete",
 };
 
 export const STORAGE_KEYS = {

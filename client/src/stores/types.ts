@@ -210,6 +210,10 @@ export interface PromptHistoryItem {
     prompt: string;
     archetype?: string;
     adherence?: number;
+    model?: string;
+    count?: number;
+    nsfw_pass?: boolean;
+    rpg_presets?: boolean;
     art_style?: string;
     created?: string;
     size?: {
