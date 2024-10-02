@@ -1,17 +1,21 @@
-import {PromptModel, UserModel} from "../db/model.js";
+import { PromptModel, UserModel } from "../db/model.js";
 import BackblazeStorageService from "./backblaze-storage-service.js";
+import { excerpt } from "../utils/helpers.js";
 
 class UserService {
     async getUserById(userId) {
-        return await UserModel.findOne({id: userId}).exec();
+        return await UserModel.findOne({ id: userId }).exec();
     }
-
 
     async findAndUpdateUser(userId, updatedUserObject) {
         try {
-            return UserModel.findOneAndUpdate({id: userId}, updatedUserObject, {new: true});
+            return UserModel.findOneAndUpdate(
+                { id: userId },
+                updatedUserObject,
+                { new: true }
+            );
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
     }
 
@@ -20,19 +24,20 @@ class UserService {
             const _user = new UserModel(user);
             await _user.save();
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
     }
 
     async getAndUpdateUserImageCount(user_id) {
         try {
-            const image_count = await BackblazeStorageService.getUserImageCount(user_id);
+            const image_count =
+                await BackblazeStorageService.getUserImageCount(user_id);
             await UserModel.updateOne(
-                {id: user_id},
-                {$set: {image_count}}
+                { id: user_id },
+                { $set: { image_count } }
             );
-            
-            return image_count
+
+            return image_count;
         } catch (error) {
             console.error("Error updating user image count:", error);
         }
@@ -42,9 +47,9 @@ class UserService {
     // bucket
     async updateUserImageCount(user_id) {
         try {
-            console.log("updating images")
+            console.log("updating images");
             // Fetch all prompts for the user
-            const prompts = await PromptModel.find({user_id}).exec();
+            const prompts = await PromptModel.find({ user_id }).exec();
 
             // Calculate the total number of images across all prompts
             const image_count = prompts.reduce((total, promptItem) => {
@@ -54,39 +59,86 @@ class UserService {
             // Patch the user with the new image count
             console.log("Updating image count:", image_count);
             await UserModel.updateOne(
-                {id: user_id},
-                {$set: {image_count}}
+                { id: user_id },
+                { $set: { image_count } }
             );
         } catch (error) {
             console.error("Error updating user image count:", error);
         }
     }
 
+    async getUserPrompts(user_id) {
+        try {
+            const response = await PromptModel.find({ user_id }).exec();
+            return response
+                .sort((a, b) => new Date(b.created) - new Date(a.created))
+                .map((p) => {
+                    return {
+                        prompt_id: p.prompt_id,
+                        prompt_excerpt: excerpt(p.prompt, 30),
+                        created: p.created,
+                        thumbnails: p.thumbnails,
+                    };
+                });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async getPromptById(promptId) {
+        try {
+            return await PromptModel.findOne({ prompt_id: promptId }).exec();
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     async savePrompt(userPrompt) {
         try {
-            const _prompt = new PromptModel(userPrompt)
-            await _prompt.save()
+            const _prompt = new PromptModel(userPrompt);
+            await _prompt.save();
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
     }
 
     async deleteUser(userId) {
         try {
-            console.log("Deleting user", userId)
-            return await UserModel.deleteOne({id: userId}).exec()
+            console.log("Deleting user", userId);
+            return await UserModel.deleteOne({ id: userId }).exec();
         } catch (err) {
-            console.log(err)
+            console.log(err);
+        }
+    }
+
+    async deletePrompt(promptId) {
+        try {
+            const response = await PromptModel.deleteOne({
+                prompt_id: promptId,
+            }).exec();
+            return {
+                message: "Prompt deleted",
+                success: true,
+                response,
+            };
+        } catch (error) {
+            return {
+                message: "Prompt deletion failed",
+                success: false,
+                error,
+            };
         }
     }
 
     async deleteFBUser(userId) {
         try {
-            return await UserModel.deleteOne({facebook_user_id: userId}).exec()
+            return await UserModel.deleteOne({
+                facebook_user_id: userId,
+            }).exec();
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
     }
 }
 
-export default new UserService()
+export default new UserService();

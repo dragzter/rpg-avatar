@@ -75,3 +75,7 @@ export function gatherRandomizedCharacterDetails(archetype) {
         attire: randomAttire
     };
 }
+
+export function excerpt(text, len) {
+    return text.length > len ? text.substring(0, len) + "..." : text;
+}

@@ -128,7 +128,6 @@ router.post("/api/image/delete", async (req, res) => {
     }
 });
 
-
 router.post("/api/task-image-v2", async (req, res) => {
     try {
         const response = await NovitaAiService.startImageGeneration(req.body?.data);
