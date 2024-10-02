@@ -731,6 +731,7 @@ const fetchOrLoadExisting = async (userId: string) => {
 onMounted(async () => {
     if (rpgUser.value.id) {
         await fetchOrLoadExisting(rpgUser.value.id);
+        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
 });
 </script>
