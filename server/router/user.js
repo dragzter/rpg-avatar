@@ -245,8 +245,6 @@ router.post("/api/prompt/delete", async (req, res) => {
             BackblazeStorageService.deleteMany(filesToDelete, prompt.user_id),
         ]);
 
-        console.log("Prompt deleted", userResponse, backBlazeResponse);
-
         return res.status(200).json({
             success: true,
             message:
