@@ -23,9 +23,10 @@ export const useUserStore = defineStore("user", {
         userError: false,
         imageThumbnails: [] as UserImage[],
         images: [] as UserImage[],
-        promptsHistory: [] as PromptHistoryItem[],
+        promptsHistory: [] as PromptHistoryItem[], // Is this useful?
         quickHistory: [] as QuickPromptHistory[],
         userPromptsLoading: false,
+        selectedPrompt: {} as PromptHistoryItem,
     }),
     actions: {
         async redeemCodeV2(
@@ -54,6 +55,49 @@ export const useUserStore = defineStore("user", {
             } catch (error) {
                 this.userError = true;
                 this.toastMessage = (error as any).response.data.message;
+            }
+        },
+
+        async deletePrompt(prompt) {
+            try {
+                const response = await axios.post(API.delete_prompt, {
+                    prompt,
+                });
+
+                if (response.data.success) {
+                    this.toastMessage = response.message;
+
+                    const deleteFilesFromState = response.data
+                        .deleted_files as string[];
+                    this.images = this.images.filter((image) => {
+                        return !deleteFilesFromState.includes(image.key);
+                    });
+                    this.imageThumbnails = this.imageThumbnails.filter(
+                        (image) => {
+                            return !deleteFilesFromState.includes(image.key);
+                        }
+                    );
+
+                    // update storage
+                    storage.s(STORAGE_KEYS.thumbnails, {
+                        thumbnails: this.imageThumbnails,
+                    });
+                    storage.s(STORAGE_KEYS.images, {
+                        images: this.images,
+                    });
+
+                    // update user image count
+                    this.user.image_count = response.data.image_count;
+
+                    // reset the selected prompt
+                    this.selectedPrompt = {} as PromptHistoryItem;
+                    // remove prompt from quick history
+                    this.quickHistory = this.quickHistory.filter(
+                        (item) => item.prompt_id !== prompt.prompt_id
+                    );
+                }
+            } catch (error) {
+                console.log(error);
             }
         },
 
@@ -95,7 +139,7 @@ export const useUserStore = defineStore("user", {
             }
         },
 
-        async fetchImages(user_id) {
+        async fetchImages(user_id: string) {
             try {
                 this.userLoading = true;
                 const response: AxiosResponse<UserImageResponse> =
@@ -125,6 +169,47 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async fetchPromptByPromptId(promptId: string) {
+            try {
+                this.userPromptsLoading = true;
+                const response = await axios.get(
+                    API.get_prompt + `/${promptId}`
+                );
+
+                const imgURLS = [] as string[];
+                const thumbURLS = [] as string[];
+                if (response.data?.thumbnails) {
+                    const thumbnails = storage.g(STORAGE_KEYS.thumbnails);
+                    for (const thumbnail of response.data?.thumbnails) {
+                        const tn = thumbnails.thumbnails.find(
+                            (t) => t.key === thumbnail
+                        );
+                        if (tn) {
+                            thumbURLS.push(tn.url as string);
+                        }
+                    }
+
+                    for (const fn of response.data?.file_names) {
+                        const img = this.images.find((im) => {
+                            return im.key.includes(fn);
+                        });
+
+                        if (img) {
+                            imgURLS.push(img.url);
+                        }
+                    }
+                }
+
+                this.selectedPrompt = {
+                    ...response.data,
+                    urls: thumbURLS,
+                    imgURLS,
+                };
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
         async fetchQuickPromptsHistory(userId: string) {
             try {
                 this.userPromptsLoading = true;
@@ -136,15 +221,15 @@ export const useUserStore = defineStore("user", {
                     const thumbnails = storage.g(STORAGE_KEYS.thumbnails);
 
                     for (const prompt of response.data) {
-                        const urls = [];
+                        const urls = [] as string[];
                         if (!prompt.thumbnails) continue;
 
                         for (const thumbnail of prompt.thumbnails) {
-                            const url = thumbnails.thumbnails.find(
+                            const tn = thumbnails.thumbnails.find(
                                 (t) => t.key === thumbnail
                             );
-                            if (url) {
-                                urls.push(url.url);
+                            if (tn) {
+                                urls.push(tn.url as string);
                             }
                         }
 
@@ -152,10 +237,7 @@ export const useUserStore = defineStore("user", {
                     }
                 }
 
-                this.quickHistory = response.data.filter(
-                    (prompt_item) => prompt_item.urls.length
-                );
-                console.log(this.quickHistory);
+                this.quickHistory = response.data;
             } catch (error) {
                 console.log(error);
             } finally {

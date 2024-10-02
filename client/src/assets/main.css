@@ -2083,15 +2083,7 @@ main {
 
 .view-image-modal {
     .modal-content {
-
         background: var(--dark-800);
-    }
-
-    .modal-footer {
-        background: #000;
-        border-radius: 40px;
-        margin: auto;
-        border: 2px solid var(--lavender)
     }
 }
 

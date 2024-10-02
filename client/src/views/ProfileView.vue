@@ -32,7 +32,8 @@
                                 aria-selected="false"
                             >
                                 Images
-                                <small class="image-cap-indicator"
+                                <small
+                                    class="image-cap-indicator d-none d-md-inline-block"
                                     >{{ rpgUser.image_count || 0 }}/{{
                                         rpgUser.image_storage_cap
                                     }}</small
@@ -50,9 +51,12 @@
                                 aria-selected="false"
                             >
                                 Prompt History
-                                <small class="image-cap-indicator">{{
-                                    userStore.quickHistory?.length || 0
-                                }}</small>
+                                <small
+                                    class="image-cap-indicator d-none d-md-inline-block"
+                                    >{{
+                                        userStore.quickHistory?.length || 0
+                                    }}</small
+                                >
                             </button>
 
                             <!--                            <button-->
@@ -256,7 +260,12 @@
                                     <template
                                         v-for="item in userStore.quickHistory"
                                     >
-                                        <div class="card">
+                                        <div
+                                            class="card"
+                                            @click="getPrompt(item.prompt_id)"
+                                            data-bs-target="#prompt-selected"
+                                            data-bs-toggle="modal"
+                                        >
                                             <div class="row g-0">
                                                 <div
                                                     v-if="item.urls?.length"
@@ -287,7 +296,14 @@
                                                         >
                                                     </div>
                                                     <span
-                                                        class="position-absolute top-0 start-100 translate-middle badge bg-primary"
+                                                        style="
+                                                            outline: 2px solid
+                                                                var(--lavender);
+                                                            background: var(
+                                                                --dark-900
+                                                            );
+                                                        "
+                                                        class="position-absolute top-0 start-100 translate-middle badge"
                                                     >
                                                         {{
                                                             (
@@ -408,6 +424,15 @@
             :allow-delete="true"
         />
 
+        <lightbox-component
+            :images="lightboxThumbnails"
+            :show="showThumbnailLightBox"
+            :index="lightboxThumbnailIndex"
+            @toast-message="onToastMessage"
+            @update:show="showThumbnailLightBox = false"
+            @delete-image="onDeleteImage"
+        />
+
         <ToastComponent
             :autoClose="true"
             :autoCloseDelay="6000"
@@ -415,6 +440,100 @@
             :message="toastMessage"
             :show="showToast"
         />
+
+        <ModalComponent
+            id="prompt-selected"
+            modal-title="Prompt Details"
+            size="lg"
+        >
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p class="text-muted mb-1">Prompt</p>
+                    <p
+                        @click="copyPrompt(selectedPrompt.prompt)"
+                        class="text-white"
+                        style="cursor: copy"
+                    >
+                        {{ selectedPrompt.prompt?.replace('"', "") }}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-2">
+                        <input
+                            readonly
+                            class="form-control read-only"
+                            id="floatingTextarea"
+                            :value="selectedPrompt.negative_prompt"
+                        />
+                        <label for="floatingTextarea">Negative Prompt</label>
+                    </div>
+
+                    <div class="form-floating mb-2">
+                        <input
+                            readonly
+                            class="form-control read-only"
+                            id="floatingTextarea"
+                            :value="selectedPrompt.adherence"
+                        />
+                        <label for="floatingTextarea">Adherence</label>
+                    </div>
+
+                    <p
+                        class="mb-1 rounded-3 p-2"
+                        style="background: var(--dark-600)"
+                    >
+                        {{ selectedPrompt?.size?.width || 0 }}
+                        <i class="fa-solid fa-xmark fw-bold"></i>
+                        {{ selectedPrompt?.size?.height || 0 }} (px)
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="thumbnails-wrapper">
+                        <h5 class="fw-light mb-3">Images</h5>
+                        <div class="prompt-grid">
+                            <template
+                                v-for="(url, index) in selectedPrompt.urls"
+                                :key="index"
+                            >
+                                <div class="overflow-hidden rounded-2">
+                                    <img
+                                        v-if="url"
+                                        @click="openThumbnailLightbox(url)"
+                                        :src="url"
+                                        alt="prompt image"
+                                        style="transition: 0.2s ease-in-out"
+                                        class="object-fit-cover w-100 h-100"
+                                    />
+                                </div>
+                            </template>
+                        </div>
+                        <div v-if="!selectedPrompt.urls?.length">
+                            <p class="text-warning">No images on record.</p>
+                            <small class="text-muted"
+                                >All images in this prompt have been deleted or
+                                no images were created.</small
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <template #footer>
+                <button @click="deletePrompt" class="btn btn-danger">
+                    <i class="fa-regular fa-trash-can"></i> Delete
+                </button>
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Close
+                </button>
+            </template>
+        </ModalComponent>
     </div>
 </template>
 
@@ -428,6 +547,8 @@ import { STORAGE_KEYS } from "@/utils";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { storage } from "@/utils/storage";
 import { useAuth0, type User } from "@auth0/auth0-vue";
+import ModalComponent from "@/components/global/ModalComponent.vue";
+import { Modal } from "bootstrap";
 
 const { user } = useAuth0();
 
@@ -440,6 +561,9 @@ const passCodeToRedeem = ref("");
 const showToast = ref(false);
 const showLightbox = ref(false);
 const lightboxIndex = ref(0);
+const showThumbnailLightBox = ref(false);
+const lightboxThumbnailIndex = ref(0);
+const modalInstance = ref<Modal | null>(null);
 
 /**
  * =*'^'*= COMPUTED =*'^'*=
@@ -449,6 +573,8 @@ const userError = computed(() => userStore.userError);
 const loading = computed(() => userStore.userLoading);
 const lightboxImages = computed(() => userStore.images.map((img) => img.url));
 const toastMessage = computed(() => userStore.toastMessage);
+const selectedPrompt = computed(() => userStore.selectedPrompt);
+const lightboxThumbnails = computed(() => userStore.selectedPrompt.imgURLS);
 
 /**
  * =*'^'*= WATCHERS =*'^'*=
@@ -475,6 +601,26 @@ watch(
 /**
  * =*'^'*= METHODS =*'^'*=
  */
+const deletePrompt = async () => {
+    const confirm = window.confirm(
+        "Are you sure you want to delete this prompt? You will also lose all associated images."
+    );
+    if (confirm) {
+        await userStore.deletePrompt(selectedPrompt.value);
+
+        const modalElement = document.getElementById("prompt-selected");
+        if (modalElement) {
+            // @ts-ignore
+            modalInstance.value =
+                Modal.getInstance(modalElement) || new Modal(modalElement);
+        }
+        modalInstance.value.hide();
+    }
+};
+
+const getPrompt = async (promptId) => {
+    await userStore.fetchPromptByPromptId(promptId);
+};
 const openLightbox = async (imageKey) => {
     const imgId = imageKey.split("/thumbnails/")[1].split(".")[0];
 
@@ -486,6 +632,20 @@ const openLightbox = async (imageKey) => {
 
     if (lightboxIndex.value > -1) {
         showLightbox.value = true;
+    }
+};
+
+const openThumbnailLightbox = async (url) => {
+    const imgId = url.split("/thumbnails/")[1].split(".")[0];
+
+    lightboxThumbnailIndex.value = lightboxThumbnails.value?.findIndex((img) =>
+        img.includes(`${imgId}.image`)
+    );
+
+    await nextTick();
+
+    if (lightboxThumbnailIndex.value > -1) {
+        showThumbnailLightBox.value = true;
     }
 };
 
@@ -523,13 +683,29 @@ const onDeleteImage = async (imageKey) => {
     }
 };
 
-const fetchOrLoadExisting = async (userId) => {
+const copyPrompt = async (promptText: string) => {
+    await nextTick();
+    navigator.clipboard
+        .writeText(promptText)
+        .then(() => {
+            showToast.value = true;
+            userStore.toastMessage = "Prompt copied!";
+
+            setTimeout(() => {
+                showToast.value = false;
+            }, 2000);
+        })
+        .catch((err) => {
+            console.error("Failed to copy to clipboard", err);
+        });
+};
+
+const fetchOrLoadExisting = async (userId: string) => {
     const stored_images = storage.g(STORAGE_KEYS.images);
     const stored_thumbnails = storage.g(STORAGE_KEYS.thumbnails);
     const have_new_images = storage.g(STORAGE_KEYS.new_images);
 
     if (!stored_images || !stored_thumbnails || have_new_images === true) {
-        console.log("fetching images");
         await userStore.fetchImages(userId);
         await userStore.getUser(user.value as User);
         return;
@@ -554,9 +730,6 @@ const fetchOrLoadExisting = async (userId) => {
 onMounted(async () => {
     if (rpgUser.value.id) {
         await fetchOrLoadExisting(rpgUser.value.id);
-
-        console.log("fetching prompts history");
-        await userStore.fetchPromptsHistory(rpgUser.value.id);
     }
 });
 </script>
@@ -579,6 +752,14 @@ onMounted(async () => {
 
     .card img {
         transition: 0.2s ease-in-out;
+    }
+
+    @media (max-width: 1366px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 991px) {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -638,5 +819,12 @@ onMounted(async () => {
     border-radius: 20px;
     font-size: 12px;
     color: #dcdcf8;
+}
+
+.thumbnails-wrapper {
+    background: var(--dark-650);
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid var(--dark-500);
 }
 </style>

@@ -209,6 +209,7 @@ export interface PromptHistoryItem {
     prompt_id: string;
     prompt: string;
     archetype?: string;
+    adherence?: number;
     art_style?: string;
     created?: string;
     size?: {
@@ -218,6 +219,7 @@ export interface PromptHistoryItem {
     negative_prompt?: string;
     thumbnails?: string[];
     file_names?: string[];
+    urls?: string[];
 }
 
 // Initial response in the profile page

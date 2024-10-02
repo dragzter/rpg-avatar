@@ -2,13 +2,24 @@
     <!-- Modal -->
     <div
         :id="id"
-        :class="`modal fade modal-${size} view-image-modal ${wrapperClasses}`"
+        :class="`modal fade modal-${size} view-image-modal ${wrapperClasses} `"
         aria-hidden="true"
         aria-labelledby="exampleModalLabel"
         tabindex="-1"
     >
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h5 v-if="modalTitle" class="modal-title">
+                        {{ modalTitle }}
+                    </h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+                </div>
                 <div class="modal-body">
                     <slot></slot>
                     <div
@@ -18,6 +29,9 @@
                     >
                         Copied!
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <slot name="footer"></slot>
                 </div>
             </div>
         </div>
@@ -45,6 +59,10 @@ const props = defineProps({
     success: {
         type: Boolean,
         default: false,
+    },
+    modalTitle: {
+        type: String,
+        default: "",
     },
 });
 
