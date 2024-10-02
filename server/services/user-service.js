@@ -130,6 +130,27 @@ class UserService {
         }
     }
 
+    async deleteManyPrompts(promptIds) {
+        try {
+            // Delete multiple prompts by their IDs
+            const response = await PromptModel.deleteMany({
+                prompt_id: { $in: promptIds },
+            }).exec();
+
+            return {
+                message: "Prompts deleted",
+                success: true,
+                response,
+            };
+        } catch (error) {
+            return {
+                message: "Prompt deletion failed",
+                success: false,
+                error,
+            };
+        }
+    }
+
     async deleteFBUser(userId) {
         try {
             return await UserModel.deleteOne({

@@ -2,7 +2,7 @@ import express from "express";
 import UserService from "../services/user-service.js";
 import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
-import { DeletionRequestModel } from "../db/model.js";
+import { DeletionRequestModel, PromptModel } from "../db/model.js";
 import BackblazeStorageService from "../services/backblaze-storage-service.js";
 
 const router = express.Router();
@@ -251,6 +251,36 @@ router.post("/api/prompt/delete", async (req, res) => {
                 "Prompt and all associated images have been deleted successfully",
             image_count: backBlazeResponse.image_count,
             deleted_files: filesToDelete,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
+router.post("/api/prompts/delete", async (req, res) => {
+    const { user_id, prompt_ids } = req.body; // Get userId from URL
+
+    try {
+        const prompts = await PromptModel.find({
+            prompt_id: { $in: prompt_ids },
+        }).exec();
+
+        const file_keys = prompts.reduce((acc, prompt) => {
+            return [...acc, ...prompt.file_names, ...prompt.thumbnails];
+        }, []);
+
+        const [userResponse, backBlazeResponse] = await Promise.all([
+            UserService.deleteManyPrompts(prompt_ids),
+            BackblazeStorageService.deleteMany(file_keys, user_id),
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Prompts and all associated images have been deleted successfully",
+            image_count: backBlazeResponse.image_count,
+            deleted_files: file_keys,
         });
     } catch (error) {
         console.log(error);

@@ -1,19 +1,21 @@
-import {NovitaSDK, TaskStatus} from "novita-sdk";
-import taskManager, {ApiTaskStatus} from "../utils/task-manager.js";
+import { NovitaSDK, TaskStatus } from "novita-sdk";
+import taskManager, { ApiTaskStatus } from "../utils/task-manager.js";
 import UserService from "./user-service.js";
-import "../config.js"
+import "../config.js";
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import axios from "axios";
-import {v4 as uuidv4} from "uuid";
-import {promptConstructorV2, promptEnhance} from "../utils/prompt-constructor.js";
+import { v4 as uuidv4 } from "uuid";
+import {
+    promptConstructorV2,
+    promptEnhance,
+} from "../utils/prompt-constructor.js";
 import OpenAiService from "./open-ai-service.js";
-
 
 class NovitaAIService {
     // store state specific to the user/request
-    state = new Map()
-    client
-    user
+    state = new Map();
+    client;
+    user;
     PROMPT_PROPS = [
         "prompt",
         "archetype",
@@ -27,32 +29,35 @@ class NovitaAIService {
         "steps",
         "model",
         "count",
-        "adherence"
-    ]
+        "adherence",
+    ];
 
-    defaultModel = "gleipnir_v20BF16_174601.safetensors"
-    model_selection  = {
+    defaultModel = "gleipnir_v20BF16_174601.safetensors";
+    model_selection = {
         character_model: "gleipnir_v20BF16_174601.safetensors",
         creatures_model: "crystalClearXL_ccxl_97637.safetensors",
         portrait_model: "demonCORESFWNSFW_v22_135842.safetensors",
         anime_model: "animexlXuebimix_v20_109348.safetensors",
-        general_model: "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors",
-        pixel_model: "pixelArtDiffusionXL_spriteShaper_291175.safetensors"
-    }
+        general_model:
+            "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors",
+        pixel_model: "pixelArtDiffusionXL_spriteShaper_291175.safetensors",
+    };
 
-    creatures_modeL_2 = "fenrisxl_V164fp16_191548.safetensors"
-    anime_model_2 = "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors"
+    creatures_modeL_2 = "fenrisxl_V164fp16_191548.safetensors";
+    anime_model_2 =
+        "protovisionXLHighFidelity3D_beta0520Bakedvae_106612.safetensors";
 
-    defaultNegativePrompt = "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined"
-    altModel = "dreamshaperXL09Alpha_alpha2Xl10_91562.safetensors"
+    defaultNegativePrompt =
+        "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined";
+    altModel = "dreamshaperXL09Alpha_alpha2Xl10_91562.safetensors";
 
     constructor() {
-        this.client = new NovitaSDK(process.env.NOVITA_API_KEY)
+        this.client = new NovitaSDK(process.env.NOVITA_API_KEY);
     }
 
     truncateString(str, maxLength) {
         if (str.length > maxLength) {
-            return str.substring(0, maxLength) + '...'; // Truncate and add ellipses
+            return str.substring(0, maxLength) + "..."; // Truncate and add ellipses
         } else {
             return str; // Return the string as-is if it's within the limit
         }
@@ -63,44 +68,50 @@ class NovitaAIService {
         if (user?.token_balance < userData.count) {
             return {
                 message: "Not enough tokens for this request",
-                success: false
-            }
+                success: false,
+            };
         }
 
         // Add date to determine when the prompt ran
         //this.userPrompt.date = new Date().toLocaleString()
-        const userPrompt = {created: new Date().toLocaleString()}
+        const userPrompt = {};
 
         for (let i = 0; i < this.PROMPT_PROPS.length; i++) {
             if (userData[this.PROMPT_PROPS[i]]) {
                 userPrompt[this.PROMPT_PROPS[i]] =
-                    userData[this.PROMPT_PROPS[i]]
+                    userData[this.PROMPT_PROPS[i]];
             }
         }
 
-        let configuredPrompt
+        let configuredPrompt;
 
         if (userData.rpg_presets) {
-            configuredPrompt = userData.prompt.replace('"', "") || "generate a random rpg character"
+            configuredPrompt =
+                userData.prompt.replace('"', "") ||
+                "generate a random rpg character";
 
             if (userData.randomize && userData.nsfw_pass) {
                 configuredPrompt = promptEnhance(userData.prompt);
             } else if (!userData.randomize && userData.nsfw_pass) {
-                configuredPrompt = promptConstructorV2(userData.prompt);
+                configuredPrompt = promptConstructorV2(userData);
             } else if (!userData.randomize && !userData.nsfw_pass) {
-                configuredPrompt = await OpenAiService.stripNSFW(promptConstructorV2(userData));
+                configuredPrompt = await OpenAiService.stripNSFW(
+                    promptConstructorV2(userData)
+                );
             } else if (userData.randomize && !userData.nsfw_pass) {
                 configuredPrompt = userData.prompt; // This has already been cleaned up
             }
         } else {
-
             if (!userData.nsfw_pass) {
-                configuredPrompt = await OpenAiService.stripNSFW(userData.prompt) || "generate something beautiful or interesting"
+                configuredPrompt =
+                    (await OpenAiService.stripNSFW(userData.prompt)) ||
+                    "generate something beautiful or interesting";
             } else {
-                configuredPrompt = userData.prompt || "generate something beautiful or interesting"
+                configuredPrompt =
+                    userData.prompt ||
+                    "generate something beautiful or interesting";
             }
         }
-
 
         const r_width = userData?.size?.width || 1024;
         const r_height = userData?.size?.height || 1024;
@@ -109,8 +120,11 @@ class NovitaAIService {
 
         const request = {
             request: {
-                model_name: this.model_selection[userData.model] || this.defaultModel,
-                prompt: this.truncateString(configuredPrompt, 1000) || "generate a random rpg character",
+                model_name:
+                    this.model_selection[userData.model] || this.defaultModel,
+                prompt:
+                    this.truncateString(configuredPrompt, 1000) ||
+                    "generate a random rpg character",
                 negative_prompt: negative_prompt,
                 width: r_width,
                 height: r_height,
@@ -127,7 +141,7 @@ class NovitaAIService {
                 nsfw_detection_level: 2,
                 enable_nsfw_detection: true,
             },
-        }
+        };
 
         try {
             const response = await this.client.txt2ImgV3(request);
@@ -145,21 +159,22 @@ class NovitaAIService {
                     task_id: response.task_id,
                     success: true,
                     message: "Image generation started.",
-                }
+                };
             }
         } catch (error) {
             // In case of error, wipe the state, new request will be needed.
             console.log("Error initiating image generation:", error);
             return {
                 success: false,
-                message: "Error initiating image generation.  This is likely an issue with the server.",
+                message:
+                    "Error initiating image generation.  This is likely an issue with the server.",
                 error,
             };
         }
     }
 
     async creditUserForImages(credits, task_id) {
-        const state = this.state.get(task_id)
+        const state = this.state.get(task_id);
         state.user.token_balance -= credits;
         await UserService.saveUser(state.user);
     }
@@ -170,23 +185,23 @@ class NovitaAIService {
     }
 
     getFinishedImages(task_id) {
-        const state = this.state.get(task_id)
+        const state = this.state.get(task_id);
         return {
             ...state,
-        }
+        };
     }
 
-
     async startTaskStatusPolling(task_id, maxAttempts = 300, attempt = 0) {
-
         return new Promise(async (resolve, reject) => {
             const check = async () => {
                 try {
-                    const progress = await this.client.progressV3({task_id});
-                    const state = this.state.get(task_id)
+                    const progress = await this.client.progressV3({ task_id });
+                    const state = this.state.get(task_id);
 
-                    const TaskSucceeded = progress.task.status === TaskStatus.SUCCEED;
-                    const TaskFailed = progress.task.status === TaskStatus.FAILED;
+                    const TaskSucceeded =
+                        progress.task.status === TaskStatus.SUCCEED;
+                    const TaskFailed =
+                        progress.task.status === TaskStatus.FAILED;
                     const MaxAttemptsNotReached = attempt < maxAttempts;
 
                     if (taskManager.isTaskCanceled(task_id)) {
@@ -194,7 +209,10 @@ class NovitaAIService {
                     }
 
                     if (TaskSucceeded) {
-                        await this.creditUserForImages(progress.images.length, task_id);
+                        await this.creditUserForImages(
+                            progress.images.length,
+                            task_id
+                        );
 
                         state["images"] = progress.images;
                         state["success"] = true;
@@ -204,57 +222,73 @@ class NovitaAIService {
                         state["status"] = ApiTaskStatus.COMPLETE;
                         state["task_id"] = task_id;
 
-                        const image_urls = progress.images?.map((obj) => obj.image_url)
+                        const image_urls = progress.images?.map(
+                            (obj) => obj.image_url
+                        );
 
-                        console.log("Task Succeeded: ", state.user.nickname)
+                        console.log("Task Succeeded: ", state.user.nickname);
 
                         try {
                             // This can keep going in the background
                             this.downloadAndUploadImages(image_urls, task_id);
                         } catch (err) {
-                            console.log(err, "Error downloading and uploading images");
+                            console.log(
+                                err,
+                                "Error downloading and uploading images"
+                            );
                         }
 
                         resolve(state);
                     } else if (TaskFailed) {
-                        taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
-                        console.log("Task Failed: ", progress.task.reason)
+                        taskManager.activeTasks[task_id].status =
+                            ApiTaskStatus.FAILED;
+                        console.log("Task Failed: ", progress.task.reason);
                         reject({
                             message: "Task failed: " + progress.task.reason,
-                            success: false
+                            success: false,
                         });
                     } else if (MaxAttemptsNotReached) {
-                        attempt++
+                        attempt++;
 
                         // Retry after 1 second
                         console.log(
-                            `Retry: ${attempt}/${maxAttempts} - (${state.user.nickname}) - Tokens: ${state.user.token_balance} - ${new Date().toLocaleString('en-US', {hour12: true})}`
+                            `Retry: ${attempt}/${maxAttempts} - (${state.user.nickname}) - Tokens: ${state.user.token_balance} - ${new Date().toLocaleString("en-US", { hour12: true })}`
                         );
 
-                        if (taskManager.activeTasks[task_id].status !== ApiTaskStatus.CANCELED) {
+                        if (
+                            taskManager.activeTasks[task_id].status !==
+                            ApiTaskStatus.CANCELED
+                        ) {
                             setTimeout(() => check(), 1000);
                         } else {
-                            console.log("task is cancelled!")
+                            console.log("task is cancelled!");
                             resolve({
                                 message: "Task canceled by user.",
                                 success: false,
                                 status: "canceled",
-                                task_id
+                                task_id,
                             });
                         }
                     } else {
-                        console.log("Task timed out", state.user.nickname, progress.task?.reason)
-                        taskManager.activeTasks[task_id].status = ApiTaskStatus.TIMEOUT;
+                        console.log(
+                            "Task timed out",
+                            state.user.nickname,
+                            progress.task?.reason
+                        );
+                        taskManager.activeTasks[task_id].status =
+                            ApiTaskStatus.TIMEOUT;
                         reject({
-                            message: "Task did not complete within the timeout period.",
-                            success: false
+                            message:
+                                "Task did not complete within the timeout period.",
+                            success: false,
                         });
                     }
                 } catch (error) {
-                    taskManager.activeTasks[task_id].status = ApiTaskStatus.FAILED;
+                    taskManager.activeTasks[task_id].status =
+                        ApiTaskStatus.FAILED;
                     reject({
                         message: "Error checking progress: " + error,
-                        success: false
+                        success: false,
                     });
                 }
             };
@@ -265,17 +299,19 @@ class NovitaAIService {
     }
 
     downloadAndUploadImages(imageUrls, task_id) {
-        const state = this.state.get(task_id)
+        const state = this.state.get(task_id);
         console.log("Downloading and uploading images...");
-        const file_names = []
-        const thumbnail_file_names = []
+        const file_names = [];
+        const thumbnail_file_names = [];
 
         const uploadPromises = imageUrls.map(async (url) => {
             try {
-                const folder = `${state.user.id.replace("|", "")}`
-                const file_key = Math.random().toString(36).substring(6)
+                const folder = `${state.user.id.replace("|", "")}`;
+                const file_key = Math.random().toString(36).substring(6);
 
-                const response = await axios.get(url, {responseType: "arraybuffer"});
+                const response = await axios.get(url, {
+                    responseType: "arraybuffer",
+                });
 
                 const buffer = response.data;
                 const image_key = `${folder}/${file_key}.image.jpeg`;
@@ -286,12 +322,20 @@ class NovitaAIService {
 
                 await Promise.all([
                     BackblazeStorageService.upload(buffer, image_key),
-                    BackblazeStorageService.createThumbnailAndUpload(buffer, thumbnail)
-                ])
+                    BackblazeStorageService.createThumbnailAndUpload(
+                        buffer,
+                        thumbnail
+                    ),
+                ]);
 
-                console.log(`Successfully uploaded: ${image_key} and ${thumbnail}`);
+                console.log(
+                    `Successfully uploaded: ${image_key} and ${thumbnail}`
+                );
             } catch (error) {
-                console.error(`Failed to download or upload image from ${url}: `, error);
+                console.error(
+                    `Failed to download or upload image from ${url}: `,
+                    error
+                );
             }
         });
 
@@ -307,20 +351,19 @@ class NovitaAIService {
                     thumbnails: thumbnail_file_names,
                     file_names: file_names,
                     prompt_id: uuidv4(),
-                }
+                };
 
+                console.log(prompt_aggregate, "Prompt Aggregate");
                 // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);
 
                 // Update the user's image count
                 await UserService.getAndUpdateUserImageCount(state.user.id);
-
             })
             .catch((error) => {
                 console.error("Error in async image upload tasks:", error);
             });
-
     }
 }
 
-export default new NovitaAIService()
+export default new NovitaAIService();
