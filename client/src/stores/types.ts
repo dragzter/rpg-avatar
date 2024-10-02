@@ -220,6 +220,7 @@ export interface PromptHistoryItem {
     thumbnails?: string[];
     file_names?: string[];
     urls?: string[];
+    imgURLS?: string[];
 }
 
 // Initial response in the profile page

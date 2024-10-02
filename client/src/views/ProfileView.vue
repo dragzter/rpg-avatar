@@ -614,7 +614,7 @@ const deletePrompt = async () => {
             modalInstance.value =
                 Modal.getInstance(modalElement) || new Modal(modalElement);
         }
-        modalInstance.value.hide();
+        modalInstance.value?.hide();
     }
 };
 
@@ -638,9 +638,10 @@ const openLightbox = async (imageKey) => {
 const openThumbnailLightbox = async (url) => {
     const imgId = url.split("/thumbnails/")[1].split(".")[0];
 
-    lightboxThumbnailIndex.value = lightboxThumbnails.value?.findIndex((img) =>
-        img.includes(`${imgId}.image`)
-    );
+    lightboxThumbnailIndex.value =
+        lightboxThumbnails.value?.findIndex((img) =>
+            img.includes(`${imgId}.image`)
+        ) || 0;
 
     await nextTick();
 

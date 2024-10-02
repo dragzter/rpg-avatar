@@ -65,7 +65,7 @@ export const useUserStore = defineStore("user", {
                 });
 
                 if (response.data.success) {
-                    this.toastMessage = response.message;
+                    this.toastMessage = response.data.message;
 
                     const deleteFilesFromState = response.data
                         .deleted_files as string[];
