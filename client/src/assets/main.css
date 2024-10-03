@@ -2408,3 +2408,108 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     }
 }
 
+#user-media-library {
+    padding: 12px;
+
+    @media (max-width: 768px) {
+        padding: 5px;
+    }
+}
+
+.prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    grid-auto-rows: minmax(
+            120px,
+            auto
+    ); /* Set a minimum height for each grid item */
+    align-items: stretch; /* Ensures all grid items stretch to the same height */
+    cursor: pointer;
+
+    .card img {
+        transition: 0.2s ease-in-out;
+    }
+
+    @media (max-width: 1366px) {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @media (max-width: 991px) {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    grid-auto-rows: 1fr;
+    align-items: center;
+
+    @media (min-width: 276px) {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+    }
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 2fr));
+        gap: 4px;
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 6px;
+    }
+}
+
+.image-grid img {
+    width: 100%;
+    max-width: 200px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.2s ease-in-out;
+
+    @media (max-width: 768px) {
+        max-width: 100% !important;
+    }
+}
+
+.image-grid > div {
+    transition: 0.2s ease-in-out;
+    border-radius: 6px;
+}
+
+.image-grid > div:hover,
+.prompt-grid > div:hover {
+    outline: 4px solid var(--lavender);
+
+    img {
+        transform: scale(1.05);
+    }
+}
+
+.image-cap-indicator {
+    background: var(--dark-300);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #dcdcf8;
+}
+
+.thumbnails-wrapper {
+    background: var(--dark-650);
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid var(--dark-500);
+}
+
+.is-selectable {
+    background: var(--dark-600);
+}
+
+.prompt-selected {
+    outline: 4px solid lavender;
+    background: var(--dark-650);
+}

@@ -301,7 +301,7 @@
                         :autoClose="true"
                         :autoCloseDelay="3000"
                         :isError="isError"
-                        :message="toastMessage"
+                        :message="userStore.toastMessage"
                         :show="showToast"
                     />
                 </div>
