@@ -353,7 +353,6 @@ class NovitaAIService {
                     prompt_id: uuidv4(),
                 };
 
-                console.log(prompt_aggregate, "Prompt Aggregate");
                 // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);
 
