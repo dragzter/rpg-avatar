@@ -2513,3 +2513,18 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     outline: 4px solid lavender;
     background: var(--dark-650);
 }
+
+.count-indicator-prompt-history-item {
+    outline: 2px solid var(--lavender);
+    background: var(
+            --dark-900
+    );
+}
+
+.first-img-label {
+    left: 5px;
+    bottom: 3px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.5);
+}
+

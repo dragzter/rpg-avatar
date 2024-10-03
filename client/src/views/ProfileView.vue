@@ -3,9 +3,7 @@
         <div class="container">
             <div class="row">
                 <div class="col">
-                    <h2 class="mb-4 title-2 text-start">
-                        User <span>Profile</span>
-                    </h2>
+                    <h2 class="mb-4 title-2 text-start">User <span>Profile</span></h2>
 
                     <nav>
                         <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -32,11 +30,8 @@
                                 aria-selected="false"
                             >
                                 Images
-                                <small
-                                    class="image-cap-indicator d-none d-md-inline-block"
-                                    >{{ rpgUser.image_count || 0 }}/{{
-                                        rpgUser.image_storage_cap
-                                    }}</small
+                                <small class="image-cap-indicator d-none d-md-inline-block"
+                                    >{{ rpgUser.image_count || 0 }}/{{ rpgUser.image_storage_cap }}</small
                                 >
                             </button>
 
@@ -51,12 +46,9 @@
                                 aria-selected="false"
                             >
                                 Prompt History
-                                <small
-                                    class="image-cap-indicator d-none d-md-inline-block"
-                                    >{{
-                                        userStore.quickHistory?.length || 0
-                                    }}</small
-                                >
+                                <small class="image-cap-indicator d-none d-md-inline-block">{{
+                                    userStore.quickHistory?.length || 0
+                                }}</small>
                             </button>
 
                             <!--                            <button-->
@@ -104,17 +96,13 @@
                             <div class="p-3">
                                 <div class="container">
                                     <div class="row py-2">
-                                        <div
-                                            class="col px-0 d-flex align-items-center"
-                                        >
+                                        <div class="col px-0 d-flex align-items-center">
                                             <button
                                                 :disabled="startSelect"
                                                 @click="startSelect = true"
                                                 class="btn btn-secondary"
                                             >
-                                                <i
-                                                    class="fa-light fa-grid-2-plus"
-                                                ></i>
+                                                <i class="fa-light fa-grid-2-plus"></i>
                                                 Select
                                             </button>
                                         </div>
@@ -123,16 +111,11 @@
 
                                 <hr />
                                 <div id="prompt-history" class="prompt-grid">
-                                    <template
-                                        v-for="item in userStore.quickHistory"
-                                    >
+                                    <template v-for="item in userStore.quickHistory">
                                         <div
                                             class="card prompt-item"
                                             :class="{
-                                                'prompt-selected':
-                                                    promptSelection.includes(
-                                                        item.prompt_id
-                                                    ),
+                                                'prompt-selected': promptSelection.includes(item.prompt_id),
                                                 'is-selectable': startSelect,
                                             }"
                                             @click="getPrompt(item)"
@@ -146,11 +129,7 @@
                                                     <input
                                                         type="checkbox"
                                                         class="form-check"
-                                                        :checked="
-                                                            promptSelection.includes(
-                                                                item.prompt_id
-                                                            )
-                                                        "
+                                                        :checked="promptSelection.includes(item.prompt_id)"
                                                         style="
                                                             width: 18px;
                                                             height: 18px;
@@ -174,61 +153,27 @@
                                                             class="object-fit-cover w-100 h-100"
                                                         />
                                                         <small
-                                                            style="
-                                                                left: 5px;
-                                                                bottom: 3px;
-                                                                right: 5px;
-                                                                background: rgba(
-                                                                    0,
-                                                                    0,
-                                                                    0,
-                                                                    0.5
-                                                                );
-                                                            "
-                                                            class="position-absolute text-center w-auto"
-                                                            >First Image</small
-                                                        >
+                                                            class="position-absolute text-center w-auto first-img-label"
+                                                            >First Image
+                                                        </small>
                                                     </div>
                                                     <span
-                                                        style="
-                                                            outline: 2px solid
-                                                                var(--lavender);
-                                                            background: var(
-                                                                --dark-900
-                                                            );
-                                                        "
-                                                        class="position-absolute top-0 start-100 translate-middle badge"
+                                                        class="position-absolute badge top-0 count-indicator-prompt-history-item"
                                                     >
-                                                        {{
-                                                            (
-                                                                item.urls as string[]
-                                                            ).length
-                                                        }}
+                                                        {{ (item.urls as string[]).length }}
 
-                                                        <span
-                                                            class="visually-hidden"
-                                                            >images
-                                                            available</span
-                                                        >
+                                                        <span class="visually-hidden">images available</span>
                                                     </span>
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
                                                         <p class="card-text">
-                                                            {{
-                                                                item.prompt_excerpt
-                                                            }}
+                                                            {{ item.prompt_excerpt }}
                                                         </p>
                                                         <p class="card-text">
-                                                            <small
-                                                                class="text-muted"
-                                                                >{{
-                                                                    niceDate(
-                                                                        item.created ||
-                                                                            ("" as string)
-                                                                    )
-                                                                }}</small
-                                                            >
+                                                            <small class="text-muted">{{
+                                                                niceDate(item.created || ("" as string))
+                                                            }}</small>
                                                         </p>
                                                     </div>
                                                 </div>
@@ -248,9 +193,7 @@
                         >
                             <div class="p-3 passes-section">
                                 <div class="card">
-                                    <div class="card-header bg-info text-dark">
-                                        Content Passes
-                                    </div>
+                                    <div class="card-header bg-info text-dark">Content Passes</div>
                                     <div class="card-body">
                                         <div
                                             v-if="!rpgUser.nsfw_pass"
@@ -258,12 +201,8 @@
                                             role="alert"
                                         >
                                             <strong>Content Limited!</strong>
-                                            You currently do not have an NSFW
-                                            content pass.
-                                            <button
-                                                class="btn btn-link p-0 m-0 align-baseline"
-                                                type="button"
-                                            >
+                                            You currently do not have an NSFW content pass.
+                                            <button class="btn btn-link p-0 m-0 align-baseline" type="button">
                                                 Upgrade
                                             </button>
                                             <button
@@ -274,9 +213,7 @@
                                             ></button>
                                         </div>
 
-                                        <div
-                                            class="d-flex mb-3 align-items-center nsfw-pass-entry"
-                                        >
+                                        <div class="d-flex mb-3 align-items-center nsfw-pass-entry">
                                             <h5 class="mb-0">NSFW:</h5>
                                             <div
                                                 v-if="!rpgUser.nsfw_pass"
@@ -284,23 +221,14 @@
                                             >
                                                 Unavailable
                                             </div>
-                                            <div
-                                                v-else
-                                                class="ms-2 badge fs-6 text-bg-success"
-                                            >
+                                            <div v-else class="ms-2 badge fs-6 text-bg-success">
                                                 Purchased
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="d-flex mb-3 align-items-center nsfw-pass-entry"
-                                        >
+                                        <div class="d-flex mb-3 align-items-center nsfw-pass-entry">
                                             <h5 class="mb-0">FaceCrunch:</h5>
-                                            <div
-                                                class="ms-2 badge fs-6 text-bg-secondary"
-                                            >
-                                                Unavailable
-                                            </div>
+                                            <div class="ms-2 badge fs-6 text-bg-secondary">Unavailable</div>
                                         </div>
                                     </div>
                                 </div>
@@ -328,19 +256,11 @@
             :show="showToast"
         />
 
-        <ModalComponent
-            id="prompt-selected"
-            modal-title="Prompt Details"
-            size="lg"
-        >
+        <ModalComponent id="prompt-selected" modal-title="Prompt Details" size="lg">
             <div class="row mb-3">
                 <div class="col-md-6">
                     <p class="text-muted mb-1">Prompt</p>
-                    <p
-                        @click="copyPrompt(selectedPrompt.prompt)"
-                        class="text-white"
-                        style="cursor: copy"
-                    >
+                    <p @click="copyPrompt(selectedPrompt.prompt)" class="text-white" style="cursor: copy">
                         {{ selectedPrompt.prompt?.replace('"', "") }}
                     </p>
                 </div>
@@ -365,10 +285,7 @@
                         <label for="floatingTextarea">Adherence</label>
                     </div>
 
-                    <div
-                        v-if="selectedPrompt?.model"
-                        class="form-floating mb-2"
-                    >
+                    <div v-if="selectedPrompt?.model" class="form-floating mb-2">
                         <input
                             readonly
                             class="form-control read-only"
@@ -378,10 +295,7 @@
                         <label for="floatingTextarea">Model</label>
                     </div>
 
-                    <div
-                        v-if="selectedPrompt?.rpg_presets"
-                        class="form-floating mb-2"
-                    >
+                    <div v-if="selectedPrompt?.rpg_presets" class="form-floating mb-2">
                         <input
                             readonly
                             class="form-control read-only"
@@ -401,10 +315,7 @@
                         prompted
                     </p>
 
-                    <p
-                        class="mb-1 rounded-3 p-2"
-                        style="background: var(--dark-600)"
-                    >
+                    <p class="mb-1 rounded-3 p-2" style="background: var(--dark-600)">
                         {{ selectedPrompt?.size?.width || 0 }}
                         <i class="fa-solid fa-xmark fw-bold"></i>
                         {{ selectedPrompt?.size?.height || 0 }} (px)
@@ -417,10 +328,7 @@
                     <div class="thumbnails-wrapper">
                         <h5 class="fw-light mb-3">Images</h5>
                         <div class="prompt-grid">
-                            <template
-                                v-for="(url, index) in selectedPrompt.urls"
-                                :key="index"
-                            >
+                            <template v-for="(url, index) in selectedPrompt.urls" :key="index">
                                 <div class="overflow-hidden rounded-2">
                                     <img
                                         v-if="url"
@@ -436,8 +344,7 @@
                         <div v-if="!selectedPrompt.urls?.length">
                             <p class="text-warning">No images on record.</p>
                             <small class="text-muted"
-                                >All images in this prompt have been deleted or
-                                no images were created.</small
+                                >All images in this prompt have been deleted or no images were created.</small
                             >
                         </div>
                     </div>
@@ -448,13 +355,7 @@
                 <button @click="deletePrompt" class="btn btn-danger">
                     <i class="fa-regular fa-trash-can"></i> Delete
                 </button>
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                >
-                    Close
-                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </template>
         </ModalComponent>
 
@@ -472,13 +373,7 @@
                 outline: 2px solid var(--dark-100);
             "
         >
-            <button
-                @click="cancelSelections"
-                class="btn btn-tertiary"
-                v-if="startSelect"
-            >
-                Cancel
-            </button>
+            <button @click="cancelSelections" class="btn btn-tertiary" v-if="startSelect">Cancel</button>
             <div v-if="startSelect" class="ms-3 badge badge-info">
                 Selected:
                 {{ promptSelection.length }}
@@ -488,14 +383,11 @@
                 @click="deleteSelections"
                 class="btn btn-danger ms-3 position-relative"
             >
-                <i
-                    v-if="!userStore.userPromptsLoading"
-                    class="fa-regular fa-trash-can"
-                ></i>
+                <i v-if="!userStore.userPromptsLoading" class="fa-regular fa-trash-can"></i>
                 <load-spinner v-if="userStore.userPromptsLoading" />
                 Delete
                 <span
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary count-indicator-prompt-history-item"
                 >
                     {{ promptSelection.length }}
                     <span class="visually-hidden">delete selected</span>
@@ -585,9 +477,7 @@ const deletePrompt = async () => {
 const getPrompt = async (prompt) => {
     if (startSelect.value) {
         if (promptSelection.value.includes(prompt.prompt_id)) {
-            promptSelection.value = promptSelection.value.filter(
-                (id) => id !== prompt.prompt_id
-            );
+            promptSelection.value = promptSelection.value.filter((id) => id !== prompt.prompt_id);
         } else {
             promptSelection.value.push(prompt.prompt_id);
         }
@@ -620,9 +510,7 @@ const openThumbnailLightbox = async (url) => {
     const imgId = url.split("/thumbnails/")[1].split(".")[0];
 
     lightboxThumbnailIndex.value =
-        lightboxThumbnails.value?.findIndex((img) =>
-            img.includes(`${imgId}.image`)
-        ) || 0;
+        lightboxThumbnails.value?.findIndex((img) => img.includes(`${imgId}.image`)) || 0;
 
     await nextTick();
 
@@ -637,9 +525,7 @@ const onToastMessage = (message) => {
 };
 
 const onDeleteImage = async (imageKey) => {
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this image?"
-    );
+    const confirmDelete = confirm("Are you sure you want to delete this image?");
     if (!confirmDelete) {
         return;
     }
@@ -687,9 +573,7 @@ const fetchOrLoadExisting = async (userId: string) => {
         await userStore.fetchImages(userId);
         await userStore.getUser(user.value as User);
     } else {
-        userStore.imageThumbnails = storage.g(
-            STORAGE_KEYS.thumbnails
-        ).thumbnails;
+        userStore.imageThumbnails = storage.g(STORAGE_KEYS.thumbnails).thumbnails;
         userStore.images = storage.g(STORAGE_KEYS.images).images;
     }
 };
@@ -706,8 +590,7 @@ onMounted(async () => {
     const modalElement = document.getElementById("prompt-selected");
     if (modalElement) {
         // @ts-ignore
-        modalInstance.value =
-            Modal.getInstance(modalElement) || new Modal(modalElement);
+        modalInstance.value = Modal.getInstance(modalElement) || new Modal(modalElement);
     }
 });
 </script>
