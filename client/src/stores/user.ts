@@ -39,8 +39,10 @@ export const useUserStore = defineStore("user", {
             // redeem code
             try {
                 this.userLoading = true;
-                const response: AxiosResponse<RedeemAPIResponse> =
-                    await axios.post(API.redeem_code_v2, redemptionData);
+                const response: AxiosResponse<RedeemAPIResponse> = await axios.post(
+                    API.redeem_code_v2,
+                    redemptionData
+                );
 
                 if (response.data?.token_balance) {
                     this.user.token_balance = response.data.token_balance;
@@ -72,13 +74,9 @@ export const useUserStore = defineStore("user", {
                     this.images = this.images.filter((image) => {
                         return !response.data.deleted_files.includes(image.key);
                     });
-                    this.imageThumbnails = this.imageThumbnails.filter(
-                        (image) => {
-                            return !response.data.deleted_files.includes(
-                                image.key
-                            );
-                        }
-                    );
+                    this.imageThumbnails = this.imageThumbnails.filter((image) => {
+                        return !response.data.deleted_files.includes(image.key);
+                    });
 
                     storage.s(STORAGE_KEYS.thumbnails, {
                         thumbnails: this.imageThumbnails,
@@ -97,25 +95,22 @@ export const useUserStore = defineStore("user", {
             }
         },
 
-        async deletePrompt(prompt) {
+        async deletePrompt(prompt_id) {
             try {
                 const response = await axios.post(API.delete_prompt, {
-                    prompt,
+                    prompt_id,
                 });
 
                 if (response.data.success) {
                     this.toastMessage = response.data.message;
 
-                    const deleteFilesFromState = response.data
-                        .deleted_files as string[];
+                    const deleteFilesFromState = response.data.deleted_files as string[];
                     this.images = this.images.filter((image) => {
                         return !deleteFilesFromState.includes(image.key);
                     });
-                    this.imageThumbnails = this.imageThumbnails.filter(
-                        (image) => {
-                            return !deleteFilesFromState.includes(image.key);
-                        }
-                    );
+                    this.imageThumbnails = this.imageThumbnails.filter((image) => {
+                        return !deleteFilesFromState.includes(image.key);
+                    });
 
                     // update storage
                     storage.s(STORAGE_KEYS.thumbnails, {
@@ -131,9 +126,7 @@ export const useUserStore = defineStore("user", {
                     // reset the selected prompt
                     this.selectedPrompt = {} as PromptHistoryItem;
                     // remove prompt from quick history
-                    this.quickHistory = this.quickHistory.filter(
-                        (item) => item.prompt_id !== prompt.prompt_id
-                    );
+                    this.quickHistory = this.quickHistory.filter((item) => item.prompt_id !== prompt_id);
                 }
             } catch (error) {
                 console.log(error);
@@ -148,16 +141,12 @@ export const useUserStore = defineStore("user", {
                     user_id,
                 });
 
-                this.images = this.images.filter(
-                    (image) => image.key !== file_key
-                );
+                this.images = this.images.filter((image) => image.key !== file_key);
 
                 let thumbnailKey = file_key.replace("/", "/thumbnails/");
                 thumbnailKey = thumbnailKey.replace(".image.", ".thumbnail.");
 
-                this.imageThumbnails = this.imageThumbnails.filter(
-                    (image) => image.key !== thumbnailKey
-                );
+                this.imageThumbnails = this.imageThumbnails.filter((image) => image.key !== thumbnailKey);
 
                 storage.s(STORAGE_KEYS.thumbnails, {
                     thumbnails: this.imageThumbnails,
@@ -181,8 +170,9 @@ export const useUserStore = defineStore("user", {
         async fetchImages(user_id: string) {
             try {
                 this.userLoading = true;
-                const response: AxiosResponse<UserImageResponse> =
-                    await axios.get(API.get_images + `/${user_id}`);
+                const response: AxiosResponse<UserImageResponse> = await axios.get(
+                    API.get_images + `/${user_id}`
+                );
 
                 this.imageThumbnails = response.data?.thumbnails as UserImage[];
                 this.images = response.data?.images as UserImage[];
@@ -211,18 +201,14 @@ export const useUserStore = defineStore("user", {
         async fetchPromptByPromptId(promptId: string) {
             try {
                 this.userPromptsLoading = true;
-                const response = await axios.get(
-                    API.get_prompt + `/${promptId}`
-                );
+                const response = await axios.get(API.get_prompt + `/${promptId}`);
 
                 const imgURLS = [] as string[];
                 const thumbURLS = [] as string[];
                 if (response.data?.thumbnails) {
                     const thumbnails = storage.g(STORAGE_KEYS.thumbnails);
                     for (const thumbnail of response.data?.thumbnails) {
-                        const tn = thumbnails.thumbnails.find(
-                            (t) => t.key === thumbnail
-                        );
+                        const tn = thumbnails.thumbnails.find((t) => t.key === thumbnail);
                         if (tn) {
                             thumbURLS.push(tn.url as string);
                         }
@@ -249,12 +235,17 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        async fetchGalleryImages() {
+            try {
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
         async fetchQuickPromptsHistory(userId: string) {
             try {
                 this.userPromptsLoading = true;
-                const response = await axios.get(
-                    API.get_user_prompts + `/${userId}`
-                );
+                const response = await axios.get(API.get_user_prompts + `/${userId}`);
 
                 if (response.data?.length) {
                     const thumbnails = storage.g(STORAGE_KEYS.thumbnails);
@@ -264,9 +255,7 @@ export const useUserStore = defineStore("user", {
                         if (!prompt.thumbnails) continue;
 
                         for (const thumbnail of prompt.thumbnails) {
-                            const tn = thumbnails.thumbnails.find(
-                                (t) => t.key === thumbnail
-                            );
+                            const tn = thumbnails.thumbnails.find((t) => t.key === thumbnail);
                             if (tn) {
                                 urls.push(tn.url as string);
                             }
@@ -320,10 +309,7 @@ export const useUserStore = defineStore("user", {
                 this.userLoaded = false;
                 this.userLoading = true;
 
-                const response = await axios.post(
-                    API.get_user + `/${user.sub}`,
-                    user
-                );
+                const response = await axios.post(API.get_user + `/${user.sub}`, user);
 
                 this.user = response.data;
                 this.userLoaded = true;

@@ -1,10 +1,5 @@
 <template>
-    <vue-easy-lightbox
-        :imgs="images"
-        :index="index"
-        :visible="show"
-        @hide="$emit('update:show', false)"
-    >
+    <vue-easy-lightbox :imgs="images" :index="index" :visible="show" @hide="$emit('update:show', false)">
         <template v-slot:toolbar="{ toolbarMethods }">
             <div class="vel-toolbar view-image-actions overflow-visible">
                 <div
@@ -25,24 +20,36 @@
                 <button
                     class="btn action-btn btn-dark"
                     @click="toolbarMethods.zoomIn"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Zoom In"
                 >
                     <i class="fa-regular fa-magnifying-glass-plus"></i>
                 </button>
                 <button
                     class="btn action-btn btn-dark"
                     @click="toolbarMethods.zoomOut"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Zoom Out"
                 >
                     <i class="fa-regular fa-magnifying-glass-minus"></i>
                 </button>
                 <button
                     class="btn action-btn btn-dark"
                     @click="downloadImage(images[index])"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Download"
                 >
                     <i class="fa-solid fa-arrow-down-to-bracket"></i>
                 </button>
                 <button
                     class="btn action-btn btn-dark"
                     @click="copyImgURL(images[index])"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Copy"
                 >
                     <i class="fa-regular fa-copy"></i>
                 </button>
@@ -50,8 +57,31 @@
                     v-if="allowDelete"
                     class="btn action-btn btn-dark"
                     @click="deleteImage(images[index])"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Delete"
                 >
                     <i class="fa-regular fa-trash-alt"></i>
+                </button>
+                <button
+                    v-if="isAdmin && !isImagePublished(images[index])"
+                    class="btn action-btn btn-dark"
+                    @click="publishImage(images[index])"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Publish"
+                >
+                    <i class="fa-regular fa-share-from-square"></i>
+                </button>
+                <button
+                    v-if="isAdmin && isImagePublished(images[index])"
+                    class="btn action-btn btn-dark"
+                    @click="unPublish(images[index])"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-title="Unpublish"
+                >
+                    <i class="fa-solid fa-square-xmark"></i>
                 </button>
             </div>
         </template>
@@ -72,8 +102,10 @@ const userStore = useUserStore(); // The user store will always have the images,
 const emit = defineEmits([
     "update:show",
     "downloadSuccess",
+    "publishImage",
     "toastMessage",
     "error",
+    "unpublishImage",
     "deleteImage",
 ]);
 
@@ -94,22 +126,33 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    isAdmin: {
+        type: Boolean,
+        default: false,
+    },
 });
 
+const publishImage = async (imgUrl: string) => {
+    await nextTick();
+    emit("publishImage", imgUrl);
+};
+
+const unPublish = async (imgUrl: string) => {
+    await nextTick();
+    emit("unpublishImage", imgUrl);
+};
+
 const downloadImage = async (url) => {
-    await nextTick(); // Ensure that the DOM updates are complete
+    await nextTick();
 
     try {
-        // Call the Node.js server to download the image, passing the Backblaze URL as a query parameter
-        const response = await axios.get(
-            import.meta.env.VITE_APP_API_URL + "/download-image",
-            {
-                params: {
-                    url: url, // Pass the Backblaze presigned URL as a query parameter
-                },
-                responseType: "blob", // Expect the binary response as a blob
-            }
-        );
+        // Call the Node.js server to download the image, passing URL as a query parameter
+        const response = await axios.get(import.meta.env.VITE_APP_API_URL + "/download-image", {
+            params: {
+                url: url,
+            },
+            responseType: "blob", // Expect the binary response as a blob
+        });
 
         // Create a URL for the Blob object directly from response.data (the blob)
         const blobUrl = URL.createObjectURL(response.data);
@@ -135,15 +178,19 @@ const downloadImage = async (url) => {
     }
 };
 
+const isImagePublished = (url) => {
+    // Find out if any of the published Images are included in the current URL
+    const published_ids = userStore.selectedPrompt?.published_images.map((pimg) => pimg.split(".")[0]);
+
+    return published_ids?.some((pimg) => url.includes(pimg));
+};
+
 const deleteImage = async (imgUrl: string) => {
     await nextTick();
     // Targeting the specific image to delete using the provided index.  The order of images form backblaze is stable.
     try {
         if (userStore?.images[props.index]?.key) {
-            emit(
-                "deleteImage",
-                (userStore.images[props.index] as UserImage).key
-            );
+            emit("deleteImage", (userStore.images[props.index] as UserImage).key);
 
             emit("toastMessage", "Image deleted");
         }

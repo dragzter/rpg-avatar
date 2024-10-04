@@ -16,29 +16,15 @@
                             />
 
                             <div class="hero-btn">
-                                <router-link
-                                    class="btn btn-lg fw-normal btn-primary"
-                                    to="generate-image"
+                                <router-link class="btn btn-lg fw-normal btn-primary" to="generate-image"
                                     >GET STARTED
                                 </router-link>
                             </div>
                         </div>
                     </div>
-                    <div
-                        v-for="row in imageRows"
-                        :key="row[0]"
-                        class="row mb-4"
-                    >
-                        <div
-                            v-for="image in row"
-                            :key="image"
-                            class="col position-relative"
-                        >
-                            <img
-                                :src="`assets/${image}`"
-                                alt="RPG Avatar"
-                                class="img-fluid"
-                            />
+                    <div v-for="row in imageRows" :key="row[0]" class="row mb-4">
+                        <div v-for="image in row" :key="image" class="col position-relative">
+                            <img :src="`assets/${image}`" alt="RPG Avatar" class="img-fluid" />
                         </div>
                     </div>
                 </div>

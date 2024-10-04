@@ -164,6 +164,15 @@
 
                                                         <span class="visually-hidden">images available</span>
                                                     </span>
+
+                                                    <span
+                                                        v-if="item.published_images?.length"
+                                                        class="position-absolute badge top-0 count-published-images-item"
+                                                    >
+                                                        {{ (item.published_images as string[]).length }}
+
+                                                        <span class="visually-hidden">images available</span>
+                                                    </span>
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
@@ -243,9 +252,13 @@
             :images="lightboxThumbnails"
             :show="showThumbnailLightBox"
             :index="lightboxThumbnailIndex"
-            @toast-message="onToastMessage"
+            @toast-message="announce"
             @update:show="showThumbnailLightBox = false"
             @delete-image="onDeleteImage"
+            :is-admin="rpgUser.admin"
+            @publish-image="publishImage"
+            @unpublish-image="unpublishImage"
+            @on-index-change="handleChangeIndex"
         />
 
         <ToastComponent
@@ -329,7 +342,7 @@
                         <h5 class="fw-light mb-3">Images</h5>
                         <div class="prompt-grid">
                             <template v-for="(url, index) in selectedPrompt.urls" :key="index">
-                                <div class="overflow-hidden rounded-2">
+                                <div class="overflow-hidden rounded-2 position-relative">
                                     <img
                                         v-if="url"
                                         @click="openThumbnailLightbox(url)"
@@ -338,6 +351,9 @@
                                         style="transition: 0.2s ease-in-out"
                                         class="object-fit-cover w-100 h-100"
                                     />
+                                    <div v-if="isImagePublished(url)" class="published-tag">
+                                        <i class="fa-solid fa-check"></i> Published
+                                    </div>
                                 </div>
                             </template>
                         </div>
@@ -399,10 +415,10 @@
 
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import { isMoreThan24Hours, niceDate } from "@/utils/date-utils";
-import { STORAGE_KEYS } from "@/utils";
+import { API, STORAGE_KEYS } from "@/utils";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { storage } from "@/utils/storage";
 import { useAuth0, type User } from "@auth0/auth0-vue";
@@ -411,6 +427,7 @@ import { Modal } from "bootstrap";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import UserDetails from "@/components/page-sections/UserDetails.vue";
 import MediaLibraryProfile from "@/components/page-sections/MediaLibraryProfile.vue";
+import axios from "axios";
 
 const { user } = useAuth0();
 
@@ -455,6 +472,7 @@ watch(
 watch(
     () => rpgUser.value.id,
     async (newId) => {
+        console.log(rpgUser.value);
         await fetchOrLoadExisting(newId);
         await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
@@ -463,14 +481,79 @@ watch(
 /**
  * =*'^'*= METHODS =*'^'*=
  */
+const announce = (msg) => {
+    userStore.toastMessage = msg;
+
+    showToast.value = true;
+    setTimeout(() => {
+        showToast.value = false;
+    }, 2000);
+};
+
 const deletePrompt = async () => {
     const confirm = window.confirm(
         "Are you sure you want to delete this prompt? You will also lose all associated images."
     );
     if (confirm) {
-        await userStore.deletePrompt(selectedPrompt.value);
+        await userStore.deletePrompt(selectedPrompt.value.prompt_id);
 
         modalInstance.value?.hide();
+    }
+};
+
+const isImagePublished = (url) => {
+    // Find out if any of the published Images are included in the current URL
+    const published_ids = selectedPrompt.value?.published_images.map((pimg) => pimg.split(".")[0]);
+
+    return published_ids?.some((pimg) => url.includes(pimg));
+};
+
+const publishImage = async (imgUrl) => {
+    try {
+        const file_key = imgUrl.split("/")[imgUrl.split("/").length - 1].split("?")[0];
+
+        const publishResponse = await axios.post(API.publish_image, {
+            file_key,
+            prompt_id: selectedPrompt.value.prompt_id,
+            user_id: rpgUser.value.id,
+        });
+
+        await nextTick();
+        await Promise.all([
+            userStore.fetchPromptByPromptId(selectedPrompt.value.prompt_id),
+            userStore.fetchQuickPromptsHistory(rpgUser.value.id),
+        ]);
+
+        announce(publishResponse.data.message);
+    } catch (error) {
+        console.log(error);
+        userStore.userError = true;
+        userStore.toastMessage = error.message;
+    }
+};
+
+const unpublishImage = async (url) => {
+    const confirm = window.confirm("Are you sure you want to unpublish this image?");
+    if (confirm) {
+        try {
+            const file_key = url.split("/")[url.split("/").length - 1].split("?")[0];
+
+            const resp = await axios.post(API.unpublish_image, {
+                file_key,
+                prompt_id: selectedPrompt.value.prompt_id,
+            });
+
+            await nextTick();
+
+            await Promise.all([
+                userStore.fetchPromptByPromptId(selectedPrompt.value.prompt_id),
+                userStore.fetchQuickPromptsHistory(rpgUser.value.id),
+            ]);
+
+            announce(resp.data.message);
+        } catch (error) {
+            console.log(error);
+        }
     }
 };
 
@@ -519,11 +602,6 @@ const openThumbnailLightbox = async (url) => {
     }
 };
 
-const onToastMessage = (message) => {
-    showToast.value = true;
-    userStore.toastMessage = message;
-};
-
 const onDeleteImage = async (imageKey) => {
     const confirmDelete = confirm("Are you sure you want to delete this image?");
     if (!confirmDelete) {
@@ -535,6 +613,7 @@ const onDeleteImage = async (imageKey) => {
             file_key: imageKey,
             user_id: rpgUser.value.id,
         });
+        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
         showLightbox.value = false;
     }
 };
@@ -544,16 +623,15 @@ const copyPrompt = async (promptText: string) => {
     navigator.clipboard
         .writeText(promptText)
         .then(() => {
-            showToast.value = true;
-            userStore.toastMessage = "Prompt copied!";
-
-            setTimeout(() => {
-                showToast.value = false;
-            }, 2000);
+            announce("Prompt copied to clipboard");
         })
         .catch((err) => {
             console.error("Failed to copy to clipboard", err);
         });
+};
+
+const handleChangeIndex = (_, newIndex) => {
+    lightboxThumbnailIndex.value = newIndex;
 };
 
 const fetchOrLoadExisting = async (userId: string) => {
@@ -592,5 +670,9 @@ onMounted(async () => {
         // @ts-ignore
         modalInstance.value = Modal.getInstance(modalElement) || new Modal(modalElement);
     }
+});
+
+onUnmounted(() => {
+    modalInstance.value?.dispose();
 });
 </script>

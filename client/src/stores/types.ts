@@ -221,6 +221,7 @@ export interface PromptHistoryItem {
         height: number;
     };
     negative_prompt?: string;
+    published_images?: string[];
     thumbnails?: string[];
     file_names?: string[];
     urls?: string[];
@@ -231,6 +232,7 @@ export interface PromptHistoryItem {
 // All that is needed to create the grid.  Clicking on a grid item fetches the metadata.
 export interface QuickPromptHistory {
     prompt_id: string;
+    published_images: string[];
     prompt_excerpt: string;
     created?: string;
     thumbnails?: string[];

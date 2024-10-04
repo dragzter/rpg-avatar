@@ -3,11 +3,7 @@
         <div id="user-media-library" class="image-grid">
             <template v-for="image in userStore.imageThumbnails">
                 <div class="overflow-hidden">
-                    <img
-                        @click="openLightbox(image.key)"
-                        :src="image.url"
-                        :alt="image.key"
-                    />
+                    <img @click="openLightbox(image.key)" :src="image.url" :alt="image.key" />
                 </div>
             </template>
         </div>
@@ -48,9 +44,7 @@ const rpgUser = computed(() => userStore.user);
 const openLightbox = async (imageKey) => {
     const imgId = imageKey.split("/thumbnails/")[1].split(".")[0];
 
-    lightboxIndex.value = lightboxImages.value?.findIndex((img) =>
-        img.includes(`${imgId}.image`)
-    );
+    lightboxIndex.value = lightboxImages.value?.findIndex((img) => img.includes(`${imgId}.image`));
 
     await nextTick();
 
@@ -60,9 +54,7 @@ const openLightbox = async (imageKey) => {
 };
 
 const onDeleteImage = async (imageKey) => {
-    const confirmDelete = confirm(
-        "Are you sure you want to delete this image?"
-    );
+    const confirmDelete = confirm("Are you sure you want to delete this image?");
     if (!confirmDelete) {
         return;
     }
@@ -72,6 +64,7 @@ const onDeleteImage = async (imageKey) => {
             file_key: imageKey,
             user_id: rpgUser.value.id,
         });
+        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
         showLightbox.value = false;
     }
 };

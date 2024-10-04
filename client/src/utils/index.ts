@@ -4,34 +4,30 @@ export const API = {
     prices: import.meta.env.VITE_APP_API_URL + "/api/prices",
     checkout: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     image: import.meta.env.VITE_APP_API_URL + "/api/image",
-    start_image_v2_task:
-        import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
+    start_image_v2_task: import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
     get_user: import.meta.env.VITE_APP_API_URL + "/api/user",
     redeem_code: import.meta.env.VITE_APP_API_URL + "/api/redeem",
     redeem_code_v2: import.meta.env.VITE_APP_API_URL + "/api/redeem-v2",
-    sign_disclaimer:
-        import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
+    sign_disclaimer: import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
     cancel_task: import.meta.env.VITE_APP_API_URL + "/api/cancel-task",
     check_task_status: import.meta.env.VITE_APP_API_URL + "/api/task-status",
     start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     get_finished_images: import.meta.env.VITE_APP_API_URL + "/api/get-images",
     admin_add_codes: import.meta.env.VITE_APP_API_URL + "/api/codes",
-    admin_get_token_codes:
-        import.meta.env.VITE_APP_API_URL + "/api/codes/token",
+    admin_get_token_codes: import.meta.env.VITE_APP_API_URL + "/api/codes/token",
     upload_images: import.meta.env.VITE_APP_API_URL + "/api/upload",
     random_prompt: import.meta.env.VITE_APP_API_URL + "/api/random-prompt",
     delete_user: import.meta.env.VITE_APP_API_URL + "/api/user/delete",
-    fb_test_delete_user:
-        import.meta.env.VITE_APP_API_URL +
-        "/api/facebook/data-deletion-callback",
+    fb_test_delete_user: import.meta.env.VITE_APP_API_URL + "/api/facebook/data-deletion-callback",
     surprise_prompt: import.meta.env.VITE_APP_API_URL + "/api/surprise-prompt",
     get_images: import.meta.env.VITE_APP_API_URL + "/api/images",
     delete_image: import.meta.env.VITE_APP_API_URL + "/api/image/delete",
     get_user_prompts: import.meta.env.VITE_APP_API_URL + "/api/user/prompts",
     get_prompt: import.meta.env.VITE_APP_API_URL + "/api/prompt",
     delete_prompt: import.meta.env.VITE_APP_API_URL + "/api/prompt/delete",
-    delete_many_prompts:
-        import.meta.env.VITE_APP_API_URL + "/api/prompts/delete",
+    delete_many_prompts: import.meta.env.VITE_APP_API_URL + "/api/prompts/delete",
+    publish_image: import.meta.env.VITE_APP_API_URL + "/api/image/publish",
+    unpublish_image: import.meta.env.VITE_APP_API_URL + "/api/image/unpublish",
 };
 
 export const STORAGE_KEYS = {
