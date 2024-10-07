@@ -79,24 +79,10 @@ export interface UserAIPrompt {
     negative_prompt?: string;
     steps?: number;
     adherence?: number;
+    cost?: number;
 }
 
-export interface UserAiPrompt {
-    prompt: string;
-    user_id: string;
-    archetype: string;
-
-    art_style?: string;
-    steps?: number;
-    negative_prompt?: string;
-    adherence?: number;
-    size?: {
-        width: number; // 1024
-        height: number; // 1024
-    };
-}
-
-export interface NovitaImg {
+export interface AiImageResponse {
     image_url: string;
     image_type: string;
     image_url_ttl: string;
@@ -104,7 +90,7 @@ export interface NovitaImg {
 }
 
 export interface ImageGenResponse {
-    images: NovitaImg[];
+    images: AiImageResponse[];
     success: boolean;
     message: string;
     new_token_balance: number;
@@ -202,7 +188,7 @@ export type UserImageResponse = {
     success: boolean;
 };
 
-export type ModelSection = { label: string; img: string; value: string };
+export type ModelSelection = { label: string; img: string; value: string; cost: number };
 
 export interface PromptHistoryItem {
     user_id: string;

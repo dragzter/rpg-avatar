@@ -5,12 +5,14 @@ export const API = {
     checkout: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     image: import.meta.env.VITE_APP_API_URL + "/api/image",
     start_image_v2_task: import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
+    start_premium_image: import.meta.env.VITE_APP_API_URL + "/api/repl/start-image-task",
     get_user: import.meta.env.VITE_APP_API_URL + "/api/user",
     redeem_code: import.meta.env.VITE_APP_API_URL + "/api/redeem",
     redeem_code_v2: import.meta.env.VITE_APP_API_URL + "/api/redeem-v2",
     sign_disclaimer: import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
     cancel_task: import.meta.env.VITE_APP_API_URL + "/api/cancel-task",
     check_task_status: import.meta.env.VITE_APP_API_URL + "/api/task-status",
+    check_premium_task_status: import.meta.env.VITE_APP_API_URL + "/api/repl/image-status",
     start_checkout_session: import.meta.env.VITE_APP_API_URL + "/api/checkout",
     get_finished_images: import.meta.env.VITE_APP_API_URL + "/api/get-images",
     admin_add_codes: import.meta.env.VITE_APP_API_URL + "/api/codes",
@@ -47,6 +49,38 @@ export const ApiTaskStatus = {
     TIMEOUT: "timeout",
 };
 
+export const PremiumImageSizeOptions = [
+    {
+        label: "512x512",
+        size: {
+            width: 512,
+            height: 512,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: false,
+    },
+    {
+        label: "1024x1024",
+        size: {
+            width: 1024,
+            height: 1024,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: true,
+    },
+    {
+        label: "1440x1440",
+        size: {
+            width: 1440,
+            height: 1440,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: false,
+    },
+];
 export const ImageOptions = [
     {
         label: "512x512",

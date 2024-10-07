@@ -1852,29 +1852,48 @@ main {
 
 .model-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Ensure each column has a min and max width */
+    gap: 10px; /* Space between grid items to prevent hover effect from being obscured */
+    height: 100%;
+    grid-auto-rows: minmax(200px, auto); /* Ensure all items have a minimum height */
+    max-width: 100%; /* Ensure the grid doesn't cause overflow */
+    overflow-x: hidden; /* Prevent horizontal scroll */
+
 
     @media (max-width: 991px) {
-        grid-template-columns: repeat(1, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(1, minmax(200px, 1fr)); /* Switch to a single column on small screens */
     }
 }
 
 .model-grid-item {
-    height: 75px;
-    width: 100%;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 3px solid transparent;
+    box-sizing: border-box; /* Ensure padding/border doesn't affect grid sizing */
+    transition: border 0.1s ease; /* Smooth transition for hover */
+
+    img {
+        @media (max-width: 768px) {
+            height: 120px !important;
+            width: 160%;
+            object-fit: cover !important;
+        }
+    }
+}
+
+.model-grid-item:hover {
+    border: 3px solid var(--lavender); /* Use border instead of outline */
 }
 
 #model-select-modal{
-    height: 70px;
     h5 {
-        font-size: 16px;
+        font-size: 13px;
     }
 }
 
 #model-select {
-    height: 100px;
+    height: 130px;
 
     &.is_disabled {
         pointer-events: none;
@@ -1886,7 +1905,9 @@ main {
     position: absolute;
     top: 6px;
     right: 10px;
+    font-size: 13px;
 }
+
 
 
 #model-select, #model-select-modal {
@@ -1898,15 +1919,15 @@ main {
     transition: 0.3s;
     overflow-x: hidden;
     position: relative;
-    background-size: contain;
-    background-position: center left;
+    background-size: cover;
+    background-position: -30px;
     background-repeat: no-repeat;
 
     &:before {
         content: " ";
         position: absolute;
         top: 0;
-        left: 0;
+        left: 10px;
         right: 0;
         bottom: 0;
         background: linear-gradient(to right, rgba(0, 0, 0, 0) 10%, rgba(0, 0, 0, 0.4) 30%, rgba(0, 0, 0, 1) 55%);
@@ -1934,6 +1955,7 @@ main {
     h5 {
         background: var(--gradient-lavender-pink-peach);
         color: #fff;
+        font-size: 14px;
         text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
         padding: 5px 10px;
         position: absolute;
