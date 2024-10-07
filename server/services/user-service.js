@@ -1,6 +1,7 @@
-import { PromptModel, UserModel } from "../db/model.js";
+import { GalleryImageModel, PromptModel, UserModel } from "../db/model.js";
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import { excerpt } from "../utils/helpers.js";
+import { v4 as uuidv4 } from "uuid";
 
 class UserService {
     async getUserById(userId) {
@@ -78,6 +79,7 @@ class UserService {
                         prompt_excerpt: excerpt(p.prompt, 30),
                         created: p.created,
                         thumbnails: p.thumbnails,
+                        published_images: p.published_images,
                     };
                 });
         } catch (err) {
@@ -99,6 +101,84 @@ class UserService {
             await _prompt.save();
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async addPublishedImage({ user_id, prompt_id, file_key }) {
+        try {
+            // Add the file key to the prompt's published images
+            const prompt = await this.getPromptById(prompt_id);
+            const existingImage = await GalleryImageModel.findOne({
+                file_key,
+            }).exec();
+
+            if (prompt.published_images.includes(file_key) || existingImage) {
+                console.log("already puiblished");
+                return {
+                    success: false,
+                    message: "Image already published",
+                };
+            }
+
+            prompt.published_images.push(file_key);
+            await prompt.save();
+
+            await new GalleryImageModel({
+                id: uuidv4(),
+                user_id,
+                prompt_id,
+                file_key,
+            }).save();
+
+            return {
+                success: true,
+                message: "Published image added",
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                success: false,
+                message: "Failed to add published image",
+                error,
+            };
+        }
+    }
+
+    async removePublishedImage({ file_key, prompt_id }) {
+        try {
+            const image = await GalleryImageModel.findOne({
+                file_key,
+            }).exec();
+
+            if (!image) {
+                return {
+                    success: false,
+                    message: "Image not found",
+                };
+            }
+            console.log("Unpublishing image", file_key);
+
+            const prompt = await this.getPromptById(prompt_id);
+            prompt.published_images = prompt.published_images.filter(
+                (image) => image !== file_key
+            );
+            await prompt.save();
+
+            await GalleryImageModel.deleteOne({
+                file_key,
+            }).exec();
+
+            return {
+                success: true,
+                message: "Published image removed",
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                success: false,
+                message: "Failed to remove published image",
+                error,
+            };
         }
     }
 

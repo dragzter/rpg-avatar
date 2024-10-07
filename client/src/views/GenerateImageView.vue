@@ -193,6 +193,13 @@
                                     rpgUser.token_balance < selected_model.cost
                                 "
                             >
+                                <router-link
+                                    class="fw-light py-2 fw-bold px-3 btn btn-primary ms-2 me-1"
+                                    to="get-tokens"
+                                    >Buy Tokens
+                                </router-link>
+                            </span>
+                            <span v-else>
                                 <button
                                     v-if="loading"
                                     class="btn me-2 btn-tertiary"
@@ -223,13 +230,6 @@
                                     </div>
                                 </button>
                             </span>
-                            <div v-else>
-                                <router-link
-                                    class="fw-light py-2 fw-bold px-3 btn btn-primary ms-2 me-1"
-                                    to="get-tokens"
-                                    >Buy Tokens
-                                </router-link>
-                            </div>
                         </div>
                     </div>
                 </div>

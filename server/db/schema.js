@@ -54,6 +54,32 @@ export const PassCodeSchema = new Schema(
     { collection: "pass_codes" }
 );
 
+export const GalleryImageSchema = new Schema(
+    {
+        id: {
+            type: String,
+            required: true,
+        },
+        user_id: {
+            type: String,
+            required: true,
+        },
+        prompt_id: {
+            type: String,
+            required: true,
+        },
+        file_key: {
+            type: String,
+            required: true,
+        },
+        created: {
+            type: Date,
+            default: Date.now,
+        },
+    },
+    { collection: "gallery" }
+);
+
 // This is based on a typescript type in types.ts in the client folder.
 export const PromptSchema = new Schema(
     {
@@ -64,6 +90,11 @@ export const PromptSchema = new Schema(
         prompt_id: {
             type: String,
             required: true,
+        },
+        published_images: {
+            type: Array,
+            required: false,
+            default: [],
         },
         prompt: {
             type: String,

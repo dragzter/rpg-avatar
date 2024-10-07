@@ -2,19 +2,18 @@ import express from "express";
 import UserService from "../services/user-service.js";
 import { v4 as uuidv4 } from "uuid";
 import crypto from "crypto";
-import { DeletionRequestModel, PromptModel } from "../db/model.js";
+import {
+    DeletionRequestModel,
+    GalleryImageModel,
+    PromptModel,
+} from "../db/model.js";
 import BackblazeStorageService from "../services/backblaze-storage-service.js";
 
 const router = express.Router();
 
 /**
- * Function to
- * parse the signed
- * request from
- * Facebook. This
- * ensures the
- * request was sent
- * by Facebook.
+ * Function to parse the signed request from Facebook. This
+ * ensures the request was sent by Facebook.
  */
 function parseSignedRequest(signed_request) {
     const [encodedSig, payload] = signed_request.split(".", 2);
@@ -36,9 +35,7 @@ function parseSignedRequest(signed_request) {
 }
 
 /**
- * Helper function
- * to decode base64
- * URLs.
+ * Helper function to decode base64 URLs.
  */
 function base64UrlDecode(input) {
     return Buffer.from(
@@ -48,11 +45,8 @@ function base64UrlDecode(input) {
 }
 
 /**
- * Data Deletion
- * Callback Route
- * Handles Facebook
- * data deletion
- * requests.
+ * Data Deletion Callback Route Handles Facebook
+ * data deletion requests.
  */
 router.post("/api/facebook/data-deletion-callback", async (req, res) => {
     const { signed_request } = req.body;
@@ -102,15 +96,8 @@ router.post("/api/facebook/data-deletion-callback", async (req, res) => {
 });
 
 /**
- * Data Deletion
- * Status Check
- * Route Allows
- * users to check
- * the status of
- * their data
- * deletion request
- * by confirmation
- * code.
+ * Data Deletion Status Check Route Allows users to check the status of
+ * their data deletion request by confirmation code.
  */
 router.get("/api/deletion-status/:confirmationCode", async (req, res) => {
     const { confirmationCode } = req.params;
@@ -236,12 +223,23 @@ router.get("/api/prompt/:promptId", async (req, res) => {
 });
 
 router.post("/api/prompt/delete", async (req, res) => {
-    const { prompt } = req.body; // Get userId from URL
+    const { prompt_id } = req.body; // Get userId from URL
 
     try {
+        const prompt = await PromptModel.findOne({
+            prompt_id,
+        }).exec();
+
+        const published_images = prompt.published_images;
+        if (published_images.length > 0) {
+            await GalleryImageModel.deleteMany({
+                file_key: { $in: published_images },
+            }).exec();
+        }
+
         const filesToDelete = [...prompt.file_names, ...prompt.thumbnails];
         const [userResponse, backBlazeResponse] = await Promise.all([
-            UserService.deletePrompt(prompt.prompt_id),
+            UserService.deletePrompt(prompt_id),
             BackblazeStorageService.deleteMany(filesToDelete, prompt.user_id),
         ]);
 
@@ -266,6 +264,18 @@ router.post("/api/prompts/delete", async (req, res) => {
             prompt_id: { $in: prompt_ids },
         }).exec();
 
+        // Get all published images from prompts so we can delete them from the
+        // gallery of published images
+        const published_images_file_keys = prompts.reduce((acc, prompt) => {
+            return [...acc, ...prompt.published_images];
+        }, []);
+
+        if (published_images_file_keys.length > 0) {
+            await GalleryImageModel.deleteMany({
+                file_key: { $in: published_images_file_keys },
+            }).exec();
+        }
+
         const file_keys = prompts.reduce((acc, prompt) => {
             return [...acc, ...prompt.file_names, ...prompt.thumbnails];
         }, []);
@@ -288,10 +298,39 @@ router.post("/api/prompts/delete", async (req, res) => {
     }
 });
 
+router.post("/api/image/publish", async (req, res) => {
+    try {
+        const { prompt_id, file_key, user_id } = req.body;
+        const response = await UserService.addPublishedImage({
+            prompt_id,
+            file_key,
+            user_id,
+        });
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
+router.post("/api/image/unpublish", async (req, res) => {
+    try {
+        const { file_key, prompt_id } = req.body;
+        const response = await UserService.removePublishedImage({
+            file_key,
+            prompt_id,
+        });
+
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
 router.get("/api/user/prompts/:user_id", async (req, res) => {
     try {
         const user_id = req.params.user_id;
-
         const response = await UserService.getUserPrompts(user_id);
         return res.status(200).json(response);
     } catch (error) {

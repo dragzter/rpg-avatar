@@ -130,7 +130,7 @@ class NovitaAIService {
                 height: r_height,
                 sampler_name: "DPM++ 2S a Karras",
                 guidance_scale: adherence,
-                steps: 25,
+                steps: 20,
                 image_num: userData.count || 1,
                 clip_skip: 1,
                 seed: -1,
