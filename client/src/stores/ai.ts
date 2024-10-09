@@ -65,7 +65,7 @@ export const useAiStore = defineStore("aiImages", {
                 this.requestLoading = false;
             }
         },
-        async getPremiumImage(userData: UserAIPrompt) {
+        async getFluxImage(userData: UserAIPrompt) {
             try {
                 this.showToast = false;
                 const userStore = useUserStore();
@@ -76,7 +76,6 @@ export const useAiStore = defineStore("aiImages", {
 
                 const response = await axios.post(API.start_premium_image, { data });
 
-                console.log(response.data);
                 if (response.data.task_id && response.data.success) {
                     this.task_id = response.data.task_id;
                     storage.s(STORAGE_KEYS.task_id, response.data.task_id);
@@ -87,7 +86,6 @@ export const useAiStore = defineStore("aiImages", {
                                 const _resp = await axios.post(API.check_premium_task_status, {
                                     task_id: response.data.task_id,
                                 });
-                                console.log(_resp.data);
 
                                 if (_resp.data.status === ApiTaskStatus.CANCELED) {
                                     clearInterval(pollInterval);

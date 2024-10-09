@@ -1,8 +1,4 @@
-import {
-    createRouter as createVueRouter,
-    createWebHistory,
-    type Router,
-} from "vue-router";
+import { createRouter as createVueRouter, createWebHistory, type Router } from "vue-router";
 import { type App } from "vue";
 import HomeView from "@/views/HomeView.vue";
 import GenerateImageView from "@/views/GenerateImageView.vue";
@@ -31,8 +27,7 @@ export function createRouter(app: App): Router {
                     title: "RPG Art Generator",
                     description:
                         "Create unique RPG avatars and high-fantasy artwork with our AI generator. Design custom visuals and bring your imagination to life in your RPG universe.",
-                    ogImage:
-                        "https://rpgartgenerator.com/assets/rogue-24-female.png",
+                    ogImage: "https://rpgartgenerator.com/assets/rogue-24-female.png",
                 },
             },
             {
@@ -106,10 +101,7 @@ export function createRouter(app: App): Router {
             try {
                 await getAccessTokenSilently(); // Attempt silent login
             } catch (error) {
-                console.error(
-                    "User not authenticated or token fetch failed",
-                    error
-                );
+                console.error("User not authenticated or token fetch failed", error);
                 return next({ name: "home" });
             }
 

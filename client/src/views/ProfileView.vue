@@ -278,7 +278,7 @@
                     </p>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-floating mb-2">
+                    <div v-if="selectedPrompt.negative_prompt" class="form-floating mb-2">
                         <input
                             readonly
                             class="form-control read-only"
@@ -288,7 +288,7 @@
                         <label for="floatingTextarea">Negative Prompt</label>
                     </div>
 
-                    <div class="form-floating mb-2">
+                    <div v-if="selectedPrompt.adherence" class="form-floating mb-2">
                         <input
                             readonly
                             class="form-control read-only"

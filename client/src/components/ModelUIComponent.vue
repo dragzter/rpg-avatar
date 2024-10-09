@@ -4,7 +4,7 @@
             style="height: 140px; object-position: left"
             :src="`assets/${model.img}`"
             class="card-img-top object-fit-cover"
-            alt="..."
+            :alt="model.img"
         />
         <div class="card-body">
             <small class="card-title">{{ model.label }}</small>
@@ -23,7 +23,7 @@ import type {PropType} from "vue";
 
 const props = defineProps({
     model: {
-        type: Object as PropType<ModelSelection>,
+        type: Object as PropType<AiModel>,
         required: true,
     },
 });

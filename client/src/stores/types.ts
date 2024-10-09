@@ -188,7 +188,23 @@ export type UserImageResponse = {
     success: boolean;
 };
 
-export type ModelSelection = { label: string; img: string; value: string; cost: number };
+export type AiModel = {
+    label: string;
+    img: string;
+    value: string;
+    adherence: number[];
+    size_option?: boolean;
+    count_option?: boolean;
+    max_outputs?: number[];
+    premium?: boolean;
+    max_img_per_request: number;
+    default_img_per_request: number;
+    cost: number;
+    negative_prompt?: boolean;
+    adherence_default?: number;
+    description?: string;
+};
+
 
 export interface PromptHistoryItem {
     user_id: string;

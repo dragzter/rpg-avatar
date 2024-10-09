@@ -2,9 +2,6 @@
     <div id="generate-image" class="container-fluid">
         <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-4">
-                <div>
-                    <h3 class="text-white mb-3">Generate Image</h3>
-                </div>
                 <div class="prompt-builder">
                     <div id="prompt-builder-inner" class="d-flex flex-column h-100">
                         <div
@@ -65,42 +62,30 @@
                             </div>
                         </div>
 
-                        <div
-                            :class="{
-                                'rpg-option-inactive': !isRPGChecked,
-                                'rpg-option-active': isRPGChecked,
-                                is_disabled: loading,
-                            }"
-                            class="rpg-generator-option d-flex mb-3 justify-content-between align-items-center"
-                            @click="toggleStatus"
-                            style="cursor: pointer"
-                        >
-                            <p class="m-0">
-                                RPG Presets
-                                <ButtonComponent
-                                    button-type="btn-dark"
-                                    data-bs-placement="top"
-                                    :enable-tooltip="true"
-                                    tooltip-title="When active, RPG presets will apply to all AI-generated outputs."
-                                    button-classes="bg-transparent border-0 ps-1"
-                                >
-                                    <i class="fa-regular fa-circle-info"></i>
-                                </ButtonComponent>
-                            </p>
-                            <div class="form-check form-switch d-flex align-items-center">
-                                <input
-                                    class="form-check-input prompt-rpg-checkbox"
-                                    type="checkbox"
-                                    id="rpg-generator-checkbox"
-                                    v-model="isRPGChecked"
-                                    @click.stop
-                                />
-                                <label class="form-check-label text-end" for="rpg-generator-checkbox">
-                                    <span class="accent-text" v-if="isRPGChecked">Active</span>
-                                    <span v-else>Inactive</span>
-                                </label>
-                            </div>
-                        </div>
+                        <GenerateOption
+                            id="rpg-generator-checkbox"
+                            :isChecked="isRPGChecked"
+                            @update:isChecked="toggleStatus"
+                            :loading="loading"
+                            label="RPG Presets"
+                            tooltipText="Enable or disable RPG presets for your AI-generated images."
+                            activeText="Enabled"
+                            inactiveText="Disabled"
+                        />
+
+                        <GenerateOption
+                            wrapper-id="nsfw-enable-checkbox"
+                            id="nsfw-enable-checkbox-input"
+                            :isChecked="rpgUser.nsfw_pass"
+                            @update:isChecked="toggleNSFWStatus"
+                            :loading="loading"
+                            label="NSFW Prompts"
+                            :show-toggle="false"
+                            tooltipText="If disabled NSFW prompts will be blocked."
+                            activeText="Enabled"
+                            inactiveText="Disabled"
+                            :class="{ 'is-available': rpgUser.nsfw_pass }"
+                        />
 
                         <div
                             v-if="isRPGChecked"
@@ -142,7 +127,7 @@
                                 id="advanced-image-select"
                                 v-model="userSelections.size"
                                 :loading="loading"
-                                :options="isPremiumRequest ? PremiumImageSizeOptions : ImageOptions"
+                                :options="isFluxModelRequest ? PremiumImageSizeOptions : ImageOptions"
                                 label="Image Resolution (px)"
                             />
 
@@ -201,7 +186,7 @@
                             </span>
                             <span v-else>
                                 <button
-                                    v-if="loading"
+                                    :disabled="!loading"
                                     class="btn me-2 btn-tertiary"
                                     @click="cancelImageRequest"
                                 >
@@ -225,7 +210,6 @@
                                 >
                                     <div class="d-flex align-items-center">
                                         <LoadSpinner v-if="loading" class="me-2" />
-
                                         Generate
                                     </div>
                                 </button>
@@ -313,7 +297,7 @@ import SelectComponent from "@/components/global/SelectComponent.vue";
 import { characterTypes, styleOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import type { ModelSelection, UserAIPrompt } from "@/stores/types";
+import type { AiModel, UserAIPrompt } from "@/stores/types";
 import { useAiStore } from "@/stores/ai";
 import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import CollapseComponent from "@/components/global/CollapseComponent.vue";
@@ -326,23 +310,26 @@ import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import ModalComponent from "@/components/global/ModalComponent.vue";
 import ModelUIComponent from "@/components/ModelUIComponent.vue";
-import ButtonComponent from "@/components/global/ButtonComponent.vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { model_selection } from "@/utils/model-utils";
+import GenerateOption from "@/components/global/GenerateOption.vue";
+import { storage } from "@/utils/storage";
+import { useRouter } from "vue-router";
 
 /**
  * =*'^'*= DATA =*'^'*=
  */
+const router = useRouter();
 const indexRef = ref(0);
-const useV2Prompt = ref(true);
 const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
+const isNSFWChecked = ref(false);
 const aiStore = useAiStore();
 const userStore = useUserStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
 const showToast = ref(false);
 const toastMessage = ref("");
 const isError = ref(false);
-const premium_request = ref(["flux_pro", "flux_11_pro", "flux_dev"]);
+const fluxModels = ref(["flux_pro", "flux_11_pro", "flux_dev", "flux_schnell"]);
 
 const userSelections = ref<UserAIPrompt>({
     archetype: "fighter",
@@ -363,13 +350,13 @@ const userSelections = ref<UserAIPrompt>({
     },
 });
 
-const models = ref<ModelSelection[]>([...model_selection]);
-const selected_model = ref<ModelSelection>(models.value[0]);
+const models = ref<AiModel[]>([...model_selection]);
+const selected_model = ref<AiModel>(models.value[0]);
 
 /**
  * =*'^'*= COMPUTED =*'^'*=
  */
-const isPremiumRequest = computed(() => premium_request.value.includes(selected_model.value.value));
+const isFluxModelRequest = computed(() => fluxModels.value.includes(selected_model.value.value));
 const rpgUser = computed(() => userStore.user || { token_balance: 0 });
 const maxImagesPossible = computed(() => {
     if (rpgUser.value.token_balance === 0) {
@@ -379,7 +366,7 @@ const maxImagesPossible = computed(() => {
     if (rpgUser.value.token_balance >= selected_model.value.max_img_per_request) {
         return selected_model.value.max_img_per_request;
     } else {
-        return isPremiumRequest.value ? 1 : rpgUser.value.token_balance;
+        return isFluxModelRequest.value ? 1 : rpgUser.value.token_balance;
     }
 });
 const lightboxImages = computed(() => aiStore.generatedImagesV2.map((img) => img.image_url));
@@ -425,11 +412,19 @@ const toggleStatus = (event) => {
     localStorage.setItem("rpg_presets", isRPGChecked.value.toString());
 };
 
+const toggleNSFWStatus = (event) => {
+    if (!rpgUser.value.nsfw_pass) {
+        router.push({ name: "get-tokens" });
+    }
+};
+
 const generateRandomPrompt = async () => {
+    if (!isAuthenticated.value) {
+        await loginWithPopup();
+    }
+
     userSelections.value.archetype = characterTypes[Math.floor(Math.random() * characterTypes.length)]?.value;
-
     userSelections.value.art_style = styleOptions[Math.floor(Math.random() * styleOptions.length)]?.value;
-
     await aiStore.getRandomPromptV2({
         archetype: userSelections.value.archetype,
         art_style: userSelections.value.art_style,
@@ -459,8 +454,8 @@ const handleSubmit = async (randomize: boolean) => {
     if (!isAuthenticated.value) {
         await loginWithPopup();
     } else {
-        if (isPremiumRequest.value) {
-            await aiStore.getPremiumImage(userSelections.value);
+        if (isFluxModelRequest.value) {
+            await aiStore.getFluxImage(userSelections.value);
         } else {
             await aiStore.getImageV2(userSelections.value);
         }
@@ -471,17 +466,18 @@ const cancelImageRequest = async () => {
     await aiStore.cancelImageGenerationTask();
 };
 
-const selectModel = (model: ModelSelection) => {
-    console.log("Selecting model", model);
-    selected_model.value = model;
-    userSelections.value.model = model.value;
+const setAiModel = (modelObject: AiModel) => {
+    selected_model.value = modelObject;
+    userSelections.value.model = modelObject.value;
+    userSelections.value.count = modelObject.default_img_per_request;
+    userSelections.value.cost = modelObject.cost;
+    userSelections.value.adherence = modelObject.adherence_default;
+    storage.s("selected_model", modelObject);
+};
 
-    if (model.premium) {
-        userSelections.value.count = 1;
-    } else {
-        userSelections.value.count = model.count_option && model.cost === 1 ? 2 : 1;
-    }
-    userSelections.value.cost = model.cost;
+const selectModel = (model: AiModel) => {
+    console.log("Selected Model in event response", model);
+    setAiModel(model);
 };
 
 /**
@@ -489,12 +485,7 @@ const selectModel = (model: ModelSelection) => {
  */
 onMounted(async () => {
     userSelections.value.rpg_presets = localStorage.getItem("rpg_presets") === "true";
-    userSelections.value.model = selected_model.value.value;
-    userSelections.value.count = maxImagesPossible.value;
-
-    if (selected_model.value?.adherence?.length) {
-        userSelections.value.adherence = selected_model.value.adherence_default;
-    }
+    setAiModel(storage.g("selected_model") || models.value[0]);
 
     aiStore.task_id = localStorage.getItem("task_id") || "";
     if (aiStore.task_id) {

@@ -1,7 +1,14 @@
-import type { ModelSelection, UserAIPrompt } from "@/stores/types";
+import type { AiModel, UserAIPrompt } from "@/stores/types";
 
 export function modelRequestMapper(request) {
     let processed_request;
+
+    const rpg_details = request.rpg_presets
+        ? {
+              archetype: request.archetype,
+              art_style: request.art_style,
+          }
+        : {};
 
     const outbound = {
         flux_11_pro: {
@@ -11,11 +18,8 @@ export function modelRequestMapper(request) {
                     disable_safety_checker: true,
                     output_quality: 80,
                     output_format: "jpg",
-                    steps: 25,
                     width: req.size?.width || 1024, // max 1440
                     height: req.size?.height || 1024, // max 1440
-                    guidance: req.adherence || 2,
-                    interval: 2,
                     aspect_ratio: "1:1",
                     safety_tolerance: 5,
                     prompt_upsampling: true,
@@ -54,6 +58,8 @@ export function modelRequestMapper(request) {
                     output_quality: 100,
                     num_inference_steps: 4,
                     disable_safety_checker: true,
+                    width: 1024,
+                    height: 1024,
                 };
             },
             cost: 1,
@@ -61,7 +67,16 @@ export function modelRequestMapper(request) {
     };
 
     if (request.randomize) {
-        // TODO add character etc
+        processed_request = {
+            cost: outbound[request.model].cost,
+            model: request.model,
+            user_id: request.user_id,
+            nsfw_pass: request.nsfw_pass,
+            rpg_presets: request.rpg_presets,
+            randomize: request.randomize,
+            count: request.count,
+            ...rpg_details,
+        };
     } else {
         processed_request = {
             input: outbound[request.model].get(request),
@@ -69,15 +84,19 @@ export function modelRequestMapper(request) {
             model: request.model,
             user_id: request.user_id,
             nsfw_pass: request.nsfw_pass,
+            rpg_presets: request.rpg_presets,
+            randomize: request.randomize,
+            count: request.count,
+            ...rpg_details,
         };
     }
 
     return processed_request;
 }
 
-export const model_selection: ModelSelection[] = [
+export const model_selection: AiModel[] = [
     {
-        label: "Flux Pro",
+        label: "black-forest-labs/flux-pro",
         img: "flux_pro.png",
         value: "flux_pro",
         adherence: [2, 5],
@@ -86,6 +105,7 @@ export const model_selection: ModelSelection[] = [
         max_outputs: [1, 1],
         premium: true,
         max_img_per_request: 1,
+        default_img_per_request: 1,
         cost: 4,
         negative_prompt: false,
         adherence_default: 3,
@@ -93,7 +113,7 @@ export const model_selection: ModelSelection[] = [
             "State-of-the-art image generation with top of the line prompt following, visual quality, image detail and output diversity.",
     },
     {
-        label: "Flux Pro 1.1",
+        label: "black-forest-labs/flux-1.1-pro",
         img: "flux_11_pro.png",
         value: "flux_11_pro",
         adherence: [],
@@ -103,12 +123,13 @@ export const model_selection: ModelSelection[] = [
         premium: true,
         cost: 3,
         max_img_per_request: 1,
+        default_img_per_request: 1,
         negative_prompt: false,
         description:
             "Faster, better FLUX Pro. Text-to-image model with excellent image quality, prompt adherence, and output diversity.",
     },
     {
-        label: "Flux Schnell",
+        label: "black-forest-labs/flux-schnell",
         img: "flux_schnell3.png",
         value: "flux_schnell",
         adherence: [],
@@ -118,6 +139,7 @@ export const model_selection: ModelSelection[] = [
         premium: false,
         cost: 1,
         max_img_per_request: 4,
+        default_img_per_request: 2,
         negative_prompt: false,
         description: "The fastest image generation model tailored for experimentation and personal use",
     },
@@ -132,6 +154,7 @@ export const model_selection: ModelSelection[] = [
         premium: false,
         cost: 1,
         max_img_per_request: 8,
+        default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
         description:
@@ -149,6 +172,7 @@ export const model_selection: ModelSelection[] = [
         premium: false,
         cost: 1,
         max_img_per_request: 8,
+        default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
         description:
@@ -165,6 +189,7 @@ export const model_selection: ModelSelection[] = [
         premium: false,
         cost: 1,
         max_img_per_request: 8,
+        default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
         description: "SDXL 1.0 Good balance of art styles suitable for character work and digital art.",
@@ -180,6 +205,7 @@ export const model_selection: ModelSelection[] = [
         premium: false,
         cost: 1,
         max_img_per_request: 8,
+        default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
         description:

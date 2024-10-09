@@ -2194,6 +2194,11 @@ main {
     border-radius: 8px;
     transition: 0.3s;
 
+    .form-check-label {
+        margin-top: 5px !important;
+        line-height: 1 !important;
+    }
+
     &.is_disabled {
         pointer-events: none !important;
         filter: grayscale(0.8) !important;
@@ -2211,6 +2216,11 @@ main {
     }
 
 
+}
+
+#nsfw-enable-checkbox.rpg-generator-option {
+    background: var(--dark-700) !important;
+    border-color: var(--dark-600) !important;
 }
 
 #privacy-policy-page {
