@@ -73,6 +73,7 @@ router.get("/api/images/:user_id", async (req, res) => {
     }
 });
 
+// "Surprise Me"
 router.post("/api/surprise-prompt", async (req, res) => {
     try {
         const { archetype, art_style, nsfw_pass } = req.body;

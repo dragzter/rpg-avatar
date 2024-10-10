@@ -44,4 +44,16 @@ router.post("/api/repl/image-status", async (req, res) => {
     }
 });
 
+router.post("/api/repl/cancel", async (req, res) => {
+    try {
+        const { task_id } = req.body;
+        const response = await ReplicateAiService.cancelTask(task_id);
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error);
+        console.log(error);
+    }
+});
+
 export { router };

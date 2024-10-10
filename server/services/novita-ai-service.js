@@ -179,11 +179,6 @@ class NovitaAIService {
         await UserService.saveUser(state.user);
     }
 
-    async savePrompt() {
-        // TODO if we save this, will need to use the instance state
-        //await UserService.savePrompt(this.userPrompt);
-    }
-
     getFinishedImages(task_id) {
         const state = this.state.get(task_id);
         return {

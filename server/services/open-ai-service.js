@@ -1,28 +1,28 @@
-import OpenAI from 'openai';
-import dotenv from 'dotenv';
-import "../config.js"
+import OpenAI from "openai";
+import dotenv from "dotenv";
+import "../config.js";
 
 dotenv.config();
 
 class OpenAIService {
     openai = {};
-    MAX_TOKEN = 500
+    MAX_TOKEN = 500;
 
     MODEL = {
         Gpt35: "gpt-3.5-turbo-0125",
         Gpt4oMini: "gpt-4o-mini",
         Dalle2: "dall-e-2",
         Dalle3: "dall-e-3",
-    }
+    };
 
     SIZE = {
         Dalle2: {
-            256: "256x256"
+            256: "256x256",
         },
         Dalle3: {
-            1024: "1024x1024"
-        }
-    }
+            1024: "1024x1024",
+        },
+    };
 
     // The previous DALL·E model released in Nov 2022. The
     // 2nd iteration of DALL·E with more realistic,
@@ -41,50 +41,49 @@ class OpenAIService {
      * @returns {Promise<void>}
      */
     async requestAiPromptV2(userRequest) {
-        const {archetype, art_style, nsfw_pass} = userRequest;
+        const { archetype, art_style, nsfw_pass } = userRequest;
 
         const gender = Math.random() < 0.5 ? "Male" : "Female";
 
-        const attractivenessNote = (gender === 'female' && nsfw_pass)
-            ? "Additionally, ensure the character is very attractive, with perfect facial features and body proportions, alluring, gorgeous and captivating."
-            : "";
+        const attractivenessNote =
+            gender === "Female" && nsfw_pass
+                ? "Emphasize her stunning beauty and athletic yet feminine body features."
+                : "";
 
         let requestMessages = [
             {
                 role: "user",
-                content: `Use this example to create a prompt in the same style using the provided archetype, art style, and gender. Do not follow structure verbatim, switch it up but stay within the spirit of the request and add in elements appropriate to the archetype.
-                        Example:"High fantasy art style (brunette rogue), (alluring figure), intricate costume design with dark leather and silver accents, sly expression, perfect face, striking pose, dynamic foreground with magical elements, ethereal lighting, mesmerizing colors capturing a sense of adventure, mythical background landscape, enchanted atmosphere, ultra-detailed, vibrant colors, fantasy world flair, dramatic ambiance."
-                        Now, generate a prompt with the following archetype: ${archetype}, art style: ${art_style}, and gender: ${gender} (always include the gender in the final prompt) set in an RPG/fantasy world. ${attractivenessNote}`
-            }
-        ]
+                content: `Create a prompt for image generation for a ${gender} **${archetype}** character in the **${art_style}** art style. The setting should be a fantasy world. Use a series of short, vivid descriptors to describe the character's appearance, clothing, and overall presence. ${attractivenessNote} The most important aspects should be emphasized using parentheses, followed by a floating-point number from 1.0 to 2.0, placed immediately after the descriptor, indicating its importance. For example: (Stunningly beautiful 1.7). Ensure the entire prompt is within 700 characters.`,
+            },
+        ];
 
         if (!nsfw_pass) {
-            requestMessages.content = requestMessages.content + "  **IMPORTANT** Ensure the prompt is safe for work while keeping within the spirit of the prompt."
+            requestMessages.content =
+                requestMessages.content +
+                "  **IMPORTANT** Ensure the prompt is safe for work while keeping within the spirit of the prompt.";
         }
 
         try {
             const response = await this.openai.chat.completions.create({
                 model: this.MODEL.Gpt4oMini,
                 messages: requestMessages,
-                max_tokens: this.MAX_TOKEN
+                max_tokens: this.MAX_TOKEN,
             });
 
-
-            return response?.choices[0]?.message?.content || "No response from AI";
-
+            return (
+                response?.choices[0]?.message?.content || "No response from AI"
+            );
         } catch (error) {
-            console.error("Error in requestAiPromptV2: ", error)
+            console.error("Error in requestAiPromptV2: ", error);
         }
-
     }
 
     async requestAiPrompt(userRequest) {
         if (!userRequest) {
-            return
+            return;
         }
 
-        const {prompt, archetype, artStyle} = userRequest;
-        //const archetypeContext = getRandomSetting(archetype);
+        const { prompt, archetype, artStyle } = userRequest;
         const archetypeContext = "";
 
         const response = await this.openai.chat.completions.create({
@@ -92,10 +91,10 @@ class OpenAIService {
             messages: [
                 {
                     role: "user",
-                    content: `Generate an AI prompt for a High Fantasy archetype image of a **${archetype.toUpperCase()}** in the **${artStyle.toUpperCase()}** art style and should be heavily emphasized. The setting: **${archetypeContext}**. Additional info (prompt): ${prompt}. Only if prompt includes female or woman **Female characters should be very attractive, physically fit, and have a slim, voluptuous figure**.  Emphasize the custom prompts provided with **, **do not include any explicit language that might violate the OpenAI Platform content policy**.`
-                }
+                    content: `Generate an AI prompt for a High Fantasy archetype image of a **${archetype.toUpperCase()}** in the **${artStyle.toUpperCase()}** art style and should be heavily emphasized. The setting: **${archetypeContext}**. Additional info (prompt): ${prompt}. Only if prompt includes female or woman **Female characters should be very attractive, physically fit, and have a slim, voluptuous figure**.  Emphasize the custom prompts provided with **, **do not include any explicit language that might violate the OpenAI Platform content policy**.`,
+                },
             ],
-            max_tokens: this.MAX_TOKEN
+            max_tokens: this.MAX_TOKEN,
         });
 
         return response.choices[0].message.content;
@@ -104,57 +103,40 @@ class OpenAIService {
     async stripNSFW(prompt) {
         const response = await this.openai.chat.completions.create({
             model: this.MODEL.Gpt4oMini,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": "Clean this prompt up and make it Safe For Work while keeping within the spirit of the prompt: " + prompt
-                }
-            ],
-            max_tokens: this.MAX_TOKEN
-        });
-
-        console.log(response.choices[0].message.content, "response from AI")
-
-        return response.choices[0].message.content;
-    }
-
-    async talkToAi(prompt) {
-        if (!prompt) {
-            return
-        }
-        const response = await this.openai.chat.completions.create({
-            model: this.MODEL.Gpt4oMini,
             messages: [
                 {
                     role: "user",
-                    content: prompt
-                }
+                    content:
+                        "Clean this prompt up and make it Safe For Work while keeping within the spirit of the prompt: " +
+                        prompt,
+                },
             ],
-            max_tokens: 4000
+            max_tokens: this.MAX_TOKEN,
         });
+
+        console.log(response.choices[0].message.content, "response from AI");
 
         return response.choices[0].message.content;
     }
 
     async requestImage(userRequest) {
+        const prompt = await this.requestAiPrompt(userRequest);
 
-        const prompt = await this.requestAiPrompt(userRequest)
-
-        console.log("calling image AI tool...")
-        console.log("using prompt: ", prompt)
+        console.log("calling image AI tool...");
+        console.log("using prompt: ", prompt);
         const response = await this.openai.images.generate({
             model: this.MODEL.Dalle3,
             prompt: prompt,
             n: 1,
             quality: "hd",
             style: "vivid",
-            size: this.SIZE.Dalle3["1024"]
+            size: this.SIZE.Dalle3["1024"],
         });
 
         const image_url = response.data[0].url;
-        console.log("URL: ", image_url)
+        console.log("URL: ", image_url);
 
-        return image_url
+        return image_url;
     }
 }
 

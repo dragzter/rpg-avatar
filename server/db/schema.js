@@ -54,6 +54,144 @@ export const PassCodeSchema = new Schema(
     { collection: "pass_codes" }
 );
 
+const FluxPro11Schema = new Schema({
+    prompt: {
+        type: String,
+        required: false,
+    },
+    disable_safety_checker: {
+        type: Boolean,
+        required: false,
+    },
+    output_quality: {
+        type: Number,
+        required: false,
+    },
+    output_format: {
+        type: String,
+        required: false,
+    },
+    width: {
+        type: Number,
+        required: false,
+    },
+    height: {
+        type: Number,
+        required: false,
+    },
+    aspect_ratio: {
+        type: String,
+        required: false,
+    },
+    safety_tolerance: {
+        type: Number,
+        required: false,
+    },
+    prompt_upsampling: {
+        type: Boolean,
+        required: false,
+    },
+});
+
+const FluxSchnellSchema = new Schema({
+    prompt: {
+        type: String,
+        required: false,
+    },
+    go_fast: {
+        type: Boolean,
+        required: false,
+    },
+    width: {
+        type: Number,
+        required: false,
+    },
+    height: {
+        type: Number,
+        required: false,
+    },
+    megapixels: {
+        type: String,
+        required: false,
+    },
+    num_outputs: {
+        type: Number,
+        required: false,
+    },
+    aspect_ratio: {
+        type: String,
+        required: false,
+    },
+    output_format: {
+        type: String,
+        required: false,
+    },
+    output_quality: {
+        type: Number,
+        required: false,
+    },
+    num_inference_steps: {
+        type: Number,
+        required: false,
+    },
+    disable_safety_checker: {
+        type: Boolean,
+        required: false,
+        default: false,
+    },
+});
+
+const FluxProSchema = new Schema({
+    prompt: {
+        type: String,
+        required: false,
+    },
+    disable_safety_checker: {
+        type: Boolean,
+        required: false,
+    },
+    output_quality: {
+        type: Number,
+        required: false,
+    },
+    output_format: {
+        type: String,
+        required: false,
+    },
+    steps: {
+        type: Number,
+        required: false,
+    },
+    width: {
+        type: Number,
+        required: false,
+    },
+    height: {
+        type: Number,
+        required: false,
+    },
+    guidance: {
+        type: Number,
+        required: false,
+    },
+    interval: {
+        type: Number,
+        required: false,
+    },
+    aspect_ratio: {
+        type: String,
+        required: false,
+    },
+    safety_tolerance: {
+        type: Number,
+        required: false,
+    },
+    prompt_upsampling: {
+        type: Boolean,
+        required: false,
+    },
+});
+
 export const GalleryImageSchema = new Schema(
     {
         id: {
@@ -157,6 +295,18 @@ export const PromptSchema = new Schema(
         created: {
             type: Date,
             default: Date.now,
+        },
+        flux_pro: {
+            type: FluxProSchema,
+            required: false,
+        },
+        flux_schnell: {
+            type: FluxSchnellSchema,
+            required: false,
+        },
+        flux_11_pro: {
+            type: FluxPro11Schema,
+            required: false,
         },
     },
     { collection: "prompts" }

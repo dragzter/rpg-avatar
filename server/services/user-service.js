@@ -1,9 +1,16 @@
 import { GalleryImageModel, PromptModel, UserModel } from "../db/model.js";
 import BackblazeStorageService from "./backblaze-storage-service.js";
-import { excerpt } from "../utils/helpers.js";
 import { v4 as uuidv4 } from "uuid";
+import { excerpt } from "../utils/helpers.js";
 
 class UserService {
+    models = {
+        flux_pro: "flux_pro",
+        flux_dev: "flux_dev",
+        flux_11_pro: "flux_11_pro",
+        flux_schnell: "flux_schnell",
+    };
+
     async getUserById(userId) {
         return await UserModel.findOne({ id: userId }).exec();
     }
@@ -74,13 +81,22 @@ class UserService {
             return response
                 .sort((a, b) => new Date(b.created) - new Date(a.created))
                 .map((p) => {
-                    return {
+                    const aggregate = {
                         prompt_id: p.prompt_id,
-                        prompt_excerpt: excerpt(p.prompt, 30),
                         created: p.created,
                         thumbnails: p.thumbnails,
                         published_images: p.published_images,
                     };
+
+                    // find out of the prompt contains any one of the properties in models
+                    const model = Object.keys(this.models).find(
+                        (key) => p[key]
+                    );
+
+                    const prompt_text = model ? p[model].prompt : p.prompt;
+                    aggregate.prompt_excerpt = excerpt(prompt_text, 30);
+
+                    return aggregate;
                 });
         } catch (err) {
             console.log(err);
@@ -89,7 +105,22 @@ class UserService {
 
     async getPromptById(promptId) {
         try {
-            return await PromptModel.findOne({ prompt_id: promptId }).exec();
+            const _p = await PromptModel.findOne({
+                prompt_id: promptId,
+            }).exec();
+            const model = Object.keys(this.models).find((key) => _p[key]);
+
+            if (model) {
+                _p.prompt = _p[model].prompt;
+                _p.size = {
+                    width: _p[model].width,
+                    height: _p[model].height,
+                };
+                _p.adherence = _p[model].guidance;
+                _p.model = model;
+            }
+
+            return _p;
         } catch (err) {
             console.log(err);
         }
