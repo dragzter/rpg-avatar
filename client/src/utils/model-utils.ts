@@ -66,33 +66,105 @@ export function modelRequestMapper(request) {
         },
     };
 
-    if (request.randomize) {
-        processed_request = {
-            cost: outbound[request.model].cost,
-            model: request.model,
-            user_id: request.user_id,
-            nsfw_pass: request.nsfw_pass,
-            rpg_presets: request.rpg_presets,
-            randomize: request.randomize,
-            count: request.count,
-            ...rpg_details,
-        };
-    } else {
-        processed_request = {
-            input: outbound[request.model].get(request),
-            cost: outbound[request.model].cost,
-            model: request.model,
-            user_id: request.user_id,
-            nsfw_pass: request.nsfw_pass,
-            rpg_presets: request.rpg_presets,
-            randomize: request.randomize,
-            count: request.count,
-            ...rpg_details,
-        };
-    }
+    processed_request = {
+        input: outbound[request.model].get(request),
+        cost: outbound[request.model].cost,
+        model: request.model,
+        user_id: request.user_id,
+        nsfw_pass: request.nsfw_pass,
+        rpg_presets: request.rpg_presets,
+        randomize: request.randomize,
+        count: request.count,
+        ...rpg_details,
+    };
 
     return processed_request;
 }
+
+export const FluxImageSizeOptions = [
+    {
+        label: "512x512",
+        size: {
+            width: 512,
+            height: 512,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: false,
+    },
+    {
+        label: "1024x1024",
+        size: {
+            width: 1024,
+            height: 1024,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: true,
+    },
+    {
+        label: "1440x1440",
+        size: {
+            width: 1440,
+            height: 1440,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: false,
+    },
+];
+export const SDImageSizeOptions = [
+    {
+        label: "512x512",
+        size: {
+            width: 512,
+            height: 512,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: false,
+    },
+    {
+        label: "1024x1024",
+        size: {
+            width: 1024,
+            height: 1024,
+        },
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        recommended: true,
+    },
+    // {
+    //     label: "2048x2048",
+    //     size: {
+    //         width: 2048,
+    //         height: 2048,
+    //     },
+    //     ratio: "1:1",
+    //     cssClass: "ratio-1x1",
+    //     recommended: false,
+    // },
+    {
+        label: "1280x1024",
+        size: {
+            width: 1280,
+            height: 1024,
+        },
+        ratio: "5:4",
+        cssClass: "ratio-5x4",
+        recommended: false,
+    },
+    {
+        label: "1536x1024",
+        size: {
+            width: 1536,
+            height: 1024,
+        },
+        ratio: "3:2",
+        cssClass: "ratio-3x2",
+        recommended: false,
+    },
+];
 
 export const model_selection: AiModel[] = [
     {
@@ -100,10 +172,10 @@ export const model_selection: AiModel[] = [
         img: "flux_pro.png",
         value: "flux_pro",
         adherence: [2, 5],
-        size_option: true,
+        size_options: FluxImageSizeOptions,
         count_option: false,
         max_outputs: [1, 1],
-        premium: true,
+        model_type: "flux",
         max_img_per_request: 1,
         default_img_per_request: 1,
         cost: 4,
@@ -117,10 +189,10 @@ export const model_selection: AiModel[] = [
         img: "flux_11_pro.png",
         value: "flux_11_pro",
         adherence: [],
-        size_option: true,
+        size_options: FluxImageSizeOptions,
         count_option: false,
         max_outputs: [1, 1],
-        premium: true,
+        model_type: "flux",
         cost: 3,
         max_img_per_request: 1,
         default_img_per_request: 1,
@@ -133,10 +205,10 @@ export const model_selection: AiModel[] = [
         img: "flux_schnell3.png",
         value: "flux_schnell",
         adherence: [],
-        size_option: false,
+        size_options: [],
         count_option: true,
         max_outputs: [1, 4],
-        premium: false,
+        model_type: "flux",
         cost: 1,
         max_img_per_request: 4,
         default_img_per_request: 2,
@@ -148,10 +220,10 @@ export const model_selection: AiModel[] = [
         img: "character_model.png",
         value: "character_model",
         adherence: [0, 30],
-        size_option: true,
+        size_options: SDImageSizeOptions,
         count_option: true,
         max_outputs: [1, 8],
-        premium: false,
+        model_type: "sd",
         cost: 1,
         max_img_per_request: 8,
         default_img_per_request: 2,
@@ -166,10 +238,10 @@ export const model_selection: AiModel[] = [
         img: "portrait_model.png",
         value: "portrait_model",
         adherence: [0, 30],
-        size_option: true,
+        size_options: SDImageSizeOptions,
         count_option: true,
         max_outputs: [1, 8],
-        premium: false,
+        model_type: "sd",
         cost: 1,
         max_img_per_request: 8,
         default_img_per_request: 2,
@@ -183,10 +255,10 @@ export const model_selection: AiModel[] = [
         img: "creatures_model.png",
         value: "creatures_model",
         adherence: [0, 30],
-        size_option: true,
+        size_options: SDImageSizeOptions,
         count_option: true,
         max_outputs: [1, 8],
-        premium: false,
+        model_type: "sd",
         cost: 1,
         max_img_per_request: 8,
         default_img_per_request: 2,
@@ -199,10 +271,10 @@ export const model_selection: AiModel[] = [
         img: "anime_model.png",
         value: "anime_model",
         adherence: [0, 30],
-        size_option: true,
+        size_options: SDImageSizeOptions,
         count_option: true,
         max_outputs: [1, 8],
-        premium: false,
+        model_type: "sd",
         cost: 1,
         max_img_per_request: 8,
         default_img_per_request: 2,

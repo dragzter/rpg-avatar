@@ -123,11 +123,11 @@
                         <!-- Advanced Settings (Dependent on Model Selected) -->
                         <CollapseComponent label="Advanced">
                             <RadioGroupComponent
-                                v-if="selected_model.size_option"
+                                v-if="selected_model.size_options?.length"
                                 id="advanced-image-select"
                                 v-model="userSelections.size"
                                 :loading="loading"
-                                :options="isFluxModelRequest ? PremiumImageSizeOptions : ImageOptions"
+                                :options="selected_model.size_options"
                                 label="Image Resolution (px)"
                             />
 
@@ -171,7 +171,7 @@
                             />
                         </CollapseComponent>
 
-                        <div class="mt-auto ms-auto button-action-row">
+                        <div class="button-action-row">
                             <span
                                 v-if="
                                     rpgUser?.token_balance === 0 ||
@@ -184,36 +184,41 @@
                                     >Buy Tokens
                                 </router-link>
                             </span>
-                            <span v-else>
+                            <div
+                                v-else
+                                class="d-flex prompt-footer-btn-container justify-content-between align-items-center"
+                            >
                                 <button
                                     :disabled="!loading"
-                                    class="btn me-2 btn-tertiary"
+                                    class="btn me-2 btn-dark"
                                     @click="cancelImageRequest"
                                 >
                                     Cancel
                                 </button>
-                                <button
-                                    v-if="isRPGChecked"
-                                    :disabled="loading"
-                                    class="btn accent-link-outline"
-                                    @click="generateRandomPrompt"
-                                >
-                                    <div class="d-flex align-items-center">
-                                        <LoadSpinner v-if="loading" class="me-2" />
-                                        Surprise Me
-                                    </div>
-                                </button>
-                                <button
-                                    :disabled="loading || rpgUser?.token_balance === 0"
-                                    class="btn btn-primary ms-2"
-                                    @click="() => handleSubmit(false)"
-                                >
-                                    <div class="d-flex align-items-center">
-                                        <LoadSpinner v-if="loading" class="me-2" />
-                                        Generate
-                                    </div>
-                                </button>
-                            </span>
+                                <div class="prompt-footer-btn-wrapper">
+                                    <button
+                                        v-if="isRPGChecked"
+                                        :disabled="loading || promptLoading"
+                                        class="btn accent-link-outline"
+                                        @click="generateRandomPrompt"
+                                    >
+                                        <div class="d-flex align-items-center">
+                                            <LoadSpinner v-if="loading || promptLoading" class="me-2" />
+                                            Surprise Me
+                                        </div>
+                                    </button>
+                                    <button
+                                        :disabled="loading || promptLoading || rpgUser?.token_balance === 0"
+                                        class="btn btn-primary ms-2"
+                                        @click="() => handleSubmit(false)"
+                                    >
+                                        <div class="d-flex align-items-center">
+                                            <LoadSpinner v-if="loading || promptLoading" class="me-2" />
+                                            Generate
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -276,7 +281,7 @@
             <h5 class="accent-text">Premium Models</h5>
             <div class="model-grid mb-4">
                 <template v-for="model in model_selection">
-                    <div v-if="model.premium" class="model-grid-item">
+                    <div v-if="model.model_type === 'flux'" class="model-grid-item">
                         <ModelUIComponent :model="model" @select="selectModel" />
                     </div>
                 </template>
@@ -284,7 +289,7 @@
             <h5 class="accent-text">Standard Models</h5>
             <div class="model-grid">
                 <template v-for="model in model_selection">
-                    <div v-if="!model.premium" class="model-grid-item">
+                    <div v-if="model.model_type === 'sd'" class="model-grid-item">
                         <ModelUIComponent :model="model" @select="selectModel" />
                     </div>
                 </template>
@@ -305,7 +310,6 @@ import LoaderComponent from "@/components/global/LoaderComponent.vue";
 import RangeComponent from "@/components/global/RangeComponent.vue";
 import RadioGroupComponent from "@/components/global/RadioGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
-import { ImageOptions, PremiumImageSizeOptions } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import ModalComponent from "@/components/global/ModalComponent.vue";
@@ -322,7 +326,6 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 const indexRef = ref(0);
 const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
-const isNSFWChecked = ref(false);
 const aiStore = useAiStore();
 const userStore = useUserStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
@@ -372,6 +375,7 @@ const maxImagesPossible = computed(() => {
 const lightboxImages = computed(() => aiStore.generatedImagesV2.map((img) => img.image_url));
 const loading = computed(() => aiStore.requestLoading);
 const loaded = computed(() => aiStore.imagesLoaded);
+const promptLoading = computed(() => aiStore.aiGeneratedPromptLoading);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
 const showLightbox = ref(false);
 
@@ -414,7 +418,7 @@ const toggleStatus = (event) => {
 
 const toggleNSFWStatus = (event) => {
     if (!rpgUser.value.nsfw_pass) {
-        router.push({ name: "get-tokens" });
+        router.push({ name: "get-tokens", query: { tab: "product_offer" } });
     }
 };
 
@@ -454,16 +458,20 @@ const handleSubmit = async (randomize: boolean) => {
     if (!isAuthenticated.value) {
         await loginWithPopup();
     } else {
-        if (isFluxModelRequest.value) {
-            await aiStore.getFluxImage(userSelections.value);
-        } else {
-            await aiStore.getImageV2(userSelections.value);
-        }
+        const requestType = {
+            flux: async () => await aiStore.getFluxImage(userSelections.value),
+            sd: async () => await aiStore.getImageV2(userSelections.value),
+        };
+        await requestType[selected_model.value.model_type]();
     }
 };
 
 const cancelImageRequest = async () => {
-    await aiStore.cancelImageGenerationTask();
+    const requestType = {
+        flux: async () => await aiStore.cancelFluxImageGenerationTask(),
+        sd: async () => await aiStore.cancelImageGenerationTask(),
+    };
+    await requestType[selected_model.value.model_type]();
 };
 
 const setAiModel = (modelObject: AiModel) => {

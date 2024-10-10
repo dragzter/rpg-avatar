@@ -30,6 +30,7 @@ export const API = {
     delete_many_prompts: import.meta.env.VITE_APP_API_URL + "/api/prompts/delete",
     publish_image: import.meta.env.VITE_APP_API_URL + "/api/image/publish",
     unpublish_image: import.meta.env.VITE_APP_API_URL + "/api/image/unpublish",
+    cancel_flux_image: import.meta.env.VITE_APP_API_URL + "/api/repl/cancel",
 };
 
 export const STORAGE_KEYS = {
@@ -49,91 +50,6 @@ export const ApiTaskStatus = {
     TIMEOUT: "timeout",
 };
 
-export const PremiumImageSizeOptions = [
-    {
-        label: "512x512",
-        size: {
-            width: 512,
-            height: 512,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: false,
-    },
-    {
-        label: "1024x1024",
-        size: {
-            width: 1024,
-            height: 1024,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: true,
-    },
-    {
-        label: "1440x1440",
-        size: {
-            width: 1440,
-            height: 1440,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: false,
-    },
-];
-export const ImageOptions = [
-    {
-        label: "512x512",
-        size: {
-            width: 512,
-            height: 512,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: false,
-    },
-    {
-        label: "1024x1024",
-        size: {
-            width: 1024,
-            height: 1024,
-        },
-        ratio: "1:1",
-        cssClass: "ratio-1x1",
-        recommended: true,
-    },
-    // {
-    //     label: "2048x2048",
-    //     size: {
-    //         width: 2048,
-    //         height: 2048,
-    //     },
-    //     ratio: "1:1",
-    //     cssClass: "ratio-1x1",
-    //     recommended: false,
-    // },
-    {
-        label: "1280x1024",
-        size: {
-            width: 1280,
-            height: 1024,
-        },
-        ratio: "5:4",
-        cssClass: "ratio-5x4",
-        recommended: false,
-    },
-    {
-        label: "1536x1024",
-        size: {
-            width: 1536,
-            height: 1024,
-        },
-        ratio: "3:2",
-        cssClass: "ratio-3x2",
-        recommended: false,
-    },
-];
-
 export function getCurrencyLabel(amount: number) {
     const formattedAmount = (amount / 100).toFixed(2); // Convert cents to dollars and format to 2 decimal places
 
@@ -142,3 +58,14 @@ export function getCurrencyLabel(amount: number) {
         currency: "USD",
     }).format(parseFloat(formattedAmount));
 }
+
+export function scrollToOffer(cssId, param, urlParamValue) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const productOffer = urlParams.get(param);
+    if (productOffer === urlParamValue) {
+        const productPasses = document.getElementById(cssId);
+        if (productPasses) {
+            productPasses.scrollIntoView({behavior: "smooth"});
+        }
+    }
+};

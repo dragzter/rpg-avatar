@@ -18,11 +18,7 @@
             />
 
             <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
-                <symbol
-                    id="check-circle-fill"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                >
+                <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
                     <path
                         d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"
                     />
@@ -32,11 +28,7 @@
                         d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"
                     />
                 </symbol>
-                <symbol
-                    id="exclamation-triangle-fill"
-                    fill="currentColor"
-                    viewBox="0 0 16 16"
-                >
+                <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
                     <path
                         d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"
                     />
@@ -48,20 +40,13 @@
                 class="alert rounded-5 d-flex text-white bg-dark-600 align-items-start mx-auto mb-5"
                 role="alert"
             >
-                <svg
-                    class="bi flex-shrink-0 me-3"
-                    width="24"
-                    height="24"
-                    role="img"
-                    aria-label="Info:"
-                >
+                <svg class="bi flex-shrink-0 me-3" width="24" height="24" role="img" aria-label="Info:">
                     <use xlink:href="#check-circle-fill" />
                 </svg>
                 <h4 class="mb-0">
                     Each user receives
                     <strong class="accent-text">free storage</strong> for up to
-                    <strong class="accent-text">300</strong> of your generated
-                    images.
+                    <strong class="accent-text">300</strong> of your generated images.
                 </h4>
             </div>
 
@@ -73,10 +58,7 @@
                 style="max-width: 1030px"
             >
                 <div class="d-flex align-items-start">
-                    <i
-                        class="fa-regular fa-triangle-exclamation me-2"
-                        style="font-size: 34px"
-                    ></i>
+                    <i class="fa-regular fa-triangle-exclamation me-2" style="font-size: 34px"></i>
                     <button
                         aria-label="Close"
                         class="btn-close"
@@ -86,12 +68,10 @@
 
                     <div class="ms-3">
                         <div>
-                            <strong>Disclaimer:</strong> AI image generation is
-                            an experimental technology. While we strive to
-                            provide high-quality results, outcomes may vary
-                            based on the nature of the input and other factors.
-                            Please be aware that not all generated images will
-                            meet specific expectations.
+                            <strong>Disclaimer:</strong> AI image generation is an experimental technology.
+                            While we strive to provide high-quality results, outcomes may vary based on the
+                            nature of the input and other factors. Please be aware that not all generated
+                            images will meet specific expectations.
                         </div>
                         <div class="form-check mt-4">
                             <input
@@ -101,12 +81,7 @@
                                 value="false"
                                 @input="disclaimerSigned"
                             />
-                            <label
-                                class="form-check-label"
-                                for="flexCheckDefault"
-                            >
-                                I UNDERSTAND
-                            </label>
+                            <label class="form-check-label" for="flexCheckDefault"> I UNDERSTAND </label>
                         </div>
                     </div>
                 </div>
@@ -120,10 +95,7 @@
                         class="product-card-item"
                     >
                         <div class="pricing-item">
-                            <h5
-                                v-if="product?.metadata?.alt_title"
-                                class="product-alt-title"
-                            >
+                            <h5 v-if="product?.metadata?.alt_title" class="product-alt-title">
                                 {{ product.metadata?.alt_title }}
                             </h5>
                             <h3
@@ -142,17 +114,12 @@
                                 <span class="fs-6">
                                     <Popper :hover="true" placement="top">
                                         <i
-                                            v-if="
-                                                product.metadata?.limited_notice
-                                            "
+                                            v-if="product.metadata?.limited_notice"
                                             class="fa-regular fa-circle-question"
                                         ></i>
                                         <template #content
                                             ><p class="m-0">
-                                                {{
-                                                    product.metadata
-                                                        ?.limited_notice
-                                                }}
+                                                {{ product.metadata?.limited_notice }}
                                             </p>
                                         </template>
                                     </Popper>
@@ -198,17 +165,12 @@
                                 <span class="fs-6 text-white">
                                     <Popper :hover="true" placement="top">
                                         <i
-                                            v-if="
-                                                product.metadata?.limited_notice
-                                            "
+                                            v-if="product.metadata?.limited_notice"
                                             class="fa-regular fa-circle-question"
                                         ></i>
                                         <template #content
                                             ><p class="m-0">
-                                                {{
-                                                    product.metadata
-                                                        ?.limited_notice
-                                                }}
+                                                {{ product.metadata?.limited_notice }}
                                             </p>
                                         </template>
                                     </Popper>
@@ -224,29 +186,16 @@
                             </h4>
                             <ul v-if="product.metadata?.type === 'passes'">
                                 <li class="pb-0">
-                                    <span style="color: goldenrod"
-                                        ><i class="fa-solid fa-check"></i
-                                    ></span>
+                                    <span style="color: goldenrod"><i class="fa-solid fa-check"></i></span>
                                     <p class="mb-0 pb-0">
-                                        {{
-                                            product.metadata.item
-                                                ? product.metadata.item
-                                                : product.name
-                                        }}
+                                        {{ product.metadata.item ? product.metadata.item : product.name }}
                                     </p>
                                 </li>
                             </ul>
-                            <div
-                                v-if="!rpgUser.nsfw_pass"
-                                class="pricing-button"
-                            >
+                            <div v-if="!rpgUser.nsfw_pass" class="pricing-button">
                                 <button @click="buy(product)">Buy Now</button>
                             </div>
-                            <span
-                                v-else
-                                class="badge w-100 fs-4 mt-2 text-bg-info"
-                                >Purchased</span
-                            >
+                            <span v-else class="badge w-100 fs-4 mt-2 text-bg-info">Purchased</span>
                         </div>
                     </div>
                 </template>
@@ -255,12 +204,13 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeMount, onMounted, ref, watch } from "vue";
 import type { ProductEnhanced } from "@/stores/types";
 import { useProductStore } from "@/stores/product";
 import ProductTitle from "@/components/global/ProductTitle.vue";
 import { useUserStore } from "@/stores/user";
 import { useAuth0 } from "@auth0/auth0-vue";
+import { scrollToOffer } from "@/utils";
 
 /**
  * DATA
@@ -273,9 +223,7 @@ const showDisclaimer = ref(false);
 /**
  * COMPUTED
  */
-const productsEnhanced = computed(
-    () => productStore.productsEnhanced as ProductEnhanced[]
-);
+const productsEnhanced = computed(() => productStore.productsEnhanced as ProductEnhanced[]);
 const rpgUser = computed(() => userStore.user);
 
 /**
@@ -284,17 +232,18 @@ const rpgUser = computed(() => userStore.user);
 watch(
     () => rpgUser.value,
     (newUser) => {
-        showDisclaimer.value = !newUser.disclaimer_signed;
+        setTimeout(() => {
+            showDisclaimer.value = !newUser.disclaimer_signed;
+        }, 200);
     }
 );
 
 /**
  * LIFE-CYCLE
  */
-onMounted(() => {
-    if (rpgUser.value) {
-        showDisclaimer.value = !rpgUser.value.disclaimer_signed;
-    }
+onMounted(async () => {
+    await nextTick();
+    scrollToOffer("product-passes", "tab", "product_offer");
 });
 
 onBeforeMount(async () => {
@@ -322,7 +271,6 @@ const disclaimerSigned = async (e: Event) => {
             await loginWithPopup();
             await userStore.signPurchaseDisclaimer(rpgUser.value.id);
         } else {
-            console.log("signing...");
             await userStore.signPurchaseDisclaimer(rpgUser.value.id);
         }
     }

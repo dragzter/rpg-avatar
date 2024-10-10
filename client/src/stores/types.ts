@@ -193,10 +193,19 @@ export type AiModel = {
     img: string;
     value: string;
     adherence: number[];
-    size_option?: boolean;
+    size_options?: {
+        label: string;
+        size?: {
+            width: number;
+            height: number;
+        };
+        ratio?: string;
+        cssClass?: string;
+        recommended?: boolean;
+    };
     count_option?: boolean;
     max_outputs?: number[];
-    premium?: boolean;
+    model_type?: string;
     max_img_per_request: number;
     default_img_per_request: number;
     cost: number;

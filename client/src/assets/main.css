@@ -254,7 +254,7 @@ input::placeholder {
 .btn {
     height: unset;
     min-height: unset;
-    padding: 8px 16px;
+    padding: 10px 16px;
     line-height: 1.5;
     font-weight: 500;
     font-size: 16px;
@@ -2312,9 +2312,17 @@ main {
         }
     }
 
-    @media (max-width: 1500px) {
+    @media (max-width: 1300px) {
         .button-action-row {
             margin: 0 !important;
+
+            .prompt-footer-btn-container {
+                flex-direction: column;
+
+                .prompt-footer-btn-wrapper {
+                    width: 100%;
+                }
+            }
 
             button {
                 width: 100%;

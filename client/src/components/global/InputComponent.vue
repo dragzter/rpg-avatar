@@ -62,7 +62,7 @@ const props = defineProps({
     },
     maxlength: {
         type: Number,
-        default: 600,
+        default: 800,
     },
     loading: Boolean,
 });

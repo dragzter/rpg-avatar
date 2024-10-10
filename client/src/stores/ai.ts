@@ -16,6 +16,7 @@ export const useAiStore = defineStore("aiImages", {
         random_ai_prompt: "",
         showToast: false,
         task_id: "",
+        aiGeneratedPromptLoading: false,
     }),
     actions: {
         async generateImageWithUserData(userData: UserAIPrompt) {
@@ -30,6 +31,20 @@ export const useAiStore = defineStore("aiImages", {
                 this.requestLoading = false;
             }
         },
+        async cancelFluxImageGenerationTask() {
+            try {
+                const response = await axios.post(API.cancel_flux_image, {
+                    task_id: this.task_id,
+                });
+
+                this.task_id = "";
+                this.toastMessage = "Task was cancelled";
+                storage.rm(STORAGE_KEYS.task_id);
+            } catch (err) {
+                console.log(err);
+            }
+        },
+
         async cancelImageGenerationTask() {
             try {
                 const response = await axios.post(API.cancel_task, {
@@ -38,6 +53,7 @@ export const useAiStore = defineStore("aiImages", {
 
                 // TODO update toast message to show task was cancelled
                 this.task_id = "";
+                this.toastMessage = "Task was cancelled";
                 storage.rm(STORAGE_KEYS.task_id);
             } catch (err) {
                 console.log(err);
@@ -54,7 +70,7 @@ export const useAiStore = defineStore("aiImages", {
         },
         async getRandomPromptV2(userData) {
             try {
-                this.requestLoading = true;
+                this.aiGeneratedPromptLoading = true;
 
                 const response = await axios.post(API.surprise_prompt, userData);
 
@@ -62,7 +78,7 @@ export const useAiStore = defineStore("aiImages", {
             } catch (err) {
                 console.log(err);
             } finally {
-                this.requestLoading = false;
+                this.aiGeneratedPromptLoading = false;
             }
         },
         async getFluxImage(userData: UserAIPrompt) {
@@ -87,7 +103,9 @@ export const useAiStore = defineStore("aiImages", {
                                     task_id: response.data.task_id,
                                 });
 
+                                console.log("Checking task status:", _resp.data.status);
                                 if (_resp.data.status === ApiTaskStatus.CANCELED) {
+                                    console.log("stopping interval");
                                     clearInterval(pollInterval);
                                     this.requestLoading = false;
                                     this.imagesLoaded = false;
@@ -174,7 +192,6 @@ export const useAiStore = defineStore("aiImages", {
                                     this.imagesLoaded = false;
                                     this.toastMessage = "Task was cancelled";
                                     this.showToast = true;
-
                                     storage.rm(STORAGE_KEYS.task_id);
                                 } else if (_resp.data.status === ApiTaskStatus.COMPLETE) {
                                     clearInterval(pollInterval);
