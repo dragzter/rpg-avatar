@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import { art_style as ARTSTYLE } from "../utils/art-style.js";
 import "../config.js";
 
 dotenv.config();
@@ -43,6 +44,7 @@ class OpenAIService {
     async requestAiPromptV2(userRequest) {
         const { archetype, art_style, nsfw_pass } = userRequest;
 
+        const style = ARTSTYLE[art_style.toLowerCase()];
         const gender = Math.random() < 0.5 ? "Male" : "Female";
 
         const attractivenessNote =
@@ -53,7 +55,8 @@ class OpenAIService {
         let requestMessages = [
             {
                 role: "user",
-                content: `Create a prompt for image generation for a ${gender} **${archetype}** character in the **${art_style}** art style. The setting should be a fantasy world. Use a series of short, vivid descriptors to describe the character's appearance, clothing, and overall presence. ${attractivenessNote} The most important aspects should be emphasized using parentheses, followed by a floating-point number from 1.0 to 2.0, placed immediately after the descriptor, indicating its importance. For example: (Stunningly beautiful 1.7). Ensure the entire prompt is within 700 characters.`,
+                content: `Generate a flexible image prompt for a ${gender} ${archetype} in the ${art_style} style, ${style}. **IMPORTANT: The art style MUST be heavily emphasized, it is critical to the output**. Describe the character based on their archetype (e.g., warlock, rogue, paladin, etc.) with fitting clothing, accessories, or weapons. The background should complement the scene and match the art style. Include dynamic lighting, detailed facial features, and other supporting elements. Specify an adventurous vibe. Important characteristics should be wrapped in perens, STRICTLY follow this format example: "({adverb} {adjective} {float between 1-2})", include 3-5 of these for key characteristics. ${attractivenessNote} Important: **Keep the prompt under 700 characters**. 
+             `,
             },
         ];
 
@@ -98,6 +101,39 @@ class OpenAIService {
         });
 
         return response.choices[0].message.content;
+    }
+
+    async checkNSFW(prompt) {
+        try {
+            const moderationResponse = await this.openai.moderations.create({
+                input: prompt,
+            });
+
+            const { flagged, categories } = moderationResponse.results[0];
+
+            console.log({
+                violence: categories.violence,
+                hate: categories.hate,
+                sexual: categories.sexual,
+                selfHarm: categories["self-harm"],
+                minors: categories["sexual/minors"],
+                selfHarmIntent: categories["self-harm/intent"],
+                flagged,
+            });
+
+            return {
+                violence: categories.violence,
+                hate: categories.hate,
+                sexual: categories.sexual,
+                selfHarm: categories["self-harm"],
+                minors: categories["sexual/minors"],
+                selfHarmIntent: categories["self-harm/intent"],
+                flagged,
+            };
+        } catch (error) {
+            console.error("Error checking NSFW content:", error);
+            return false;
+        }
     }
 
     async stripNSFW(prompt) {

@@ -1,17 +1,27 @@
 export const art_style = {
-    sketch: "Sketch art style (Rough, hand-drawn lines, monochrome sketch 1.2)",
-    gothic: "Gothic art style (Dark tones, dramatic shadows, intricate detailing 1.2)",
-    pop_art: "Pop art style (Bold, vibrant colors, retro aesthetic 1.2)",
-    grunge: "Grunge art style (Rough textures, dark tones, distressed 1.2)",
-    pixel_art: "Pixel Art art style (Blocky shapes, limited colors, retro video game style 1.2)",
-    stylized_realism: "Stylized Realism art style (Realistic but exaggerated features, sharp detail 1.2)",
-    retro: "Retro art style (Vintage aesthetics, bold colors, nostalgic 1.2)",
-    vintage: "Vintage art style (Faded tones, classic designs, old-world charm 1.2)",
-    minimalist: "Minimalist art style ( Simple lines, limited colors, clean design 1.2)",
-    futuristic: "Futuristic art style (Sleek designs, metallic tones, high-tech elements 1.2)",
-    cyberpunk: "Cyberpunk art style (Neon colors, dystopian, high-tech cityscape 1.2)",
-    watercolor: "Watercolor art style (Soft washes, fluid colors, delicate textures 1.2)",
-    cartoon: "Cartoon art style (Simplified shapes, bold outlines, exaggerated features 1.2)",
-    realistic: "Realistic art style (Highly detailed, true-to-life proportions, natural lighting 1.2)",
-    anime: "Anime art style (Big eyes, vibrant colors, exaggerated expressions 1.2)"
+    sketch: "The sketch style is defined by raw, unfinished visuals emphasizing line work and shading to create a hand-drawn look.",
+    gothic: "The gothic style is defined by dark, moody visuals featuring ornate designs, dramatic contrasts, and often macabre themes.",
+    pop_art:
+        "The pop art style is defined by bold, colorful imagery inspired by commercial and mass media, with high contrast and graphic appeal.",
+    grunge: "The grunge style is defined by gritty, textured visuals with dark tones and a rough, distressed appearance.",
+    pixel_art:
+        "The pixel art style is defined by retro, blocky visuals created using small pixel units, reminiscent of old video games.",
+    stylized_realism:
+        "The stylized realism style is defined by a blend of realistic detail and exaggerated or artistic elements for more expression.",
+    retro: "The retro style is defined by nostalgic visuals with bright colors and designs inspired by past decades.",
+    vintage:
+        "The vintage style is defined by classic, aged visuals with muted tones and designs that evoke earlier eras.",
+    minimalist:
+        "The minimalist style is defined by clean, simple visuals focusing on essential shapes and colors with limited detail.",
+    futuristic:
+        "The futuristic style is defined by sleek, modern designs featuring advanced technology, clean lines, and sci-fi elements.",
+    cyberpunk:
+        "The cyberpunk style is defined by dystopian, tech-heavy visuals combining neon lights, urban decay, and high-tech elements.",
+    watercolor:
+        "The watercolor style is defined by soft, flowing visuals using translucent colors and brush-like strokes for a fluid effect.",
+    cartoon:
+        "The cartoon style is defined by vibrant, exaggerated visuals with bold outlines and playful, simplified features.",
+    realistic:
+        "The realistic style is defined by detailed, lifelike depictions focused on accuracy in subjects and environments.",
+    anime: "The anime style is defined by vibrant, highly expressive visuals with exaggerated facial features and dynamic poses.",
 };

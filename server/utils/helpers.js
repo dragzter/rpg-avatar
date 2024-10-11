@@ -18,11 +18,10 @@ import {
     shaman,
     spellsword,
     warlock,
-    wizard
+    wizard,
 } from "./characters.js";
 
 export function gatherRandomizedCharacterDetails(archetype) {
-    console.log(archetype)
     // Define all character types
     const characters = {
         alchemist,
@@ -56,14 +55,16 @@ export function gatherRandomizedCharacterDetails(archetype) {
     // Helper function to get a random element from an array
     const getRandomElement = (array) => {
         if (!array || array.length === 0) {
-            return "No data available";  // Handle cases where arrays might be empty
+            return "No data available"; // Handle cases where arrays might be empty
         }
         return array[Math.floor(Math.random() * array.length)];
     };
 
     // Gather random selections from each attribute (independently)
     const randomSetting = getRandomElement(selectedCharacter.settings);
-    const randomAppearance = getRandomElement(selectedCharacter.physical_appearance);
+    const randomAppearance = getRandomElement(
+        selectedCharacter.physical_appearance
+    );
     const randomDetail = getRandomElement(selectedCharacter.details);
     const randomAttire = getRandomElement(selectedCharacter.attire);
 
@@ -72,7 +73,7 @@ export function gatherRandomizedCharacterDetails(archetype) {
         setting: randomSetting,
         physical_appearance: randomAppearance,
         details: randomDetail,
-        attire: randomAttire
+        attire: randomAttire,
     };
 }
 

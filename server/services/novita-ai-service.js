@@ -55,14 +55,6 @@ class NovitaAIService {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY);
     }
 
-    truncateString(str, maxLength) {
-        if (str.length > maxLength) {
-            return str.substring(0, maxLength) + "..."; // Truncate and add ellipses
-        } else {
-            return str; // Return the string as-is if it's within the limit
-        }
-    }
-
     async startImageGeneration(userData) {
         const user = await UserService.getUserById(userData.user_id);
         if (user?.token_balance < userData.count) {
@@ -72,10 +64,25 @@ class NovitaAIService {
             };
         }
 
-        // Add date to determine when the prompt ran
-        //this.userPrompt.date = new Date().toLocaleString()
-        const userPrompt = {};
+        // Handle NSFW
+        const { minors, selfHarmIntent, selfHarm, flagged } =
+            await OpenAiService.checkNSFW(userData.prompt);
 
+        if (
+            selfHarm ||
+            minors ||
+            selfHarmIntent ||
+            (!userData.nsfw_pass && flagged)
+        ) {
+            return {
+                message: "Prompt rejected due to unsafe content",
+                success: false,
+                status: "failed",
+            };
+        }
+
+        // Prepare the prompt details
+        const userPrompt = {};
         for (let i = 0; i < this.PROMPT_PROPS.length; i++) {
             if (userData[this.PROMPT_PROPS[i]]) {
                 userPrompt[this.PROMPT_PROPS[i]] =
@@ -83,8 +90,8 @@ class NovitaAIService {
             }
         }
 
+        // Configure the prompt
         let configuredPrompt;
-
         if (userData.rpg_presets) {
             configuredPrompt =
                 userData.prompt.replace('"', "") ||
@@ -113,11 +120,6 @@ class NovitaAIService {
             }
         }
 
-        const r_width = userData?.size?.width || 1024;
-        const r_height = userData?.size?.height || 1024;
-        const adherence = userData.adherence || 7;
-        const negative_prompt = userData.negative_prompt || "none";
-
         const request = {
             request: {
                 model_name:
@@ -125,11 +127,11 @@ class NovitaAIService {
                 prompt:
                     this.truncateString(configuredPrompt, 1000) ||
                     "generate a random rpg character",
-                negative_prompt: negative_prompt,
-                width: r_width,
-                height: r_height,
+                negative_prompt: userData.negative_prompt || "none",
+                width: userData?.size?.width || 1024,
+                height: userData?.size?.height || 1024,
                 sampler_name: "DPM++ 2S a Karras",
-                guidance_scale: adherence,
+                guidance_scale: userData.adherence || 7,
                 steps: 20,
                 image_num: userData.count || 1,
                 clip_skip: 1,
@@ -184,6 +186,14 @@ class NovitaAIService {
         return {
             ...state,
         };
+    }
+
+    truncateString(str, maxLength) {
+        if (str.length > maxLength) {
+            return str.substring(0, maxLength) + "..."; // Truncate and add ellipses
+        } else {
+            return str; // Return the string as-is if it's within the limit
+        }
     }
 
     async startTaskStatusPolling(task_id, maxAttempts = 300, attempt = 0) {
@@ -279,12 +289,15 @@ class NovitaAIService {
                         });
                     }
                 } catch (error) {
-                    taskManager.activeTasks[task_id].status =
-                        ApiTaskStatus.FAILED;
-                    reject({
-                        message: "Error checking progress: " + error,
-                        success: false,
-                    });
+                    if (taskManager.activeTasks[task_id]) {
+                        taskManager.activeTasks[task_id].status =
+                            ApiTaskStatus.FAILED;
+
+                        reject({
+                            message: "Error checking progress: " + error,
+                            success: false,
+                        });
+                    }
                 }
             };
 

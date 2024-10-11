@@ -8,6 +8,13 @@ class ReplicateAiService {
     replicate;
     models;
     state = new Map();
+    maxChecks = 200;
+    failureCodes = {
+        nsfw: "nsfw",
+        timeout: "timeout",
+        canceled: "canceled",
+        network: "network",
+    };
 
     constructor() {
         this.replicate = new Replicate({
@@ -30,6 +37,10 @@ class ReplicateAiService {
         };
     }
 
+    LOG(message) {
+        console.log(`[ReplicateAiService] ${message}`);
+    }
+
     async startImageTask(userDetails) {
         const { input, user_id, model, cost, count } = userDetails;
         const user = await UserService.getUserById(user_id);
@@ -47,6 +58,8 @@ class ReplicateAiService {
         this.state.set(task_id, {
             status: "working",
             canceled: false,
+            failureCode: "network",
+            errorMessage: "",
             check_count: 0,
             cost,
             user,
@@ -78,26 +91,39 @@ class ReplicateAiService {
             });
 
             if (!this.state.get(task_id)) {
-                console.log("Task has been canceled");
+                this.LOG("Task has been canceled - attempted to write output.");
                 return;
             }
 
+            this.LOG(`Task ${task_id} has completed`);
             this.state.get(task_id).status = "complete";
             this.state.get(task_id).output = output;
         } catch (error) {
-            console.log(error);
+            this.LOG(error.message);
+            this.state.get(task_id).status = "failed";
+            this.state.get(task_id).errorMessage = error.message;
+
+            if (error.message.toLowerCase().includes("nsfw")) {
+                this.state.get(task_id).failureCode = this.failureCodes.nsfw;
+                this.state.get(task_id).errorMessage =
+                    error.message +
+                    " An NSFW pass is" +
+                    " required to make NSFW prompts.";
+            }
+
             if (this.state.get(task_id)?.canceled) {
-                console.log("Task has failed or been canceled");
+                this.LOG("Task has failed or been canceled");
                 this.state.get(task_id).status = "failed";
                 return;
             }
         }
     }
 
-    cancelTask(taskId) {
-        console.log(`Canceling task: ${taskId}`);
-        this.state.get(taskId).canceled = true;
-        this.state.get(taskId).controller.abort();
+    cancelTask(task_id) {
+        console.log(`Canceling task: ${task_id}`);
+        this.state.get(task_id).canceled = true;
+        this.state.get(task_id).controller.abort();
+        this.state.delete(task_id);
     }
 
     async creditUser(credits, task_id) {
@@ -108,19 +134,31 @@ class ReplicateAiService {
 
     async checkStatus(task_id) {
         const t = this.state.get(task_id);
+
+        if (!t) {
+            return;
+        }
+
         t.check_count = t.check_count + 1;
 
-        console.log(
+        this.LOG(
             `Check: ${t.check_count} - ${t.user.nickname} | balance: ${t.user.token_balance}`
         );
 
         if (t.canceled) {
-            this.state.delete(task_id);
-
             return {
                 success: false,
                 status: "canceled",
-                message: `Task ${task_id} has been canceled.`,
+                message: `Task ${task_id} has timed out.`,
+            };
+        }
+
+        if (t.check_count >= this.maxChecks) {
+            this.cancelTask(task_id);
+            return {
+                success: false,
+                status: "timeout",
+                message: `Task ${task_id} has timed out. Please try another prompt`,
             };
         }
 
@@ -140,9 +178,12 @@ class ReplicateAiService {
                 task_id
             );
 
+            this.state.delete(task_id);
+
             return {
                 success: true,
                 status: "complete",
+                message: `Task ${task_id} has completed successfully.`,
                 images,
                 new_token_balance: _state.user.token_balance,
             };
@@ -150,13 +191,15 @@ class ReplicateAiService {
             return {
                 success: true,
                 status: "working",
+                message: `Task ${task_id} is still working.`,
                 task_id,
             };
         } else if (t.status === "failed") {
+            const msg = t.errorMessage || "Task has failed.";
             return {
                 success: false,
                 status: "failed",
-                message: `Task ${task_id} has failed.`,
+                message: msg,
             };
         }
     }
