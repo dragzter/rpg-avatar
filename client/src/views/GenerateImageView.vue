@@ -261,7 +261,7 @@
                     />
                     <ToastComponent
                         :autoClose="true"
-                        :autoCloseDelay="3000"
+                        :autoCloseDelay="4000"
                         :isError="isError"
                         :message="userStore.toastMessage"
                         :show="showToast"
@@ -269,7 +269,7 @@
 
                     <ToastComponent
                         :autoClose="true"
-                        :autoCloseDelay="3000"
+                        :autoCloseDelay="4000"
                         :isError="isError"
                         :message="aiStore.toastMessage"
                         :show="aiStore.showToast"
@@ -278,7 +278,7 @@
             </div>
         </div>
         <modal-component id="model-selection-modal" size="lg" modal-title="Select AI Model">
-            <h5 class="accent-text">Premium Models</h5>
+            <h5 class="accent-text">Premium Models (Flux)</h5>
             <div class="model-grid mb-4">
                 <template v-for="model in model_selection">
                     <div v-if="model.model_type === 'flux'" class="model-grid-item">
@@ -286,7 +286,7 @@
                     </div>
                 </template>
             </div>
-            <h5 class="accent-text">Standard Models</h5>
+            <h5 class="accent-text">Standard Models (Stable Diffusion)</h5>
             <div class="model-grid">
                 <template v-for="model in model_selection">
                     <div v-if="model.model_type === 'sd'" class="model-grid-item">
@@ -331,7 +331,6 @@ const userStore = useUserStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
 const showToast = ref(false);
 const toastMessage = ref("");
-const isError = ref(false);
 const fluxModels = ref(["flux_pro", "flux_11_pro", "flux_dev", "flux_schnell"]);
 
 const userSelections = ref<UserAIPrompt>({
@@ -355,6 +354,7 @@ const userSelections = ref<UserAIPrompt>({
 
 const models = ref<AiModel[]>([...model_selection]);
 const selected_model = ref<AiModel>(models.value[0]);
+const showLightbox = ref(false);
 
 /**
  * =*'^'*= COMPUTED =*'^'*=
@@ -377,8 +377,7 @@ const loading = computed(() => aiStore.requestLoading);
 const loaded = computed(() => aiStore.imagesLoaded);
 const promptLoading = computed(() => aiStore.aiGeneratedPromptLoading);
 const gridCount = computed(() => `grid-${userSelections.value.count}`);
-const showLightbox = ref(false);
-
+const isError = computed(() => aiStore.toastError);
 const imagesV2 = computed(() => {
     const existingImages = aiStore.generatedImagesV2 || [];
     const desiredCount = userSelections.value.count || 1;

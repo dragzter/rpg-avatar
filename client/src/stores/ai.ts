@@ -16,6 +16,8 @@ export const useAiStore = defineStore("aiImages", {
         random_ai_prompt: "",
         showToast: false,
         task_id: "",
+        toastType: "success",
+        toastError: false,
         aiGeneratedPromptLoading: false,
     }),
     actions: {
@@ -33,6 +35,7 @@ export const useAiStore = defineStore("aiImages", {
         },
         async cancelFluxImageGenerationTask() {
             try {
+                this.toastError = false;
                 const response = await axios.post(API.cancel_flux_image, {
                     task_id: this.task_id,
                 });
@@ -47,6 +50,7 @@ export const useAiStore = defineStore("aiImages", {
 
         async cancelImageGenerationTask() {
             try {
+                this.toastError = false;
                 const response = await axios.post(API.cancel_task, {
                     task_id: this.task_id,
                 });
@@ -70,6 +74,7 @@ export const useAiStore = defineStore("aiImages", {
         },
         async getRandomPromptV2(userData) {
             try {
+                this.toastError = false;
                 this.aiGeneratedPromptLoading = true;
 
                 const response = await axios.post(API.surprise_prompt, userData);
@@ -83,6 +88,7 @@ export const useAiStore = defineStore("aiImages", {
         },
         async getFluxImage(userData: UserAIPrompt) {
             try {
+                this.toastError = false;
                 this.showToast = false;
                 const userStore = useUserStore();
                 this.requestLoading = true;
@@ -103,21 +109,20 @@ export const useAiStore = defineStore("aiImages", {
                                     task_id: response.data.task_id,
                                 });
 
-                                console.log("Checking task status:", _resp.data.status);
-                                if (_resp.data.status === ApiTaskStatus.CANCELED) {
-                                    console.log("stopping interval");
+                                const status = _resp.data.status;
+
+                                if (status === ApiTaskStatus.CANCELED) {
                                     clearInterval(pollInterval);
                                     this.requestLoading = false;
                                     this.imagesLoaded = false;
                                     this.toastMessage = "Task was cancelled";
                                     this.showToast = true;
                                     storage.rm(STORAGE_KEYS.task_id);
-                                } else if (_resp.data.status === ApiTaskStatus.COMPLETE) {
+                                } else if (status === ApiTaskStatus.COMPLETE) {
                                     clearInterval(pollInterval);
 
                                     this.generatedImagesV2 = _resp.data.images;
 
-                                    console.log(this.generatedImagesV2);
                                     if (_resp.data.new_token_balance !== undefined) {
                                         userStore.user.token_balance = _resp.data.new_token_balance;
                                     }
@@ -129,10 +134,17 @@ export const useAiStore = defineStore("aiImages", {
                                         storage.s(STORAGE_KEYS.new_images, true);
                                         storage.rm(STORAGE_KEYS.task_id);
                                     }
-                                } else if (_resp.data.status === ApiTaskStatus.FAILED) {
-                                    console.log("failed task!");
+                                } else if (
+                                    status === ApiTaskStatus.FAILED ||
+                                    status === ApiTaskStatus.TIMEOUT
+                                ) {
                                     clearInterval(pollInterval);
+                                    storage.rm(STORAGE_KEYS.task_id);
+
                                     this.requestLoading = false;
+                                    this.toastMessage = _resp.data.message;
+                                    this.toastError = true;
+                                    this.showToast = true;
                                 }
                             } catch (error) {
                                 console.error("Error checking task status:", error);
@@ -157,6 +169,7 @@ export const useAiStore = defineStore("aiImages", {
         },
         async getImageV2(userData: UserAIPrompt) {
             try {
+                this.toastError = false;
                 this.showToast = false;
 
                 const userStore = useUserStore();
@@ -190,7 +203,7 @@ export const useAiStore = defineStore("aiImages", {
                                     clearInterval(pollInterval);
                                     this.requestLoading = false;
                                     this.imagesLoaded = false;
-                                    this.toastMessage = "Task was cancelled";
+                                    this.toastMessage = _resp.data.message;
                                     this.showToast = true;
                                     storage.rm(STORAGE_KEYS.task_id);
                                 } else if (_resp.data.status === ApiTaskStatus.COMPLETE) {
@@ -215,6 +228,12 @@ export const useAiStore = defineStore("aiImages", {
                                     clearInterval(pollInterval);
                                     storage.rm(STORAGE_KEYS.task_id);
                                     this.requestLoading = false;
+                                } else if (_resp.data.status === ApiTaskStatus.TIMEOUT) {
+                                    clearInterval(pollInterval);
+                                    storage.rm(STORAGE_KEYS.task_id);
+                                    this.requestLoading = false;
+                                    this.toastMessage = _resp.data.message;
+                                    this.showToast = true;
                                 }
                             } catch (error) {
                                 console.error("Error checking task status:", error);
@@ -234,10 +253,10 @@ export const useAiStore = defineStore("aiImages", {
                     this.requestLoading = false;
                 }
             } catch (err) {
-                console.log(err);
-                // TODO to something here
-                this.toastMessage = (err as any).message;
+                this.toastMessage = (err as any).response?.data?.message || "An error occurred";
+                this.toastError = true;
                 this.showToast = true;
+                this.requestLoading = false;
             }
         },
     },

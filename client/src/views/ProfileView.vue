@@ -152,10 +152,6 @@
                                                             alt="image"
                                                             class="object-fit-cover w-100 h-100"
                                                         />
-                                                        <small
-                                                            class="position-absolute text-center w-auto first-img-label"
-                                                            >First Image
-                                                        </small>
                                                     </div>
                                                     <span
                                                         class="position-absolute badge top-0 count-indicator-prompt-history-item"

@@ -15,13 +15,13 @@ export function modelRequestMapper(request) {
             get: (req: UserAIPrompt) => {
                 return {
                     prompt: req.prompt,
-                    disable_safety_checker: true,
+                    disable_safety_checker: req.nsfw_pass,
                     output_quality: 80,
                     output_format: "jpg",
                     width: req.size?.width || 1024, // max 1440
                     height: req.size?.height || 1024, // max 1440
                     aspect_ratio: "1:1",
-                    safety_tolerance: 5,
+                    safety_tolerance: req.nsfw_pass ? 5 : 2,
                     prompt_upsampling: true,
                 };
             },
@@ -31,7 +31,7 @@ export function modelRequestMapper(request) {
             get: (req: UserAIPrompt) => {
                 return {
                     prompt: req.prompt,
-                    disable_safety_checker: true,
+                    disable_safety_checker: req.nsfw_pass,
                     output_quality: 90,
                     output_format: "jpg",
                     steps: 30,
@@ -40,7 +40,7 @@ export function modelRequestMapper(request) {
                     guidance: req.adherence || 3,
                     interval: 2,
                     aspect_ratio: "1:1",
-                    safety_tolerance: 5,
+                    safety_tolerance: req.nsfw_pass ? 5 : 2,
                     prompt_upsampling: true,
                 };
             },
@@ -57,7 +57,7 @@ export function modelRequestMapper(request) {
                     output_format: "jpg",
                     output_quality: 100,
                     num_inference_steps: 4,
-                    disable_safety_checker: true,
+                    disable_safety_checker: req.nsfw_pass,
                     width: 1024,
                     height: 1024,
                 };
@@ -78,6 +78,7 @@ export function modelRequestMapper(request) {
         ...rpg_details,
     };
 
+    console.log("processed_request", processed_request);
     return processed_request;
 }
 
