@@ -24,11 +24,10 @@ export function promptConstructor(promptDetails, randomize) {
 }
 
 export function promptConstructorV2(promptDetails) {
-    console.log(promptDetails, "Prompt Details");
     const character_art_style =
         art_style[promptDetails.art_style || "stylized_realism"];
 
-    return `A fantasy RPG image of a ${promptDetails?.archetype?.replace("_", " ")} in the    ${character_art_style?.replace("_", " ")}${promptDetails?.prompt ? ", (Emphasize these details: " + promptDetails?.prompt + ", 1.4)" : ""})`;
+    return `A fantasy RPG image of a ${promptDetails?.archetype?.replace("_", " ")} in the ${promptDetails.art_style} art style. ${character_art_style?.replace("_", " ")}${promptDetails?.prompt ? ", (Emphasize these details: " + promptDetails?.prompt + ", 1.4)" : ""})`;
 }
 
 export function promptEnhance(promptString) {

@@ -3,6 +3,7 @@ import BackblazeStorageService from "./backblaze-storage-service.js";
 import { v4 as uuidv4 } from "uuid";
 import Replicate from "replicate";
 import axios from "axios";
+import { promptConstructorV2 } from "../utils/prompt-constructor.js";
 
 class ReplicateAiService {
     replicate;
@@ -42,7 +43,17 @@ class ReplicateAiService {
     }
 
     async startImageTask(userDetails) {
-        const { input, user_id, model, cost, count } = userDetails;
+        const {
+            input,
+            user_id,
+            model,
+            cost,
+            count,
+            randomize,
+            art_style,
+            archetype,
+            rpg_presets,
+        } = userDetails;
         const user = await UserService.getUserById(user_id);
 
         if (user?.token_balance < cost) {
@@ -53,7 +64,17 @@ class ReplicateAiService {
             };
         }
 
+        if (rpg_presets && !randomize) {
+            input.prompt = promptConstructorV2({
+                prompt: input.prompt,
+                art_style,
+                archetype,
+            });
+        }
+
         const task_id = uuidv4();
+
+        console.log(input.prompt, userDetails.art_style);
 
         this.state.set(task_id, {
             status: "working",
