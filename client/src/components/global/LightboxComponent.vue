@@ -180,7 +180,7 @@ const downloadImage = async (url) => {
 
 const isImagePublished = (url) => {
     // Find out if any of the published Images are included in the current URL
-    const published_ids = userStore.selectedPrompt?.published_images.map((pimg) => pimg.split(".")[0]);
+    const published_ids = userStore.selectedPrompt?.published_images?.map((pimg) => pimg.split(".")[0]);
 
     return published_ids?.some((pimg) => url.includes(pimg));
 };

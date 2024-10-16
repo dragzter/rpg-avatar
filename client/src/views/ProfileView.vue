@@ -499,7 +499,7 @@ const deletePrompt = async () => {
 
 const isImagePublished = (url) => {
     // Find out if any of the published Images are included in the current URL
-    const published_ids = selectedPrompt.value?.published_images.map((pimg) => pimg.split(".")[0]);
+    const published_ids = selectedPrompt.value?.published_images?.map((pimg) => pimg.split(".")[0]);
 
     return published_ids?.some((pimg) => url.includes(pimg));
 };
@@ -524,7 +524,7 @@ const publishImage = async (imgUrl) => {
     } catch (error) {
         console.log(error);
         userStore.userError = true;
-        userStore.toastMessage = error.message;
+        userStore.toastMessage = (error as any).message;
     }
 };
 

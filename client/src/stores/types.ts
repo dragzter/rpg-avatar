@@ -188,21 +188,23 @@ export type UserImageResponse = {
     success: boolean;
 };
 
+export interface SizeOption {
+    label: string;
+    size?: {
+        width: number;
+        height: number;
+    };
+    ratio?: string;
+    cssClass?: string;
+    recommended?: boolean;
+}
+
 export type AiModel = {
     label: string;
     img: string;
     value: string;
     adherence: number[];
-    size_options?: {
-        label: string;
-        size?: {
-            width: number;
-            height: number;
-        };
-        ratio?: string;
-        cssClass?: string;
-        recommended?: boolean;
-    };
+    size_options?: SizeOption[];
     count_option?: boolean;
     max_outputs?: number[];
     model_type?: string;
@@ -213,7 +215,6 @@ export type AiModel = {
     adherence_default?: number;
     description?: string;
 };
-
 
 export interface PromptHistoryItem {
     user_id: string;
@@ -249,4 +250,3 @@ export interface QuickPromptHistory {
     thumbnails?: string[];
     urls?: string[];
 }
-

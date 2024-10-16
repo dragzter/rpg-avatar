@@ -461,7 +461,10 @@ const handleSubmit = async (randomize: boolean) => {
             flux: async () => await aiStore.getFluxImage(userSelections.value),
             sd: async () => await aiStore.getImageV2(userSelections.value),
         };
-        await requestType[selected_model.value.model_type]();
+
+        if (selected_model.value.model_type) {
+            await requestType[selected_model.value.model_type]();
+        }
     }
 };
 
@@ -470,7 +473,10 @@ const cancelImageRequest = async () => {
         flux: async () => await aiStore.cancelFluxImageGenerationTask(),
         sd: async () => await aiStore.cancelImageGenerationTask(),
     };
-    await requestType[selected_model.value.model_type]();
+
+    if (selected_model.value.model_type) {
+        await requestType[selected_model.value.model_type]();
+    }
 };
 
 const setAiModel = (modelObject: AiModel) => {

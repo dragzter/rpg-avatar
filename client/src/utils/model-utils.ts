@@ -1,4 +1,4 @@
-import type { AiModel, UserAIPrompt } from "@/stores/types";
+import type { AiModel, SizeOption, UserAIPrompt } from "@/stores/types";
 
 export function modelRequestMapper(request) {
     let processed_request;
@@ -82,7 +82,7 @@ export function modelRequestMapper(request) {
     return processed_request;
 }
 
-export const FluxImageSizeOptions = [
+export const FluxImageSizeOptions: SizeOption[] = [
     {
         label: "512x512",
         size: {
@@ -114,7 +114,7 @@ export const FluxImageSizeOptions = [
         recommended: false,
     },
 ];
-export const SDImageSizeOptions = [
+export const SDImageSizeOptions: SizeOption[] = [
     {
         label: "512x512",
         size: {

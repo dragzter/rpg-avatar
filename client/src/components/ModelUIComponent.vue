@@ -20,6 +20,7 @@
 </template>
 <script lang="ts" setup>
 import type {PropType} from "vue";
+import type {AiModel} from "@/stores/types";
 
 const props = defineProps({
     model: {
