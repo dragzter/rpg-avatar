@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import Replicate from "replicate";
 import axios from "axios";
 import { promptConstructorV2 } from "../utils/prompt-constructor.js";
+import OpenAiService from "./open-ai-service.js";
 
 class ReplicateAiService {
     replicate;
@@ -56,6 +57,7 @@ class ReplicateAiService {
         } = userDetails;
         const user = await UserService.getUserById(user_id);
 
+        // (1) ================ COST CHECK ================
         if (user?.token_balance < cost) {
             return {
                 message: "Not enough tokens for this request",
@@ -63,7 +65,27 @@ class ReplicateAiService {
                 success: false,
             };
         }
+        // ================ COST CHECK ================
 
+        // (2) =============== NS CHECK ===============
+        const { minors, selfHarmIntent, selfHarm, flagged } =
+            await OpenAiService.checkNSFW(userDetails.input.prompt);
+
+        if (
+            selfHarm ||
+            minors ||
+            selfHarmIntent ||
+            (!userDetails.nsfw_pass && flagged)
+        ) {
+            return {
+                message: "Prompt rejected due to unsafe content",
+                success: false,
+                status: "failed",
+            };
+        }
+        // =============== NS CHECK ===============
+
+        // (3) =============== PROMPT ENHANCEMENT ===============
         if (rpg_presets && !randomize) {
             input.prompt = promptConstructorV2({
                 prompt: input.prompt,
@@ -71,11 +93,10 @@ class ReplicateAiService {
                 archetype,
             });
         }
+        // =============== PROMPT ENHANCEMENT ===============
 
+        // (4) =============== TASK CREATION ===============
         const task_id = uuidv4();
-
-        console.log(input.prompt, userDetails.art_style);
-
         this.state.set(task_id, {
             status: "working",
             canceled: false,
@@ -90,9 +111,8 @@ class ReplicateAiService {
             input,
         });
 
-        // TODO: Check for NSFW content
-        // Purposely not awaiting this function
         this.beginImageGeneration(input, model, task_id);
+        // =============== TASK CREATION ===============
 
         return {
             success: true,
