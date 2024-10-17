@@ -214,6 +214,7 @@ export type AiModel = {
     negative_prompt?: boolean;
     adherence_default?: number;
     description?: string;
+    tags?: string[];
 };
 
 export interface PromptHistoryItem {

@@ -15,6 +15,9 @@
                 </p>
             </p>
             <p class="model-description d-none d-md-block">{{ model.description }}</p>
+                <div v-for="tag in model.tags" :key="tag" class="model-tag d-inline-block">
+                    {{tag}}
+                </div>
         </div>
     </div>
 </template>
@@ -35,3 +38,13 @@ const handleClick = () => {
     emit("select", props.model);
 };
 </script>
+<style>
+.model-tag {
+    background: #9e9ef0;
+    color: #111;
+    font-size: 12px;
+    padding: 2px 6px;
+    margin-right: 3px;
+    border-radius: 6px;
+}
+</style>

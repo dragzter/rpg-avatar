@@ -51,6 +51,10 @@
                                 :class="{ is_disabled: loading }"
                             >
                                 <div class="model-select-inner">
+                                    <h4 class="model-price-indicator position-relative mb-4">
+                                        <i class="fa fa-coins me-2 text-warning"></i>
+                                        <span><i class="fa fa-times"></i></span>{{ selected_model.cost }}
+                                    </h4>
                                     <h5 class="m-0 text-truncate" style="max-width: 250px">
                                         {{ selected_model.label }}
                                     </h5>
@@ -277,7 +281,7 @@
                 </div>
             </div>
         </div>
-        <modal-component id="model-selection-modal" size="lg" modal-title="Select AI Model">
+        <modal-component id="model-selection-modal" modal-title="Select AI Model" size="lg">
             <h5 class="accent-text">Premium Models (Flux)</h5>
             <div class="model-grid mb-4">
                 <template v-for="model in model_selection">

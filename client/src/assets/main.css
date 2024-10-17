@@ -1850,6 +1850,14 @@ main {
     }
 }
 
+.model-price-indicator {
+    span {
+        font-size: 14px;
+        margin-right: 3px;
+        color: #fff
+    }
+}
+
 .model-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Ensure each column has a min and max width */

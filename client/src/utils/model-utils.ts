@@ -78,7 +78,6 @@ export function modelRequestMapper(request) {
         ...rpg_details,
     };
 
-    console.log("processed_request", processed_request);
     return processed_request;
 }
 
@@ -182,6 +181,7 @@ export const model_selection: AiModel[] = [
         cost: 4,
         negative_prompt: false,
         adherence_default: 3,
+        tags: ["portrait", "landscape", "illustration", "fantasy", "photo realism"],
         description:
             "State-of-the-art image generation with top of the line prompt following, visual quality, image detail and output diversity.",
     },
@@ -198,6 +198,7 @@ export const model_selection: AiModel[] = [
         max_img_per_request: 1,
         default_img_per_request: 1,
         negative_prompt: false,
+        tags: ["portrait", "landscape", "illustration", "fantasy", "photo realism"],
         description:
             "Faster, better FLUX Pro. Text-to-image model with excellent image quality, prompt adherence, and output diversity.",
     },
@@ -214,6 +215,7 @@ export const model_selection: AiModel[] = [
         max_img_per_request: 4,
         default_img_per_request: 2,
         negative_prompt: false,
+        tags: ["illustration", "fantasy", "experimentation", "concept art"],
         description: "The fastest image generation model tailored for experimentation and personal use",
     },
     {
@@ -230,6 +232,7 @@ export const model_selection: AiModel[] = [
         default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
+        tags: ["character", "fantasy", "illustration", "anime", "nsfw", "portrait", "2d concept" + " art"],
         description:
             "SDXL 1.0 Character model trained on a variety of character types and styles.  Excellent image" +
             " quality and prompt adherence.",
@@ -248,6 +251,7 @@ export const model_selection: AiModel[] = [
         default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
+        tags: ["character", "fantasy", "illustration", "anime", "nsfw", "portrait"],
         description:
             "SDXL 1.0 Portrait model trained on a variety of portrait types and styles.  Excellent image quality and prompt adherence.",
     },
@@ -265,6 +269,7 @@ export const model_selection: AiModel[] = [
         default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
+        tags: ["character", "fantasy", "illustration", "anime", "nsfw", "portrait"],
         description: "SDXL 1.0 Good balance of art styles suitable for character work and digital art.",
     },
     {
@@ -281,6 +286,7 @@ export const model_selection: AiModel[] = [
         default_img_per_request: 2,
         negative_prompt: true,
         adherence_default: 7,
+        tags: ["character", "fantasy", "illustration", "anime", "nsfw", "portrait"],
         description:
             "SDXL 1.0 Anime model trained on a variety of anime styles.  Excellent image quality and prompt adherence.",
     },
