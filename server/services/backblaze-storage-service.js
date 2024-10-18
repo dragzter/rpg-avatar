@@ -157,29 +157,42 @@ class BackblazeStorageService {
         let image_response = [];
         let thumbnail_response = [];
 
-        // Attempt to get contents of the bucket
         try {
             const params = {
                 Bucket: this.bucket_name,
                 Prefix: `${user_id.replace("|", "")}/`,
             };
 
-            const image_command = new ListObjectsV2Command(params);
-            const image_contents_response =
-                await this.s3_client.send(image_command);
+            let isTruncated = true;
+            let continuationToken = null;
 
-            const sortedContents = image_contents_response.Contents.sort(
-                (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
-            );
-
-            // Sort the images and thumbnails into their own arrays
-            sortedContents.forEach((obj) => {
-                if (obj.Key.includes("thumbnails/")) {
-                    thumbnail_response.push(obj.Key);
-                } else {
-                    image_response.push(obj.Key);
+            while (isTruncated) {
+                if (continuationToken) {
+                    params.ContinuationToken = continuationToken;
                 }
-            });
+
+                const image_command = new ListObjectsV2Command(params);
+                const image_contents_response =
+                    await this.s3_client.send(image_command);
+
+                const sortedContents = image_contents_response.Contents.sort(
+                    (a, b) =>
+                        new Date(b.LastModified) - new Date(a.LastModified)
+                );
+
+                // Sort the images and thumbnails into their own arrays
+                sortedContents.forEach((obj) => {
+                    if (obj.Key.includes("thumbnails/")) {
+                        thumbnail_response.push(obj.Key);
+                    } else {
+                        image_response.push(obj.Key);
+                    }
+                });
+
+                isTruncated = image_contents_response.IsTruncated;
+                continuationToken =
+                    image_contents_response.NextContinuationToken;
+            }
         } catch (error) {
             console.log(error);
         }
