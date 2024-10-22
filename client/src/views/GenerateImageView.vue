@@ -139,6 +139,10 @@
                                 class="d-flex align-items-center justify-content-between flex-sm-row gap-3 flex-column"
                             >
                                 <RangeComponent
+                                    v-if="
+                                        (rpgUser as any)?.token_balance === 0 ||
+                                        model_selection.max_img_per_request > 1
+                                    "
                                     id="image-count-range"
                                     v-model="userSelections.count as number"
                                     :disabled="(rpgUser as any)?.token_balance === 0 || !rpgUser?.id"
