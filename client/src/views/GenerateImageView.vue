@@ -140,8 +140,8 @@
                             >
                                 <RangeComponent
                                     v-if="
-                                        (rpgUser as any)?.token_balance === 0 ||
-                                        model_selection.max_img_per_request > 1
+                                        (rpgUser as any)?.token_balance > 0 &&
+                                        selected_model.max_img_per_request > 1
                                     "
                                     id="image-count-range"
                                     v-model="userSelections.count as number"
