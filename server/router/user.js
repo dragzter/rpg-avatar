@@ -179,7 +179,7 @@ router.post("/api/user/:userId", async (req, res) => {
             return res.status(200).json(user);
         } else {
             const newUser = {
-                token_balance: 2,
+                token_balance: 20,
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],
