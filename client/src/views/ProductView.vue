@@ -254,7 +254,7 @@ onBeforeMount(async () => {
  * HANDLERS
  */
 const buy = async (product: ProductEnhanced) => {
-    if (!rpgUser.value) {
+    if (!isAuthenticated.value && !rpgUser.value.id) {
         await loginWithPopup();
     }
 

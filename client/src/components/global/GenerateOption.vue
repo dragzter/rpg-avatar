@@ -6,7 +6,7 @@
             'rpg-option-active': isChecked,
             is_disabled: loading,
         }"
-        class="rpg-generator-option d-flex mb-3 justify-content-between align-items-center"
+        class="rpg-generator-option d-flex justify-content-between align-items-center"
         @click="toggleStatus"
         style="cursor: pointer"
     >

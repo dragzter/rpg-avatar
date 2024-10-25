@@ -4,17 +4,10 @@
             <div class="col-sm-12 col-md-12 col-lg-4">
                 <div class="prompt-builder">
                     <div id="prompt-builder-inner" class="d-flex flex-column h-100">
-                        <div
-                            class="prompt-header title-row mb-3 d-flex justify-content-between align-items-center"
-                        >
-                            <h5 class="mb-0 text-white">Prompt</h5>
-
-                            <div
-                                class="text-end"
-                                style="width: 20px; height: 60px; border-right: 1px solid #313151"
-                            ></div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="prompt-info-text"><strong>1.</strong> SELECT AI MODEL</h6>
                             <router-link
-                                class="fw-light"
+                                class="fw-light ms-2 mb-3"
                                 data-bs-placement="top"
                                 data-bs-title="Buy More Tokens"
                                 data-bs-toggle="tooltip"
@@ -39,7 +32,7 @@
                             </router-link>
                         </div>
 
-                        <div class="model-select-wrapper">
+                        <div class="model-select-wrapper position-relative">
                             <div
                                 data-bs-toggle="modal"
                                 data-bs-target="#model-selection-modal"
@@ -52,6 +45,7 @@
                             >
                                 <div class="model-select-inner">
                                     <h4 class="model-price-indicator position-relative mb-4">
+                                        <span class="text-white me-2">cost per image: </span>
                                         <i class="fa fa-coins me-2 text-warning"></i>
                                         <span><i class="fa fa-times"></i></span>{{ selected_model.cost }}
                                     </h4>
@@ -64,32 +58,24 @@
                                     </p>
                                 </div>
                             </div>
+                            <p class="model-click-instruction">
+                                <strong class="text-white">Click </strong> To Select Model
+                            </p>
                         </div>
 
-                        <GenerateOption
-                            id="rpg-generator-checkbox"
-                            :isChecked="isRPGChecked"
-                            @update:isChecked="toggleStatus"
-                            :loading="loading"
-                            label="RPG Presets"
-                            tooltipText="Enable or disable RPG presets for your AI-generated images."
-                            activeText="Enabled"
-                            inactiveText="Disabled"
-                        />
-
-                        <GenerateOption
-                            wrapper-id="nsfw-enable-checkbox"
-                            id="nsfw-enable-checkbox-input"
-                            :isChecked="rpgUser.nsfw_pass"
-                            @update:isChecked="toggleNSFWStatus"
-                            :loading="loading"
-                            label="NSFW Prompts"
-                            :show-toggle="false"
-                            tooltipText="If disabled NSFW prompts will be blocked."
-                            activeText="Enabled"
-                            inactiveText="Disabled"
-                            :class="{ 'is-available': rpgUser.nsfw_pass }"
-                        />
+                        <!--                        <GenerateOption-->
+                        <!--                            wrapper-id="nsfw-enable-checkbox"-->
+                        <!--                            id="nsfw-enable-checkbox-input"-->
+                        <!--                            :isChecked="rpgUser.nsfw_pass"-->
+                        <!--                            @update:isChecked="toggleNSFWStatus"-->
+                        <!--                            :loading="loading"-->
+                        <!--                            label="NSFW Prompts"-->
+                        <!--                            :show-toggle="false"-->
+                        <!--                            tooltipText="If disabled NSFW prompts will be blocked."-->
+                        <!--                            activeText="Enabled"-->
+                        <!--                            inactiveText="Disabled"-->
+                        <!--                            :class="{ 'is-available': rpgUser.nsfw_pass }"-->
+                        <!--                        />-->
 
                         <div
                             v-if="isRPGChecked"
@@ -115,17 +101,18 @@
                             />
                         </div>
 
+                        <h6 class="prompt-info-text"><strong>2.</strong> TYPE IN PROMPT</h6>
                         <InputComponent
                             id="custom-prompt"
                             v-model="userSelections.prompt"
                             :loading="loading"
                             input-type="textarea"
-                            label="Additional details..."
+                            label="Prompt"
                             placeholder="prompt"
                         />
 
                         <!-- Advanced Settings (Dependent on Model Selected) -->
-                        <CollapseComponent label="Advanced">
+                        <CollapseComponent label="Advanced (optional)">
                             <RadioGroupComponent
                                 v-if="selected_model.size_options?.length"
                                 id="advanced-image-select"
@@ -150,7 +137,7 @@
                                     :max="maxImagesPossible"
                                     :min="1"
                                     :step="1"
-                                    class="w-100"
+                                    class="w-100 mb-2"
                                     label="Number of images"
                                 />
                                 <RangeComponent
@@ -162,7 +149,7 @@
                                     :max="selected_model.adherence[1]"
                                     :min="selected_model.adherence[0]"
                                     :step="0.1"
-                                    class="w-100"
+                                    class="w-100 mb-2"
                                     label="Prompt adherence"
                                     tooltip-text="Higher number limits AI's creativity."
                                 />
@@ -170,12 +157,25 @@
                             <InputComponent
                                 v-if="selected_model.negative_prompt"
                                 id="custom-prompt"
+                                class="mb-2"
                                 v-model="userSelections.negative_prompt"
                                 :loading="loading"
                                 height="90px"
                                 input-type="textarea"
                                 label="Negative prompt"
                                 placeholder="prompt"
+                            />
+
+                            <GenerateOption
+                                id="rpg-generator-checkbox"
+                                :isChecked="isRPGChecked"
+                                :loading="loading"
+                                activeText="Enabled"
+                                class="w-100"
+                                inactiveText="Disabled"
+                                label="RPG Presets"
+                                tooltipText="Enable or disable RPG presets for your AI-generated images."
+                                @update:isChecked="toggleStatus"
                             />
                         </CollapseComponent>
 
@@ -347,7 +347,7 @@ const userSelections = ref<UserAIPrompt>({
     art_style: "stylized_realism",
     randomize: false,
     prompt: "",
-    nsfw_pass: false,
+    nsfw_pass: true,
     rpg_presets: true,
     count: 2,
     negative_prompt: "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined",
@@ -439,14 +439,18 @@ const generateRandomPrompt = async () => {
     await aiStore.getRandomPromptV2({
         archetype: userSelections.value.archetype,
         art_style: userSelections.value.art_style,
-        nsfw_pass: userSelections.value.nsfw_pass,
+        nsfw_pass: true,
+        // setting true to bypass nsfw logic - determined flow was confusing (10/24/24)
     });
 
     await handleSubmit(true);
 };
 
 const handleSubmit = async (randomize: boolean) => {
-    // Reset the images
+    if (!isAuthenticated.value) {
+        await loginWithPopup();
+    }
+
     resetImages();
     showToast.value = false;
     toastMessage.value = "";
@@ -462,17 +466,13 @@ const handleSubmit = async (randomize: boolean) => {
         }
     }
 
-    if (!isAuthenticated.value) {
-        await loginWithPopup();
-    } else {
-        const requestType = {
-            flux: async () => await aiStore.getFluxImage(userSelections.value),
-            sd: async () => await aiStore.getImageV2(userSelections.value),
-        };
+    const requestType = {
+        flux: async () => await aiStore.getFluxImage(userSelections.value),
+        sd: async () => await aiStore.getImageV2(userSelections.value),
+    };
 
-        if (selected_model.value.model_type) {
-            await requestType[selected_model.value.model_type]();
-        }
+    if (selected_model.value.model_type) {
+        await requestType[selected_model.value.model_type]();
     }
 };
 
