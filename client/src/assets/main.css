@@ -1872,6 +1872,10 @@ main {
         margin-right: 4px;
         outline: 2px solid var(--lavender);
     }
+    
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
 }
 
 .model-click-instruction {
@@ -1883,7 +1887,7 @@ main {
     padding: 5px 12px;
     background: rgba(255,255,255,0.2);
     border-radius: 8px;
-    top: 20%;
+    top: 28%;
     left: 50%;
     z-index: 1;
     pointer-events: none;
