@@ -27,6 +27,64 @@ class BackblazeStorageService {
         });
     }
 
+    async deleteAllInFolder(userId) {
+        try {
+            // Sanitize the userId to remove any pipes
+            const sanitizedUserId = userId.replace("|", "");
+            const folderPath = `${sanitizedUserId}/`;
+
+            let isTruncated = true;
+            let continuationToken = null;
+            const deletePromises = [];
+
+            while (isTruncated) {
+                const listParams = {
+                    Bucket: this.bucket_name,
+                    Prefix: folderPath, // Specify the folder path as the prefix
+                    ContinuationToken: continuationToken,
+                };
+
+                const commandList = new ListObjectsV2Command(listParams);
+                const response = await this.s3_client.send(commandList);
+
+                // Collect all delete commands for the files in the folder
+                response.Contents.forEach((file) => {
+                    const deleteParams = {
+                        Bucket: this.bucket_name,
+                        Key: file.Key,
+                    };
+                    deletePromises.push(
+                        this.s3_client.send(
+                            new DeleteObjectCommand(deleteParams)
+                        )
+                    );
+                });
+
+                isTruncated = response.IsTruncated;
+                continuationToken = response.NextContinuationToken;
+            }
+
+            // Execute all delete commands in parallel
+            await Promise.all(deletePromises);
+
+            const image_count =
+                await UserService.getAndUpdateUserImageCount(userId);
+
+            return {
+                success: true,
+                message: "All files in the folder deleted successfully",
+                image_count,
+            };
+        } catch (error) {
+            console.error("Error deleting files in folder:", error);
+            return {
+                success: false,
+                message: "Error deleting files in folder",
+                error,
+            };
+        }
+    }
+
     async deleteMany(fileNames, userId) {
         try {
             const deletionPromises = fileNames.map(async (fileName) => {

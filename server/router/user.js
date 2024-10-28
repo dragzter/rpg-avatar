@@ -159,6 +159,7 @@ router.post("/api/user/delete", async (req, res) => {
     }
 });
 
+// Log in, create new user if not found
 router.post("/api/user/:userId", async (req, res) => {
     const { userId } = req.params; // Get userId from URL
     const providedUser = req.body; //
@@ -178,8 +179,13 @@ router.post("/api/user/:userId", async (req, res) => {
 
             return res.status(200).json(user);
         } else {
+            const hasReceivedInitialTokens =
+                await UserService.hasReceivedFirstTimeTokenReward(
+                    providedUser.sub
+                );
+
             const newUser = {
-                token_balance: 20,
+                token_balance: hasReceivedInitialTokens ? 0 : 20, // No initial tokens if they received before
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],
@@ -200,6 +206,11 @@ router.post("/api/user/:userId", async (req, res) => {
             }
 
             await UserService.saveUser(newUser);
+
+            // Log initial token grant if this is their first time receiving it
+            if (!hasReceivedInitialTokens) {
+                await UserService.logInitialTokenGrant(providedUser.sub);
+            }
 
             return res.status(200).json(newUser);
         }

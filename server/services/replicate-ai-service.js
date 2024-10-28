@@ -249,6 +249,20 @@ class ReplicateAiService {
         const state = this.state.get(task_id);
         console.log("(Replicate) Downloading and uploading images...");
 
+        if (
+            state.user.image_count >= state.user.image_storage_cap ||
+            !state.user.admin
+        ) {
+            console.log(
+                "(Replicate) User has reached image storage cap or is not an admin",
+                {
+                    image_count: state.user.image_count,
+                    image_storage_cap: state.user.image_storage_cap,
+                }
+            );
+            return;
+        }
+
         const file_names = [];
         const thumbnail_file_names = [];
 

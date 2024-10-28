@@ -1,4 +1,9 @@
-import { GalleryImageModel, PromptModel, UserModel } from "../db/model.js";
+import {
+    GalleryImageModel,
+    PromptModel,
+    TokenTrackingModel,
+    UserModel,
+} from "../db/model.js";
 import BackblazeStorageService from "./backblaze-storage-service.js";
 import { v4 as uuidv4 } from "uuid";
 import { excerpt } from "../utils/helpers.js";
@@ -128,8 +133,13 @@ class UserService {
 
     async savePrompt(userPrompt) {
         try {
-            const _prompt = new PromptModel(userPrompt);
-            await _prompt.save();
+            const user = await this.getUserById(userPrompt.user_id);
+
+            if (user.image_count < user.image_storage_cap || user.admin) {
+                // Admin has no cap
+                const _prompt = new PromptModel(userPrompt);
+                await _prompt.save();
+            }
         } catch (err) {
             console.log(err);
         }
@@ -213,9 +223,35 @@ class UserService {
         }
     }
 
+    // Check if a user has previously received initial tokens
+    async hasReceivedFirstTimeTokenReward(userId) {
+        try {
+            const record = await TokenTrackingModel.findOne({ userId });
+            return record !== null; // Returns true if the user has a record
+        } catch (error) {
+            console.error("Error checking token grant status:", error);
+            throw error;
+        }
+    }
+
+    // Log the user's initial token grant
+    async logInitialTokenGrant(userId) {
+        try {
+            await TokenTrackingModel.create({ userId });
+        } catch (error) {
+            console.error("Error logging initial token grant:", error);
+            throw error;
+        }
+    }
+
     async deleteUser(userId) {
         try {
-            console.log("Deleting user", userId);
+            // delete images and prompts
+            await Promise.all([
+                PromptModel.deleteMany({ user_id: userId }).exec(),
+                BackblazeStorageService.deleteAllInFolder(userId),
+            ]);
+
             return await UserModel.deleteOne({ id: userId }).exec();
         } catch (err) {
             console.log(err);

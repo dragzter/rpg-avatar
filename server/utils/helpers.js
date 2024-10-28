@@ -78,5 +78,5 @@ export function gatherRandomizedCharacterDetails(archetype) {
 }
 
 export function excerpt(text, len) {
-    return text.length > len ? text.substring(0, len) + "..." : text;
+    return text?.length > len ? text.substring(0, len) + "..." : text;
 }

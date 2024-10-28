@@ -25,9 +25,9 @@
                         <router-link class="nav-link mx-1 accent-link" to="community-gallery"
                             >GALLERY
                         </router-link>
-                        <router-link class="btn btn-secondary mx-2" to="generate-image"
-                            >GENERATE
-                        </router-link>
+                        <!--                        <router-link class="btn btn-secondary mx-2" to="generate-image"-->
+                        <!--                            >GENERATE-->
+                        <!--                        </router-link>-->
                     </div>
 
                     <div id="auth-column">
@@ -155,7 +155,7 @@ watch(
 
 const deleteAccount = async () => {
     const confirmation = confirm(
-        "Are you sure you want to delete your account? This action is irreversible."
+        "Are you sure you want to delete your account? This will permanently remove all stored PROMPTS, TOKENS and IMAGES, and cannot be undone. Bonus tokens will not be reissued."
     );
 
     if (confirmation) {

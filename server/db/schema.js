@@ -218,6 +218,11 @@ export const GalleryImageSchema = new Schema(
     { collection: "gallery" }
 );
 
+export const TokenTrackingSchema = new mongoose.Schema({
+    userId: { type: String, required: true, unique: true },
+    grantedOn: { type: Date, default: Date.now },
+});
+
 // This is based on a typescript type in types.ts in the client folder.
 export const PromptSchema = new Schema(
     {

@@ -1,6 +1,5 @@
 import { createRouter as createVueRouter, createWebHistory, type Router } from "vue-router";
 import { type App } from "vue";
-import HomeView from "@/views/HomeView.vue";
 import GenerateImageView from "@/views/GenerateImageView.vue";
 import ProductView from "@/views/ProductView.vue";
 import ReturnPolicyView from "@/views/ReturnPolicyView.vue";
@@ -22,11 +21,12 @@ export function createRouter(app: App): Router {
             {
                 path: "/",
                 name: "home",
-                component: HomeView,
+                component: GenerateImageView,
                 meta: {
                     title: "RPG Art Generator",
                     description:
-                        "Create unique RPG avatars and high-fantasy artwork with our AI generator. Design custom visuals and bring your imagination to life in your RPG universe.",
+                        "Create unique RPG characters and high-fantasy artwork with our AI" +
+                        " generator. Design custom visuals and bring your imagination to life in your RPG universe.",
                     ogImage: "https://rpgartgenerator.com/assets/rogue-24-female.png",
                 },
             },
