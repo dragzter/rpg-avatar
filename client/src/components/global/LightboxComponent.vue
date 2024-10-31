@@ -92,6 +92,7 @@ import { nextTick, type PropType, ref } from "vue";
 import axios from "axios";
 import { useUserStore } from "@/stores/user";
 import type { UserImage } from "@/stores/types"; // Ez-lightbox
+import { v4 as uuid } from "uuid";
 
 // Ez-lightbox
 const sharedImgUrl = ref("");
@@ -160,7 +161,7 @@ const downloadImage = async (url) => {
         // Create a link element for download
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = `rpgavatar.com-image.jpeg`; // Set the desired file name
+        link.download = `rpgavatar.${uuid()}.jpeg`; // Set the desired file name
 
         // Trigger the download
         document.body.appendChild(link);

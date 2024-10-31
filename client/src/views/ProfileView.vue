@@ -20,7 +20,7 @@
                                 Profile
                             </button>
                             <button
-                                class="nav-link ms-1"
+                                class="nav-link ms-1 d-flex align-items-center flex-column flex-md-row"
                                 id="nav-library-tab"
                                 data-bs-toggle="tab"
                                 data-bs-target="#nav-media-library"
@@ -29,14 +29,14 @@
                                 aria-controls="nav-profile"
                                 aria-selected="false"
                             >
-                                Images
-                                <small class="image-cap-indicator d-none d-md-inline-block"
-                                    >{{ rpgUser.image_count || 0 }}/{{ rpgUser.image_storage_cap }}</small
+                                <span>Images</span>
+                                <small class="image-cap-indicator ms-1"
+                                    >{{ totalImages }}/{{ rpgUser.image_storage_cap }}</small
                                 >
                             </button>
 
                             <button
-                                class="nav-link ms-1"
+                                class="nav-link ms-1 d-flex align-items-center flex-column flex-md-row"
                                 id="nav-prompt-history-tab"
                                 data-bs-toggle="tab"
                                 data-bs-target="#nav-prompt-history"
@@ -45,24 +45,13 @@
                                 aria-controls="nav-prompt-history"
                                 aria-selected="false"
                             >
-                                Prompt History
-                                <small class="image-cap-indicator d-none d-md-inline-block">{{
-                                    userStore.quickHistory?.length || 0
-                                }}</small>
+                                <span>Prompt History</span>
+                                <small class="image-cap-indicator ms-1"
+                                    >{{ userStore.visiblePrompts }}/{{
+                                        userStore.quickHistory?.length || 0
+                                    }}</small
+                                >
                             </button>
-
-                            <!--                            <button-->
-                            <!--                                class="nav-link ms-1"-->
-                            <!--                                id="nav-passes-tab"-->
-                            <!--                                data-bs-toggle="tab"-->
-                            <!--                                data-bs-target="#nav-passes"-->
-                            <!--                                type="button"-->
-                            <!--                                role="tab"-->
-                            <!--                                aria-controls="nav-passes"-->
-                            <!--                                aria-selected="false"-->
-                            <!--                            >-->
-                            <!--                                Content Passes-->
-                            <!--                            </button>-->
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
@@ -78,12 +67,28 @@
 
                         <!-- TAB - media lib -->
                         <div
-                            class="tab-pane"
+                            class="tab-pane position-relative"
                             id="nav-media-library"
                             role="tabpanel"
                             aria-labelledby="nav-media-lib-tab"
                         >
+                            <p class="text-end text-sm-center p-3 pb-1 mb-2">
+                                {{ startImage }} - {{ endImage }} out of {{ totalImages }}
+                            </p>
+                            <MediaPagination
+                                :change-page="changePage"
+                                :current-page="currentPage"
+                                :total-pages="totalPages"
+                            />
                             <MediaLibraryProfile />
+                            <p class="text-center mt-3">
+                                Showing {{ startImage }} - {{ endImage }} out of {{ totalImages }}
+                            </p>
+                            <MediaPagination
+                                :change-page="changePage"
+                                :current-page="currentPage"
+                                :total-pages="totalPages"
+                            />
                         </div>
 
                         <!-- TAB - prompt history -->
@@ -93,10 +98,12 @@
                             role="tabpanel"
                             aria-labelledby="nav-prompt-history"
                         >
-                            <div class="p-3">
+                            <div class="p-3 prompt-history-tab">
                                 <div class="container">
                                     <div class="row py-2">
-                                        <div class="col px-0 d-flex align-items-center">
+                                        <div
+                                            class="col px-0 d-flex align-items-center justify-content-between"
+                                        >
                                             <button
                                                 :disabled="startSelect"
                                                 @click="startSelect = true"
@@ -105,6 +112,12 @@
                                                 <i class="fa-light fa-grid-2-plus"></i>
                                                 Select
                                             </button>
+
+                                            <p class="text-muted m-0 prompt-count-indicator">
+                                                <strong>{{ userStore.visiblePrompts }}</strong> of
+                                                <strong>{{ userStore.quickHistory.length }}</strong>
+                                                prompts
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -113,6 +126,7 @@
                                 <div id="prompt-history" class="prompt-grid">
                                     <template v-for="item in userStore.quickHistory">
                                         <div
+                                            v-if="item.urls?.length"
                                             class="card prompt-item"
                                             :class="{
                                                 'prompt-selected': promptSelection.includes(item.prompt_id),
@@ -177,7 +191,7 @@
                                                         </p>
                                                         <p class="card-text">
                                                             <small class="text-muted">{{
-                                                                niceDate(item.created || ("" as string))
+                                                                nicerDate(item.created || ("" as string))
                                                             }}</small>
                                                         </p>
                                                     </div>
@@ -185,57 +199,6 @@
                                             </div>
                                         </div>
                                     </template>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- TAB - content passes -->
-                        <div
-                            class="tab-pane"
-                            id="nav-passes"
-                            role="tabpanel"
-                            aria-labelledby="nav-profile-passes"
-                        >
-                            <div class="p-3 passes-section">
-                                <div class="card">
-                                    <div class="card-header bg-info text-dark">Content Passes</div>
-                                    <div class="card-body">
-                                        <div
-                                            v-if="!rpgUser.nsfw_pass"
-                                            class="alert alert-warning alert-dismissible fade show"
-                                            role="alert"
-                                        >
-                                            <strong>Content Limited!</strong>
-                                            You currently do not have an NSFW content pass.
-                                            <button class="btn btn-link p-0 m-0 align-baseline" type="button">
-                                                Upgrade
-                                            </button>
-                                            <button
-                                                aria-label="Close"
-                                                class="btn-close"
-                                                data-bs-dismiss="alert"
-                                                type="button"
-                                            ></button>
-                                        </div>
-
-                                        <div class="d-flex mb-3 align-items-center nsfw-pass-entry">
-                                            <h5 class="mb-0">NSFW:</h5>
-                                            <div
-                                                v-if="!rpgUser.nsfw_pass"
-                                                class="ms-2 badge fs-6 text-bg-secondary"
-                                            >
-                                                Unavailable
-                                            </div>
-                                            <div v-else class="ms-2 badge fs-6 text-bg-success">
-                                                Purchased
-                                            </div>
-                                        </div>
-
-                                        <div class="d-flex mb-3 align-items-center nsfw-pass-entry">
-                                            <h5 class="mb-0">FaceCrunch:</h5>
-                                            <div class="ms-2 badge fs-6 text-bg-secondary">Unavailable</div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -413,7 +376,7 @@
 import { useUserStore } from "@/stores/user";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
-import { isMoreThan24Hours, niceDate } from "@/utils/date-utils";
+import { isMoreThan24Hours, nicerDate } from "@/utils/date-utils";
 import { API, STORAGE_KEYS } from "@/utils";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { storage } from "@/utils/storage";
@@ -424,6 +387,7 @@ import LoadSpinner from "@/components/global/LoadSpinner.vue";
 import UserDetails from "@/components/page-sections/UserDetails.vue";
 import MediaLibraryProfile from "@/components/page-sections/MediaLibraryProfile.vue";
 import axios from "axios";
+import MediaPagination from "@/components/page-sections/MediaPagination.vue";
 
 const { user } = useAuth0();
 
@@ -440,6 +404,8 @@ const lightboxThumbnailIndex = ref(0);
 const modalInstance = ref<Modal | null>(null);
 const startSelect = ref(false);
 const promptSelection = ref<string[]>([]);
+const currentPage = ref(1);
+const itemsPerPage = ref(50);
 
 /**
  * =*'^'*= COMPUTED =*'^'*=
@@ -449,7 +415,13 @@ const userError = computed(() => userStore.userError);
 const loading = computed(() => userStore.userLoading);
 const toastMessage = computed(() => userStore.toastMessage);
 const selectedPrompt = computed(() => userStore.selectedPrompt);
+const totalImages = computed(() => rpgUser.value.image_count);
 const lightboxThumbnails = computed(() => userStore.selectedPrompt.imgURLS);
+const totalPages = computed(() => {
+    return Math.ceil(userStore.totalPages);
+});
+const startImage = computed(() => (currentPage.value - 1) * itemsPerPage.value + 1);
+const endImage = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalImages.value));
 
 /**
  * =*'^'*= WATCHERS =*'^'*=
@@ -469,7 +441,7 @@ watch(
     () => rpgUser.value.id,
     async (newId) => {
         console.log(rpgUser.value);
-        await fetchOrLoadExisting(newId);
+        await fetchOrLoadExistingImages(newId, { page: currentPage.value, limit: itemsPerPage.value }, true);
         await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
 );
@@ -477,6 +449,15 @@ watch(
 /**
  * =*'^'*= METHODS =*'^'*=
  */
+
+// Function to change page and load new data
+const changePage = async (page: number) => {
+    if (page > 0 && page <= totalPages.value) {
+        currentPage.value = page;
+        await fetchOrLoadExistingImages(rpgUser.value.id, { page, limit: itemsPerPage.value });
+    }
+};
+
 const announce = (msg) => {
     userStore.toastMessage = msg;
 
@@ -630,22 +611,36 @@ const handleChangeIndex = (_, newIndex) => {
     lightboxThumbnailIndex.value = newIndex;
 };
 
-const fetchOrLoadExisting = async (userId: string) => {
+const fetchOrLoadExistingImages = async (
+    userId: string,
+    p = { page: currentPage.value, limit: itemsPerPage.value },
+    force: false
+) => {
+    await userStore.deleteEmptyPrompts(rpgUser.value.id);
     const stored_images = storage.g(STORAGE_KEYS.images);
     const stored_thumbnails = storage.g(STORAGE_KEYS.thumbnails);
     const have_new_images = storage.g(STORAGE_KEYS.new_images);
+    const stored_page = parseInt(storage.g(STORAGE_KEYS.page));
 
-    if (!stored_images || !stored_thumbnails || have_new_images === true) {
-        await userStore.fetchImages(userId);
-        await userStore.getUser(user.value as User);
+    if (!stored_images || !stored_thumbnails || have_new_images === true || stored_page !== p.page || force) {
+        await userStore.fetchImagesPaginated(userId, p);
+        await Promise.all([
+            userStore.getUser(user.value as User),
+            userStore.fetchQuickPromptsHistory(userId),
+        ]);
         return;
     }
 
     const lastRequested = storage.g(STORAGE_KEYS.images_requested_on);
 
     if (isMoreThan24Hours(lastRequested)) {
-        await userStore.fetchImages(userId);
-        await userStore.getUser(user.value as User);
+        await userStore.fetchImagesPaginated(userId, p);
+        await Promise.all([
+            userStore.getUser(user.value as User),
+            userStore.fetchQuickPromptsHistory(userId),
+        ]);
+
+        await userStore.deleteEmptyPrompts();
     } else {
         userStore.imageThumbnails = storage.g(STORAGE_KEYS.thumbnails).thumbnails;
         userStore.images = storage.g(STORAGE_KEYS.images).images;
@@ -657,7 +652,11 @@ const fetchOrLoadExisting = async (userId: string) => {
  */
 onMounted(async () => {
     if (rpgUser.value.id) {
-        await fetchOrLoadExisting(rpgUser.value.id);
+        await fetchOrLoadExistingImages(
+            rpgUser.value.id,
+            { page: currentPage.value, limit: itemsPerPage.value },
+            true
+        );
         await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
 

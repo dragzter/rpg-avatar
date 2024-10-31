@@ -2,8 +2,14 @@
     <div class="p-3">
         <div id="user-media-library" class="image-grid">
             <template v-for="image in userStore.imageThumbnails">
-                <div class="overflow-hidden">
-                    <img @click="openLightbox(image.key)" :src="image.url" :alt="image.key" />
+                <div class="overflow-hidden" style="background: #142434">
+                    <img
+                        :alt="image.key"
+                        :class="{ 'images-loading': loading }"
+                        :src="image.url"
+                        class="media-gallery-image"
+                        @click="openLightbox(image.key)"
+                    />
                 </div>
             </template>
         </div>
@@ -37,6 +43,7 @@ const showToast = ref(false);
  */
 const lightboxImages = computed(() => userStore.images.map((img) => img.url));
 const rpgUser = computed(() => userStore.user);
+const loading = computed(() => userStore.imagesLoading);
 
 /**
  * =*'^'*= METHODS =*'^'*=

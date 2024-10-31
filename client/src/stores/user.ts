@@ -21,12 +21,16 @@ export const useUserStore = defineStore("user", {
         auth0User: {} as User,
         toastMessage: "",
         userError: false,
+        currentPage: 1,
+        totalPages: 1,
+        imagesLoading: false,
         imageThumbnails: [] as UserImage[],
         images: [] as UserImage[],
         promptsHistory: [] as PromptHistoryItem[], // Is this useful?
         quickHistory: [] as QuickPromptHistory[],
         userPromptsLoading: false,
         selectedPrompt: {} as PromptHistoryItem,
+        visiblePrompts: 0,
     }),
     actions: {
         async redeemCodeV2(
@@ -127,49 +131,79 @@ export const useUserStore = defineStore("user", {
                     this.selectedPrompt = {} as PromptHistoryItem;
                     // remove prompt from quick history
                     this.quickHistory = this.quickHistory.filter((item) => item.prompt_id !== prompt_id);
+
+                    this.visiblePrompts = this.quickHistory.filter((item) => item.urls.length > 0).length;
                 }
             } catch (error) {
                 console.log(error);
             }
         },
 
-        async deleteImage({ file_key, user_id }) {
+        async deleteEmptyPrompts(user_id) {
             try {
-                this.userLoading = true;
-                const response = await axios.post(API.delete_image, {
-                    file_key,
-                    user_id,
-                });
+                const response = await axios.delete(`${API.delete_empty_prompts}/${user_id}`);
 
-                this.images = this.images.filter((image) => image.key !== file_key);
+                if (response?.data?.success && response.data.deleted_prompts) {
+                    this.toastMessage = response.data.message;
+                    this.selectedPrompt = {} as PromptHistoryItem;
 
-                let thumbnailKey = file_key.replace("/", "/thumbnails/");
-                thumbnailKey = thumbnailKey.replace(".image.", ".thumbnail.");
-
-                this.imageThumbnails = this.imageThumbnails.filter((image) => image.key !== thumbnailKey);
-
-                storage.s(STORAGE_KEYS.thumbnails, {
-                    thumbnails: this.imageThumbnails,
-                });
-                storage.s(STORAGE_KEYS.images, {
-                    images: this.images,
-                });
-
-                if (response.data?.success === true) {
-                    this.user.image_count = response.data.image_count;
+                    this.quickHistory = this.quickHistory.filter(
+                        (item) => !response.data?.deleted_prompts.includes(item.prompt_id)
+                    );
                 }
-
-                this.toastMessage = response.data.message;
             } catch (error) {
                 console.log(error);
+            }
+        },
+
+        async fetchImagesPaginated(user_id: string, p = { page: 1, limit: 50 }) {
+            try {
+                this.images = [];
+                this.imageThumbnails = Array.from({ length: p.limit }, () => ({
+                    key: "placeholder", // Or a unique identifier if needed
+                    url: "https://placehold.co/200x200/142434/FFF?text=...", // Empty URL or
+                    // placeholder image
+                }));
+                this.userLoading = true;
+                this.imagesLoading = true;
+
+                const response: AxiosResponse<UserImageResponse> = await axios.get(
+                    `${API.get_images_paginated}/${user_id}?page=${p.page}&limit=${p.limit}`
+                );
+
+                this.imageThumbnails = response.data?.thumbnails as UserImage[];
+                this.images = response.data?.images as UserImage[];
+
+                // Store pagination metadata
+                this.totalPages = response.data?.total_pages || 1;
+                this.currentPage = p.page;
+                this.limit = p.limit;
+
+                if (this.imageThumbnails?.length || this.images?.length) {
+                    // Store images and timestamps in local storage if needed
+                    storage.s(STORAGE_KEYS.page, this.currentPage || 1);
+                    storage.s(STORAGE_KEYS.thumbnails, { thumbnails: this.imageThumbnails });
+                    storage.s(STORAGE_KEYS.images, { images: this.images });
+                    storage.s(
+                        STORAGE_KEYS.images_requested_on,
+                        response.data?.requested_on || new Date().toISOString()
+                    );
+                }
+
+                storage.rm(STORAGE_KEYS.new_images);
+            } catch (error) {
+                console.log("Error fetching images:", error);
             } finally {
                 this.userLoading = false;
+                this.imagesLoading = false;
             }
         },
 
         async fetchImages(user_id: string) {
             try {
+                this.images = [];
                 this.userLoading = true;
+                this.imagesLoading = true;
                 const response: AxiosResponse<UserImageResponse> = await axios.get(
                     API.get_images + `/${user_id}`
                 );
@@ -195,6 +229,9 @@ export const useUserStore = defineStore("user", {
                 storage.rm(STORAGE_KEYS.new_images);
             } catch (error) {
                 console.log(error);
+            } finally {
+                this.userLoading = false;
+                this.imagesLoading = false;
             }
         },
 
@@ -237,13 +274,6 @@ export const useUserStore = defineStore("user", {
             }
         },
 
-        async fetchGalleryImages() {
-            try {
-            } catch (error) {
-                console.log(error);
-            }
-        },
-
         async fetchQuickPromptsHistory(userId: string) {
             try {
                 this.userPromptsLoading = true;
@@ -266,6 +296,9 @@ export const useUserStore = defineStore("user", {
                         prompt.urls = urls;
                     }
                 }
+
+                // Count how many items in response.data have the property urls.length > 0
+                this.visiblePrompts = response.data.filter((item) => item.urls.length > 0).length;
 
                 this.quickHistory = response.data;
             } catch (error) {
@@ -299,6 +332,40 @@ export const useUserStore = defineStore("user", {
                 this.toastMessage = response.data.message;
             } catch (error) {
                 console.log(error);
+            }
+        },
+
+        async deleteImage({ file_key, user_id }) {
+            try {
+                this.userLoading = true;
+                const response = await axios.post(API.delete_image, {
+                    file_key,
+                    user_id,
+                });
+
+                this.images = this.images.filter((image) => image.key !== file_key);
+
+                let thumbnailKey = file_key.replace("/", "/thumbnails/");
+                thumbnailKey = thumbnailKey.replace(".image.", ".thumbnail.");
+
+                this.imageThumbnails = this.imageThumbnails.filter((image) => image.key !== thumbnailKey);
+
+                storage.s(STORAGE_KEYS.thumbnails, {
+                    thumbnails: this.imageThumbnails,
+                });
+                storage.s(STORAGE_KEYS.images, {
+                    images: this.images,
+                });
+
+                if (response.data?.success === true) {
+                    this.user.image_count = response.data.image_count;
+                }
+
+                this.toastMessage = response.data.message;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userLoading = false;
             }
         },
 

@@ -46,7 +46,7 @@
                 <h4 class="mb-0">
                     Each user receives
                     <strong class="accent-text">free storage</strong> for up to
-                    <strong class="accent-text">300</strong> of your generated images.
+                    <strong class="accent-text">400</strong> of your generated images.
                 </h4>
             </div>
 

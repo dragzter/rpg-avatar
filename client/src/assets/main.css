@@ -221,6 +221,13 @@ input::placeholder {
     -webkit-text-fill-color: transparent;
 }
 
+.disabled .accent-text {
+    background: #ccc;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
 .title,
 .title-2 {
     font-size: 96px;
@@ -2497,13 +2504,6 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     }
 }
 
-#user-media-library {
-    padding: 12px;
-
-    @media (max-width: 768px) {
-        padding: 5px;
-    }
-}
 
 .prompt-grid {
     display: grid;
@@ -2555,6 +2555,7 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
 .image-grid img {
     width: 100%;
     max-width: 200px;
+    height: 100%;
     object-fit: cover;
     cursor: pointer;
     border-radius: 6px;
@@ -2568,6 +2569,7 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
 .image-grid > div {
     transition: 0.2s ease-in-out;
     border-radius: 6px;
+    aspect-ratio: 1 / 1
 }
 
 .image-grid > div:hover,
@@ -2577,6 +2579,17 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     img {
         transform: scale(1.05);
     }
+}
+
+#media-library-capacity-text {
+    position:absolute;
+    top: 15px;
+    left: 15px;
+    background: #bcbcbc;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: #000;
+    font-size: 14px;
 }
 
 .image-cap-indicator {
@@ -2632,4 +2645,48 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     font-size: 14px;
     color: #fff;
     background-image: linear-gradient(90deg, #000, var(--dark-600), transparent, transparent);
+}
+
+.rpg-pagination {
+    li:not(.disabled) button {
+        background: none;
+        color: #fff !important;
+        
+        &:hover {
+            color: #d9d9e8 !important;
+        }
+    }
+    
+    button {
+        font-size: 22px;
+        border-radius: 8px;
+        border: none;
+        
+        @media (max-width: 768px) {
+            font-size: 18px;
+        }
+    }
+    
+    button.dropdown-toggle {
+        background: var(--dark-400);
+        margin: 0 9px !important;
+        outline: 2px solid var(--lavender);
+        min-width: 110px;
+    }
+}
+
+.prompt-count-indicator {
+    background: var(--dark-600);
+    padding: 4px 12px;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 14px;
+}
+
+.media-gallery-image {
+    transition: all 0.1s;
+    
+    &.images-loading {
+        opacity: 0
+    }
 }

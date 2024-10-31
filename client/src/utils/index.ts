@@ -31,10 +31,13 @@ export const API = {
     publish_image: import.meta.env.VITE_APP_API_URL + "/api/image/publish",
     unpublish_image: import.meta.env.VITE_APP_API_URL + "/api/image/unpublish",
     cancel_flux_image: import.meta.env.VITE_APP_API_URL + "/api/repl/cancel",
+    get_images_paginated: import.meta.env.VITE_APP_API_URL + "/api/images-paginated",
+    delete_empty_prompts: import.meta.env.VITE_APP_API_URL + "/users/delete-empty-prompts",
 };
 
 export const STORAGE_KEYS = {
     thumbnails: "thumbnails",
+    page: "page",
     images: "images",
     user: "user",
     task_id: "task_id",
@@ -65,7 +68,7 @@ export function scrollToOffer(cssId, param, urlParamValue) {
     if (productOffer === urlParamValue) {
         const productPasses = document.getElementById(cssId);
         if (productPasses) {
-            productPasses.scrollIntoView({behavior: "smooth"});
+            productPasses.scrollIntoView({ behavior: "smooth" });
         }
     }
-};
+}
