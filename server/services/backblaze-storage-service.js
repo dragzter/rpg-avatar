@@ -148,8 +148,6 @@ class BackblazeStorageService {
             const image_count =
                 await UserService.getAndUpdateUserImageCount(userId);
 
-            // TODO delete the associated prompt
-
             return {
                 success: true,
                 message: "File deleted successfully",
@@ -177,7 +175,7 @@ class BackblazeStorageService {
 
     // Maybe this is also useful -- Not being used as of 9/20/2021
     // Decided that getting thumbnails and images is better done together
-    // Since the max is 300 images and this is pretty fast already.
+    // Since the max is 400 images and this is pretty fast already.
     async fetchImageThumbnails(user_id) {
         try {
             const params = {
@@ -211,68 +209,62 @@ class BackblazeStorageService {
         }
     }
 
+    // This is somewhat deprecated as it fetches all images and thumbnails
+    // Use fetchImagesPaginated instead to limit traffic and network loads.
     async fetchImages(user_id) {
-        let image_response = [];
-        let thumbnail_response = [];
+        let allImages = []; // Collect all images across all pages
+        let allThumbnails = []; // Collect all thumbnails across all pages
 
         try {
-            const params = {
-                Bucket: this.bucket_name,
-                Prefix: `${user_id.replace("|", "")}/`,
-            };
-
+            const prefix = `${user_id.replace("|", "")}/`;
             let isTruncated = true;
             let continuationToken = null;
 
+            // Loop to fetch all objects, bypassing the 1000-item limit
             while (isTruncated) {
-                if (continuationToken) {
-                    params.ContinuationToken = continuationToken;
-                }
+                const params = {
+                    Bucket: this.bucket_name,
+                    Prefix: prefix,
+                    ContinuationToken: continuationToken,
+                };
 
-                const image_command = new ListObjectsV2Command(params);
-                const image_contents_response =
-                    await this.s3_client.send(image_command);
+                const command = new ListObjectsV2Command(params);
+                const response = await this.s3_client.send(command);
 
-                const sortedContents = image_contents_response.Contents.sort(
-                    (a, b) =>
-                        new Date(b.LastModified) - new Date(a.LastModified)
-                );
-
-                // Sort the images and thumbnails into their own arrays
-                sortedContents.forEach((obj) => {
+                // Collect all items in allImages and allThumbnails
+                response.Contents.forEach((obj) => {
                     if (obj.Key.includes("thumbnails/")) {
-                        thumbnail_response.push(obj.Key);
+                        allThumbnails.push(obj);
                     } else {
-                        image_response.push(obj.Key);
+                        allImages.push(obj);
                     }
                 });
 
-                isTruncated = image_contents_response.IsTruncated;
-                continuationToken =
-                    image_contents_response.NextContinuationToken;
+                isTruncated = response.IsTruncated;
+                continuationToken = response.NextContinuationToken;
             }
-        } catch (error) {
-            console.log(error);
-        }
 
-        // Get the presigned URLs for the images and thumbnails
-        try {
+            // Sort all images and thumbnails by LastModified date in descending order
+            const sortedImages = allImages.sort(
+                (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
+            );
+            const sortedThumbnails = allThumbnails.sort(
+                (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
+            );
+
+            // Get presigned URLs for the sorted images and thumbnails
             const [thumbnails, images] = await Promise.all([
                 await Promise.all(
-                    thumbnail_response.map(async (key) => {
-                        return {
-                            key,
-                            url: await this.getPresignedUrl(key),
-                        };
-                    })
+                    sortedThumbnails.map(async (item) => ({
+                        key: item.Key,
+                        url: await this.getPresignedUrl(item.Key),
+                    }))
                 ),
                 await Promise.all(
-                    image_response.map(async (key) => {
-                        return {
-                            key,
-                            url: await this.getPresignedUrl(key),
-                        };
-                    })
+                    sortedImages.map(async (item) => ({
+                        key: item.Key,
+                        url: await this.getPresignedUrl(item.Key),
+                    }))
                 ),
             ]);
 
@@ -283,9 +275,104 @@ class BackblazeStorageService {
                 images,
             };
         } catch (error) {
-            console.log(error);
+            console.error("Error fetching and sorting images:", error);
             return {
                 success: false,
+                message: "Error fetching and sorting images",
+                error,
+            };
+        }
+    }
+
+    // Added on 10/30/2024 - This is the new way to fetch images with pagination
+    async fetchImagesPaginated(user_id, { page = 1, limit = 50 }) {
+        let allImages = [];
+        let allThumbnails = [];
+
+        try {
+            const prefix = `${user_id.replace("|", "")}/`;
+            let isTruncated = true;
+            let continuationToken = null;
+
+            // Fetch all objects in the bucket for the given user
+            while (isTruncated) {
+                const params = {
+                    Bucket: this.bucket_name,
+                    Prefix: prefix,
+                    ContinuationToken: continuationToken,
+                };
+
+                const command = new ListObjectsV2Command(params);
+                const response = await this.s3_client.send(command);
+
+                response.Contents.forEach((obj) => {
+                    if (obj.Key.includes("thumbnails/")) {
+                        allThumbnails.push(obj);
+                    } else {
+                        allImages.push(obj);
+                    }
+                });
+
+                isTruncated = response.IsTruncated;
+                continuationToken = response.NextContinuationToken;
+            }
+
+            // Sort images and thumbnails by LastModified date
+            const sortedImages = allImages.sort(
+                (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
+            );
+            const sortedThumbnails = allThumbnails.sort(
+                (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
+            );
+
+            // Calculate total pages based on the number of images and limit
+            const totalImages = sortedImages.length;
+            const totalPages = Math.ceil(totalImages / limit);
+
+            // Implement pagination by slicing sorted arrays based on page and limit
+            const startIndex = (page - 1) * limit;
+            const endIndex = startIndex + limit;
+
+            const pagedImages = sortedImages.slice(startIndex, endIndex);
+            const pagedThumbnails = sortedThumbnails.slice(
+                startIndex,
+                endIndex
+            );
+
+            // Retrieve presigned URLs for the paginated results
+            const [thumbnails, images] = await Promise.all([
+                Promise.all(
+                    pagedThumbnails.map(async (item) => ({
+                        key: item.Key,
+                        url: await this.getPresignedUrl(item.Key),
+                    }))
+                ),
+                Promise.all(
+                    pagedImages.map(async (item) => ({
+                        key: item.Key,
+                        url: await this.getPresignedUrl(item.Key),
+                    }))
+                ),
+            ]);
+
+            return {
+                success: true,
+                requested_on: new Date().toISOString(),
+                page,
+                limit,
+                total_images: totalImages,
+                total_pages: totalPages,
+                thumbnails,
+                images,
+            };
+        } catch (error) {
+            console.error(
+                "Error fetching and sorting images with pagination:",
+                error
+            );
+            return {
+                success: false,
+                message: "Error fetching and sorting images with pagination",
                 error,
             };
         }

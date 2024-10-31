@@ -185,6 +185,8 @@ export type UserImageResponse = {
     images?: UserImage[];
     thumbnails?: UserImage[];
     requested_on?: string;
+    total_images?: number;
+    total_pages?: number;
     success: boolean;
 };
 

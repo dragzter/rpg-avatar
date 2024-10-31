@@ -375,7 +375,7 @@ export const UserSchema = new Schema(
         image_storage_cap: {
             type: Number,
             required: false,
-            default: 300,
+            default: 400,
         },
         token_balance: {
             type: Number,

@@ -23,6 +23,7 @@ export const useUserStore = defineStore("user", {
         userError: false,
         currentPage: 1,
         totalPages: 1,
+        limit: 50,
         imagesLoading: false,
         imageThumbnails: [] as UserImage[],
         images: [] as UserImage[],
@@ -132,7 +133,8 @@ export const useUserStore = defineStore("user", {
                     // remove prompt from quick history
                     this.quickHistory = this.quickHistory.filter((item) => item.prompt_id !== prompt_id);
 
-                    this.visiblePrompts = this.quickHistory.filter((item) => item.urls.length > 0).length;
+                    this.visiblePrompts =
+                        this.quickHistory.filter((item) => (item?.urls ?? []).length > 0).length || 0;
                 }
             } catch (error) {
                 console.log(error);
@@ -163,7 +165,7 @@ export const useUserStore = defineStore("user", {
                     key: "placeholder", // Or a unique identifier if needed
                     url: "https://placehold.co/200x200/142434/FFF?text=...", // Empty URL or
                     // placeholder image
-                }));
+                })) as UserImage[];
                 this.userLoading = true;
                 this.imagesLoading = true;
 

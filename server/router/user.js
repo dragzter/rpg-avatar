@@ -198,7 +198,7 @@ router.post("/api/user/:userId", async (req, res) => {
                 email_verified: providedUser.email_verified,
                 admin: false,
                 image_count: 0,
-                image_storage_cap: 300,
+                image_storage_cap: 400,
             };
 
             if (providedUser.sub.includes("facebook")) {
@@ -336,6 +336,31 @@ router.post("/api/image/unpublish", async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(500).json(error);
+    }
+});
+
+router.delete("/users/delete-empty-prompts/:userId", async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const result = await UserService.deleteEmptyPrompts(userId);
+
+        if (result.success) {
+            res.status(200).json(result);
+        } else {
+            res.status(500).json({
+                message: result.message,
+                error: result.error,
+            });
+        }
+    } catch (error) {
+        console.error("Error deleting empty prompts:", error);
+        res.status(500).json({
+            message:
+                "An error occurred while deleting empty prompts. This is likely a network" +
+                " error.",
+            error,
+        });
     }
 });
 

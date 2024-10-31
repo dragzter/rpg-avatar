@@ -421,7 +421,7 @@ const totalPages = computed(() => {
     return Math.ceil(userStore.totalPages);
 });
 const startImage = computed(() => (currentPage.value - 1) * itemsPerPage.value + 1);
-const endImage = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalImages.value));
+const endImage = computed(() => Math.min(currentPage.value * itemsPerPage.value, totalImages.value || 0));
 
 /**
  * =*'^'*= WATCHERS =*'^'*=
@@ -614,7 +614,7 @@ const handleChangeIndex = (_, newIndex) => {
 const fetchOrLoadExistingImages = async (
     userId: string,
     p = { page: currentPage.value, limit: itemsPerPage.value },
-    force: false
+    force: boolean = false
 ) => {
     await userStore.deleteEmptyPrompts(rpgUser.value.id);
     const stored_images = storage.g(STORAGE_KEYS.images);
@@ -640,7 +640,7 @@ const fetchOrLoadExistingImages = async (
             userStore.fetchQuickPromptsHistory(userId),
         ]);
 
-        await userStore.deleteEmptyPrompts();
+        await userStore.deleteEmptyPrompts(userId);
     } else {
         userStore.imageThumbnails = storage.g(STORAGE_KEYS.thumbnails).thumbnails;
         userStore.images = storage.g(STORAGE_KEYS.images).images;

@@ -5,7 +5,6 @@ import taskManager, { ApiTaskStatus } from "../utils/task-manager.js";
 import { promptConstructor } from "../utils/prompt-constructor.js";
 import BackblazeStorageService from "../services/backblaze-storage-service.js";
 import axios from "axios";
-import { GalleryImageModel } from "../db/model.js";
 import UserService from "../services/user-service.js";
 
 const router = express.Router();
@@ -73,6 +72,40 @@ router.get("/api/images/:user_id", async (req, res) => {
     }
 });
 
+router.get("/api/images-paginated/:user_id", async (req, res) => {
+    try {
+        const user_id = req.params.user_id;
+
+        // Parse and validate pagination parameters with defaults
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 50;
+
+        if (page <= 0 || limit <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Page and limit must be positive integers",
+            });
+        }
+
+        // Fetch paginated images
+        const response = await BackblazeStorageService.fetchImagesPaginated(
+            user_id,
+            {
+                page,
+                limit,
+            }
+        );
+        return res.status(200).json(response);
+    } catch (error) {
+        console.error("Error fetching paginated images:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error fetching paginated images",
+            error: error.message,
+        });
+    }
+});
+
 // "Surprise Me"
 router.post("/api/surprise-prompt", async (req, res) => {
     try {
@@ -122,42 +155,30 @@ router.get("/download-image", async (req, res) => {
 
 // DELETE endpoint for deleting an image and its thumbnail
 router.post("/api/image/delete", async (req, res) => {
-    const { file_key, user_id } = req.body; // Extract the file name from the request
+    const { file_key, user_id } = req.body;
 
-    // Remove published image from the gallery
     try {
-        const publish_key = file_key.split("/")[1];
-        const published_image = await GalleryImageModel.findOne({
-            file_key: publish_key,
-        }).exec();
+        // First, remove all references to the image within the prompt document
+        const response = await UserService.removeImage({ file_key, user_id });
 
-        if (published_image) {
-            const prompt_id = published_image.prompt_id;
-            await UserService.removePublishedImage({
-                file_key: publish_key,
-                prompt_id,
+        if (!response.success) {
+            return res.status(404).json({
+                message: response.message,
+                success: false,
             });
         }
-    } catch (error) {
-        return res.status(500).json({
-            message:
-                "Internal server error while deleting the full-size image or thumbnail",
-            success: false,
-            error: error.message,
-        });
-    }
 
-    try {
-        const response = await BackblazeStorageService.deleteImageAndThumbnail(
-            file_key,
-            user_id
-        );
+        // Then, delete the actual file and thumbnail from Backblaze
+        const storageResponse =
+            await BackblazeStorageService.deleteImageAndThumbnail(
+                file_key,
+                user_id
+            );
 
-        res.status(200).json(response);
+        res.status(200).json(storageResponse);
     } catch (error) {
         res.status(500).json({
-            message:
-                "Internal server error while deleting the full-size image or thumbnail",
+            message: "Internal server error while deleting image",
             success: false,
             error: error.message,
         });

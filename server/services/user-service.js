@@ -90,6 +90,7 @@ class UserService {
                         prompt_id: p.prompt_id,
                         created: p.created,
                         thumbnails: p.thumbnails,
+                        file_names: p.file_names,
                         published_images: p.published_images,
                     };
 
@@ -125,6 +126,7 @@ class UserService {
                 _p.model = model;
             }
 
+            console.log(_p);
             return _p;
         } catch (err) {
             console.log(err);
@@ -185,40 +187,62 @@ class UserService {
         }
     }
 
-    async removePublishedImage({ file_key, prompt_id }) {
+    async removeImage({ file_key, user_id }) {
         try {
-            const image = await GalleryImageModel.findOne({
-                file_key,
+            // Extract the unique identifier, ignoring extensions and suffixes
+            const fileIdentifier = file_key.match(
+                /([a-zA-Z0-9]+)(?=\.(image|thumbnail))/
+            )?.[0];
+            if (!fileIdentifier) {
+                throw new Error("Invalid file key format");
+            }
+
+            // Find the prompt document that contains the identifier in any of the arrays
+            const prompt = await PromptModel.findOne({
+                user_id,
+                $or: [
+                    { file_names: { $regex: fileIdentifier } },
+                    { thumbnails: { $regex: fileIdentifier } },
+                    { published_images: { $regex: fileIdentifier } },
+                ],
             }).exec();
 
-            if (!image) {
+            if (!prompt) {
                 return {
                     success: false,
-                    message: "Image not found",
+                    message: "Prompt not found with specified file identifier",
                 };
             }
-            console.log("Unpublishing image", file_key);
 
-            const prompt = await this.getPromptById(prompt_id);
-            prompt.published_images = prompt.published_images.filter(
-                (image) => image !== file_key
+            // Remove entries containing the identifier from file_names, thumbnails, and published_images
+            prompt.file_names = prompt.file_names.filter(
+                (name) => !name.includes(fileIdentifier)
             );
+            prompt.thumbnails = prompt.thumbnails.filter(
+                (thumbnail) => !thumbnail.includes(fileIdentifier)
+            );
+            prompt.published_images = prompt.published_images.filter(
+                (image) => !image.includes(fileIdentifier)
+            );
+
+            // Save the updated prompt
             await prompt.save();
 
+            // Delete the image from the GalleryImageModel
             await GalleryImageModel.deleteOne({
-                file_key,
+                file_key: { $regex: fileIdentifier },
             }).exec();
 
             return {
                 success: true,
-                message: "Published image removed",
+                message: "Image removed from prompt and gallery",
             };
         } catch (error) {
-            console.log(error);
+            console.log("Error removing image:", error);
             return {
                 success: false,
-                message: "Failed to remove published image",
-                error,
+                message: "Failed to remove image from prompt and gallery",
+                error: error.message,
             };
         }
     }
@@ -305,6 +329,40 @@ class UserService {
             }).exec();
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async deleteEmptyPrompts(user_id) {
+        try {
+            // Find prompts that match the criteria to be deleted
+            const promptsToDelete = await PromptModel.find({
+                user_id,
+                file_names: { $size: 0 },
+            }).exec();
+
+            // Extract prompt IDs to return after deletion
+            const deleted_prompts = promptsToDelete.map(
+                (prompt) => prompt.prompt_id
+            );
+
+            // Delete the prompts
+            const response = await PromptModel.deleteMany({
+                user_id,
+                file_names: { $size: 0 },
+            }).exec();
+
+            return {
+                message: "Empty prompts deleted for user",
+                success: true,
+                response,
+                deleted_prompts,
+            };
+        } catch (error) {
+            return {
+                message: "Empty prompt deletion failed",
+                success: false,
+                error,
+            };
         }
     }
 }
