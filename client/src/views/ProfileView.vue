@@ -72,23 +72,33 @@
                             role="tabpanel"
                             aria-labelledby="nav-media-lib-tab"
                         >
-                            <p class="text-end text-sm-center p-3 pb-1 mb-2">
-                                {{ startImage }} - {{ endImage }} out of {{ totalImages }}
+                            <template v-if="imageCount > 50">
+                                <p class="text-end text-sm-center p-3 pb-1 mb-2">
+                                    {{ startImage }} - {{ endImage }} out of {{ totalImages }}
+                                </p>
+                                <MediaPagination
+                                    :change-page="changePage"
+                                    :current-page="currentPage"
+                                    :total-pages="totalPages"
+                                />
+                            </template>
+
+                            <MediaLibraryProfile v-if="imageCount > 1" />
+                            <p v-else class="text-muted p-4 m-0">
+                                You have no images. You can generate some
+                                <router-link to="/">here</router-link>.
                             </p>
-                            <MediaPagination
-                                :change-page="changePage"
-                                :current-page="currentPage"
-                                :total-pages="totalPages"
-                            />
-                            <MediaLibraryProfile />
-                            <p class="text-center mt-3">
-                                Showing {{ startImage }} - {{ endImage }} out of {{ totalImages }}
-                            </p>
-                            <MediaPagination
-                                :change-page="changePage"
-                                :current-page="currentPage"
-                                :total-pages="totalPages"
-                            />
+
+                            <template v-if="imageCount > 50">
+                                <p class="text-center mt-3">
+                                    Showing {{ startImage }} - {{ endImage }} out of {{ totalImages }}
+                                </p>
+                                <MediaPagination
+                                    :change-page="changePage"
+                                    :current-page="currentPage"
+                                    :total-pages="totalPages"
+                                />
+                            </template>
                         </div>
 
                         <!-- TAB - prompt history -->
@@ -411,6 +421,7 @@ const itemsPerPage = ref(50);
  * =*'^'*= COMPUTED =*'^'*=
  */
 const rpgUser = computed(() => userStore.user);
+const imageCount = computed(() => rpgUser.value?.image_count || 0);
 const userError = computed(() => userStore.userError);
 const loading = computed(() => userStore.userLoading);
 const toastMessage = computed(() => userStore.toastMessage);
@@ -440,9 +451,7 @@ watch(
 watch(
     () => rpgUser.value.id,
     async (newId) => {
-        console.log(rpgUser.value);
         await fetchOrLoadExistingImages(newId, { page: currentPage.value, limit: itemsPerPage.value }, true);
-        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
     }
 );
 
@@ -616,7 +625,6 @@ const fetchOrLoadExistingImages = async (
     p = { page: currentPage.value, limit: itemsPerPage.value },
     force: boolean = false
 ) => {
-    await userStore.deleteEmptyPrompts(rpgUser.value.id);
     const stored_images = storage.g(STORAGE_KEYS.images);
     const stored_thumbnails = storage.g(STORAGE_KEYS.thumbnails);
     const have_new_images = storage.g(STORAGE_KEYS.new_images);
@@ -628,6 +636,7 @@ const fetchOrLoadExistingImages = async (
             userStore.getUser(user.value as User),
             userStore.fetchQuickPromptsHistory(userId),
         ]);
+
         return;
     }
 
@@ -639,8 +648,6 @@ const fetchOrLoadExistingImages = async (
             userStore.getUser(user.value as User),
             userStore.fetchQuickPromptsHistory(userId),
         ]);
-
-        await userStore.deleteEmptyPrompts(userId);
     } else {
         userStore.imageThumbnails = storage.g(STORAGE_KEYS.thumbnails).thumbnails;
         userStore.images = storage.g(STORAGE_KEYS.images).images;
@@ -657,7 +664,7 @@ onMounted(async () => {
             { page: currentPage.value, limit: itemsPerPage.value },
             true
         );
-        await userStore.fetchQuickPromptsHistory(rpgUser.value.id);
+        await userStore.deleteEmptyPrompts(rpgUser.value.id);
     }
 
     const modalElement = document.getElementById("prompt-selected");

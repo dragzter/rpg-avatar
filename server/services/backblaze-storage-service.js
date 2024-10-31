@@ -305,7 +305,7 @@ class BackblazeStorageService {
                 const command = new ListObjectsV2Command(params);
                 const response = await this.s3_client.send(command);
 
-                response.Contents.forEach((obj) => {
+                response.Contents?.forEach((obj) => {
                     if (obj.Key.includes("thumbnails/")) {
                         allThumbnails.push(obj);
                     } else {
@@ -324,6 +324,20 @@ class BackblazeStorageService {
             const sortedThumbnails = allThumbnails.sort(
                 (a, b) => new Date(b.LastModified) - new Date(a.LastModified)
             );
+
+            // Return an empty response if there are no images
+            if (sortedImages.length === 0) {
+                return {
+                    success: true,
+                    requested_on: new Date().toISOString(),
+                    page,
+                    limit,
+                    total_images: 0,
+                    total_pages: 0,
+                    thumbnails: [],
+                    images: [],
+                };
+            }
 
             // Calculate total pages based on the number of images and limit
             const totalImages = sortedImages.length;

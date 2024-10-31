@@ -21,9 +21,7 @@
                         }"
                         class="user-tokens-wrapper d-inline-block mb-0"
                     >
-                        <span style="color: goldenrod"
-                            ><i class="fa-sharp fa-light fa-coins"></i
-                        ></span>
+                        <span style="color: goldenrod"><i class="fa-sharp fa-light fa-coins"></i></span>
                         <span
                             :class="{
                                 'text-danger': rpgUser.token_balance === 0,
@@ -59,7 +57,7 @@
             <dt class="col-sm-3">Images Saved</dt>
             <dd class="col-sm-9">
                 <p class="lead">
-                    {{ rpgUser.image_count || 0 }}
+                    {{ rpgUser?.image_count || 0 }}
                 </p>
             </dd>
 
@@ -82,9 +80,7 @@
         <div class="row" id="redeem-passes-row">
             <div class="col bg-dark-600 rounded-3">
                 <h5 class="text-white p-2 my-2">Redeem Codes</h5>
-                <div
-                    class="position-relative p-2 flex-column flex-md-row d-flex gap-4"
-                >
+                <div class="position-relative p-2 flex-column flex-md-row d-flex gap-4">
                     <InputButtonSubmit
                         id="token-code-submit"
                         v-model="tokenCodeToRedeem"
