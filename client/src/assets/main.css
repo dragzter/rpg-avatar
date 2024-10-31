@@ -2463,6 +2463,14 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         background: var(--dark-600);
         border: none;
         color: #a4a4a4;
+        
+        @media (max-width: 768px) {
+            padding: 10px;
+            
+            span {
+                font-size: 14px;
+            }
+        }
 
         &.active {
             background: var(--dark-800);
