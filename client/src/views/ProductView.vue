@@ -139,6 +139,40 @@
                 </template>
             </div>
 
+            <ProductTitle
+                :wrapper-css-classes="['mt-5']"
+                css-id="product-currency-title"
+                size="h3"
+                sub-text=""
+                titleHTML="Cost <span>Analysis</span>"
+            />
+            <table class="analysis-table table table-striped mt-4 mx-auto">
+                <thead>
+                    <tr>
+                        <th>Deal</th>
+                        <th>Cost per Token</th>
+                        <th>Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>150 for $4</td>
+                        <td>2.67 cents</td>
+                        <td>$4</td>
+                    </tr>
+                    <tr>
+                        <td>325 for $8</td>
+                        <td>2.46 cents</td>
+                        <td>$8</td>
+                    </tr>
+                    <tr>
+                        <td>1500 for $29</td>
+                        <td>1.93 cents</td>
+                        <td>$29</td>
+                    </tr>
+                </tbody>
+            </table>
+
             <!--            <div class="text-center my-5">-->
             <!--                <img alt="logo" src="/assets/rpgavatarlogo.png" />-->
             <!--            </div>-->
@@ -276,3 +310,15 @@ const disclaimerSigned = async (e: Event) => {
     }
 };
 </script>
+<style>
+.analysis-table {
+    font-size: 24px;
+    max-width: 700px;
+    border-radius: 10px;
+    outline: 2px solid var(--lavender);
+
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
+}
+</style>
