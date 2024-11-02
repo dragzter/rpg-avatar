@@ -17,13 +17,13 @@ export function modelRequestMapper(request) {
             get: (req: UserAIPrompt) => {
                 return {
                     prompt: req.prompt,
-                    disable_safety_checker: req.nsfw_pass,
-                    output_quality: 95,
+                    disable_safety_checker: true,
+                    output_quality: 100,
                     output_format: "jpg",
                     width: req.size?.width || 1024, // max 1440
                     height: req.size?.height || 1024, // max 1440
                     aspect_ratio: aspect_ratio,
-                    safety_tolerance: req.nsfw_pass ? 5 : 2,
+                    safety_tolerance: 5,
                     prompt_upsampling: true,
                 };
             },
@@ -33,8 +33,8 @@ export function modelRequestMapper(request) {
             get: (req: UserAIPrompt) => {
                 return {
                     prompt: req.prompt,
-                    disable_safety_checker: req.nsfw_pass,
-                    output_quality: 95,
+                    disable_safety_checker: true,
+                    output_quality: 100,
                     output_format: "jpg",
                     steps: 30,
                     width: req.size?.width || 1024, // max 1440
@@ -42,7 +42,7 @@ export function modelRequestMapper(request) {
                     guidance: req.adherence || 3,
                     interval: 2,
                     aspect_ratio: aspect_ratio,
-                    safety_tolerance: req.nsfw_pass ? 5 : 2,
+                    safety_tolerance: 5,
                     prompt_upsampling: true,
                 };
             },
@@ -59,7 +59,7 @@ export function modelRequestMapper(request) {
                     output_format: "jpg",
                     output_quality: 100,
                     num_inference_steps: 4,
-                    disable_safety_checker: req.nsfw_pass,
+                    disable_safety_checker: true,
                     width: 1024,
                     height: 1024,
                 };
