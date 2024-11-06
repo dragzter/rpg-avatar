@@ -15,7 +15,7 @@
                 alt="Fantasy Character"
             />
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title text-capitalize accent-text">
+                <h5 class="card-title mb-3 text-capitalize accent-text">
                     <span>{{ data.name }}</span>
                 </h5>
                 <hr />

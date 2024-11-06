@@ -75,7 +75,7 @@ export function createRouter(app: App): Router {
                 component: LoaderView,
             },
             {
-                path: "/community-gallery",
+                path: "/gallery",
                 name: "gallery",
                 component: CharacterCatalog,
             },

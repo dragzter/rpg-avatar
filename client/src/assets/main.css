@@ -1609,7 +1609,7 @@ main {
     top: 10px;
     left: 50%;
     border-radius: 40px;
-    z-index: 4;
+    z-index: 5;
     padding: 18px 0;
     transition: background-color 0.5s;
     min-width: 370px;
@@ -2682,6 +2682,22 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
             background: #14151a;
             z-index: 4;
         }
+        
+        @media (max-width: 768px) {
+            .card-text {
+                display: none;
+            }
+            
+            .card-title {
+                font-size: 16px ;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            hr {
+                display: none;
+            }
+        }
     }
     
     &:hover .card {
@@ -2783,6 +2799,15 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     h4 i {
         color: #e9a313
     }
+    
+    @media (max-width: 576px) {
+        top: 3px;
+        right: 3px;
+        
+        h4 {
+            font-size: 20px;
+        }
+    }
 }
 
 .card-corner {
@@ -2796,4 +2821,9 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     background: #eeeeee;
     box-shadow: 0 0 30px 2px rgba(0, 0, 0, 0.4);
     outline: 2px solid #fff;
+    
+    @media (max-width: 576px) {
+        top: -105px;
+        right: -72px;
+    }
 }

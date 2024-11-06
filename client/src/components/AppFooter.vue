@@ -9,7 +9,7 @@
                         <div class="rpg-avatar py-2 w-100">
                             <code class="text-white">rpgavatar.com</code>
                         </div>
-                        <p class="d-none d-sm-block accent-text ms-0 mb-0" style="width: 100px">v0.8.0</p>
+                        <p class="d-none d-sm-block accent-text ms-0 mb-0" style="width: 100px">v0.8.1</p>
                         <router-link class="ms-3" to="loaders">Loaders </router-link>
                     </div>
                     <div class="m-0 ms-md-4 mb-3 mb-md-0 text-center text-md-start w-100">

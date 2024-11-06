@@ -224,6 +224,24 @@ function getPresets() {
                 height: 1024,
             },
         },
+        preset_18: {
+            name: "Stunning In Red",
+            prompt: "Create a close-up, photorealistic image of a brunette with loose curls, wearing a red bikini. She’s lying on a lounge chair by the pool, her body stretched out as she relaxes in the sun. The natural light accentuates the toned curves of her athletic figure, with sweat glistening on her skin, adding a realistic touch to the calm, sun-kissed moment",
+            adherence: 3, // guidance
+            size: {
+                width: 1024,
+                height: 1024,
+            },
+        },
+        preset_19: {
+            name: "River Goddess",
+            prompt: "insanely gorgeous brunette, smiling, incredibly voluptuous, slender, sitting next to a river, she's holding a  golden staff, low cut black and pink robe, intricate magical patterns, legs bare, barefoot, detailed, fantasy adventure vibe",
+            adherence: 3, // guidance
+            size: {
+                width: 1024,
+                height: 1024,
+            },
+        },
     };
 }
 

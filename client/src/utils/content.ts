@@ -7,7 +7,7 @@ export const SolutionContentItems: ContentItem[] = [
         imagePosition: "left",
         image: "mage-2.jpg",
         buttonText: "Learn More",
-        routerTo: "community-gallery",
+        routerTo: "gallery",
     },
     {
         title: "Bring Your Characters to Life",
@@ -15,7 +15,7 @@ export const SolutionContentItems: ContentItem[] = [
         imagePosition: "right",
         image: "hunter-2.jpg",
         buttonText: "Learn More",
-        routerTo: "community-gallery",
+        routerTo: "gallery",
     },
     {
         title: "Custom-Made Art for Campaigns and Adventures",
@@ -23,7 +23,7 @@ export const SolutionContentItems: ContentItem[] = [
         imagePosition: "left",
         image: "alchemist-4.jpeg",
         buttonText: "Learn More",
-        routerTo: "community-gallery",
+        routerTo: "gallery",
     },
 ];
 

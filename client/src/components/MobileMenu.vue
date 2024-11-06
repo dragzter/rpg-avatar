@@ -31,24 +31,11 @@
                 <div class="modal-body">
                     <div class="link-wrapper-mobile-menu">
                         <div id="nav-column-mobile" class="d-flex flex-column">
-                            <router-link
-                                aria-current="page"
-                                class="nav-link"
-                                to="/"
-                                >HOME
-                            </router-link>
-                            <router-link class="nav-link" to="get-tokens"
-                                >BUY
-                            </router-link>
+                            <router-link aria-current="page" class="nav-link" to="/">HOME </router-link>
+                            <router-link class="nav-link" to="get-tokens">BUY </router-link>
 
-                            <router-link class="nav-link" to="community-gallery"
-                                >GALLERY
-                            </router-link>
-                            <router-link
-                                class="btn btn-primary"
-                                to="generate-image"
-                                >GENERATE
-                            </router-link>
+                            <router-link class="nav-link" to="gallery">GALLERY </router-link>
+                            <router-link class="btn btn-primary" to="generate-image">GENERATE </router-link>
                         </div>
                     </div>
                 </div>

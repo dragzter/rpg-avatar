@@ -12,9 +12,10 @@
                     </router-link>
                 </div>
                 <div class="mt-4">
-                    <h1 class="text-white">
-                        Character Preset Gallery <span class="badge bg-danger">NEW</span>
-                    </h1>
+                    <div class="d-flex align-items-center">
+                        <h1 class="text-white">Preset Prompt Gallery</h1>
+                        <span class="badge ms-3 bg-danger">NEW</span>
+                    </div>
                     <p class="mx-auto lead mt-3">
                         Discover a gallery of <strong class="text-white">ready-made AI prompts</strong>,
                         curated from popular designs to make creating stunning art as
@@ -23,14 +24,14 @@
                         Check back soon, <strong class="text-white">new characters added regularly</strong>.
                     </p>
 
-                    <p class="my-3 lead mx-auto">
+                    <div class="fs-5 alert alert-info rounded-3 text-info border-2 my-3" role="alert">
+                        <i class="fa-regular fa-circle-exclamation"></i>
                         Suggest additions to this library on the
 
                         <a id="facebook-callout" href="https://www.facebook.com/profile.php?id=61566109046101"
                             ><i class="fa-brands fa-square-facebook"></i> page</a
                         >
-                        .
-                    </p>
+                    </div>
                 </div>
             </div>
 
@@ -296,6 +297,22 @@ const flux_characters = ref([
         cost: 3,
         model: "flux_11_pro",
         api_preset_id: "preset_17",
+    },
+    {
+        name: "Stunning In Red",
+        description: "Close up of gorgeous brunette sunbathing.",
+        image: "red_bikini_lounge.jpeg",
+        cost: 3,
+        model: "flux_11_pro",
+        api_preset_id: "preset_18",
+    },
+    {
+        name: "River Goddess",
+        description: "Stunningly beautiful Sorceress captured in a magical moment.",
+        image: "river_goddess.jpeg",
+        cost: 3,
+        model: "flux_11_pro",
+        api_preset_id: "preset_19",
     },
 ]);
 const sd_characters = ref([
