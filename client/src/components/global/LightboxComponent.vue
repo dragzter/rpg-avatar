@@ -36,6 +36,7 @@
                     <i class="fa-regular fa-magnifying-glass-minus"></i>
                 </button>
                 <button
+                    v-if="!viewOnly"
                     class="btn action-btn btn-dark"
                     @click="downloadImage(images[index])"
                     data-bs-toggle="tooltip"
@@ -45,6 +46,7 @@
                     <i class="fa-solid fa-arrow-down-to-bracket"></i>
                 </button>
                 <button
+                    v-if="!viewOnly"
                     class="btn action-btn btn-dark"
                     @click="copyImgURL(images[index])"
                     data-bs-toggle="tooltip"
@@ -54,7 +56,7 @@
                     <i class="fa-regular fa-copy"></i>
                 </button>
                 <button
-                    v-if="allowDelete"
+                    v-if="(allowDelete || isAdmin) && !viewOnly"
                     class="btn action-btn btn-dark"
                     @click="deleteImage(images[index])"
                     data-bs-toggle="tooltip"
@@ -64,7 +66,7 @@
                     <i class="fa-regular fa-trash-alt"></i>
                 </button>
                 <button
-                    v-if="isAdmin && !isImagePublished(images[index])"
+                    v-if="isAdmin && !isImagePublished(images[index]) && !viewOnly"
                     class="btn action-btn btn-dark"
                     @click="publishImage(images[index])"
                     data-bs-toggle="tooltip"
@@ -74,7 +76,7 @@
                     <i class="fa-regular fa-share-from-square"></i>
                 </button>
                 <button
-                    v-if="isAdmin && isImagePublished(images[index])"
+                    v-if="isAdmin && isImagePublished(images[index]) && !viewOnly"
                     class="btn action-btn btn-dark"
                     @click="unPublish(images[index])"
                     data-bs-toggle="tooltip"
@@ -128,6 +130,10 @@ const props = defineProps({
         default: false,
     },
     isAdmin: {
+        type: Boolean,
+        default: false,
+    },
+    viewOnly: {
         type: Boolean,
         default: false,
     },

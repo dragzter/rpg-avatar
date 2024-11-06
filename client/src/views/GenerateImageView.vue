@@ -1,5 +1,5 @@
 <template>
-    <div id="generate-image" class="container-fluid">
+    <div id="generate-image" class="container">
         <div class="row">
             <div class="col-sm-12 col-md-12 col-lg-4">
                 <div class="prompt-builder">
@@ -101,7 +101,12 @@
                             />
                         </div>
 
-                        <h6 class="prompt-info-text"><strong>2.</strong> TYPE IN PROMPT</h6>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h6 class="prompt-info-text"><strong>2.</strong> TYPE IN PROMPT</h6>
+                            <router-link class="btn btn-accent try-preset-btn" to="characters">
+                                <i class="fa-solid fa-sparkles"></i> Preset
+                            </router-link>
+                        </div>
                         <InputComponent
                             id="custom-prompt"
                             v-model="userSelections.prompt"
@@ -332,6 +337,7 @@ import { useRouter } from "vue-router";
  * =*'^'*= DATA =*'^'*=
  */
 const router = useRouter();
+const route = router.currentRoute;
 const indexRef = ref(0);
 const isRPGChecked = ref(localStorage.getItem("rpg_presets") === "true");
 const aiStore = useAiStore();
@@ -349,6 +355,7 @@ const userSelections = ref<UserAIPrompt>({
     prompt: "",
     nsfw_pass: true,
     rpg_presets: true,
+    preset_id: "",
     count: 2,
     negative_prompt: "((blurry)), worst quality, 3D, cgi, bad hands, ((deformed)), ((unnatural)), undefined",
     user_id: "",
@@ -472,6 +479,7 @@ const handleSubmit = async (randomize: boolean) => {
     };
 
     if (selected_model.value.model_type) {
+        console.log("firing action", userSelections.value.user_id);
         await requestType[selected_model.value.model_type]();
     }
 };
@@ -497,8 +505,18 @@ const setAiModel = (modelObject: AiModel) => {
 };
 
 const selectModel = (model: AiModel) => {
-    console.log("Selected Model in event response", model);
     setAiModel(model);
+};
+
+const firePresetFromRoute = async () => {
+    if (route.value?.query?.preset_id && route.value?.query?.model && rpgUser.value?.id) {
+        setAiModel(models.value.find((model) => model.value === route.value.query.model) || models.value[0]);
+        userSelections.value.prompt = route.value.query.preset_id as string;
+        userSelections.value.preset_id = route.value.query.preset_id as string;
+        userSelections.value.user_id = rpgUser.value.id;
+        console.log("setuser id", userSelections.value.user_id);
+        await handleSubmit(false);
+    }
 };
 
 /**
@@ -517,6 +535,8 @@ onMounted(async () => {
         userSelections.value.nsfw_pass = rpgUser.value.nsfw_pass;
         userSelections.value.user_id = rpgUser.value.id;
     }
+
+    await firePresetFromRoute();
 });
 
 /**
@@ -524,9 +544,11 @@ onMounted(async () => {
  */
 watch(
     () => rpgUser.value,
-    (newRgpUser) => {
+    async (newRgpUser) => {
         userSelections.value.nsfw_pass = newRgpUser.nsfw_pass;
         userSelections.value.user_id = newRgpUser.id;
+
+        await firePresetFromRoute();
     }
 );
 

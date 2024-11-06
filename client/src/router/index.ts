@@ -13,6 +13,7 @@ import { useUserStore } from "@/stores/user";
 import PageNotFound from "@/views/PageNotFound.vue";
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue";
 import DeletionStatusView from "@/views/DeletionStatusView.vue";
+import CharacterCatalog from "@/views/CharacterCatalog.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -39,6 +40,11 @@ export function createRouter(app: App): Router {
                 path: "/support",
                 name: "support",
                 component: SupportView,
+            },
+            {
+                path: "/characters",
+                name: "characters",
+                component: CharacterCatalog,
             },
             {
                 path: "/deletion-status/:confirmationCode",
@@ -71,7 +77,7 @@ export function createRouter(app: App): Router {
             {
                 path: "/community-gallery",
                 name: "gallery",
-                component: GalleryView,
+                component: CharacterCatalog,
             },
             {
                 path: "/return-policy",

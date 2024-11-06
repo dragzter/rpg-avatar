@@ -1609,7 +1609,7 @@ main {
     top: 10px;
     left: 50%;
     border-radius: 40px;
-    z-index: 1;
+    z-index: 4;
     padding: 18px 0;
     transition: background-color 0.5s;
     min-width: 370px;
@@ -2442,7 +2442,17 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     background: var(--dark-650) !important;
 }
 
-#user-profile {
+.character-catalog-nav-wrapper {
+    button {
+        font-size: 24px;
+        
+        @media (max-width: 768px) {
+            font-size: 14px;
+        }
+    }
+}
+
+#user-profile, #character-catalog {
     min-height: calc(100vh - 265px);
 
     .nav-tabs {
@@ -2631,6 +2641,16 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     );
 }
 
+.preset-indicator {
+    padding: 2px 6px;
+    background: #dedede;
+    color: var(--dark-600);
+    border-radius: 8px;
+    display: inline-block;
+    border: 3px solid var(--dark-400);
+    outline: 2px solid var(--lavender);
+}
+
 .count-published-images-item {
     outline: 2px solid #fff;
     background: var(--gradient-lavender-pink-peach);
@@ -2644,6 +2664,43 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     right: 5px;
     background: rgba(0, 0, 0, 0.5);
 }
+
+.character-preset-card {
+    .card {
+        transition: 0.2s;
+        
+        img {
+            cursor: pointer;
+            transition: 0.6s;
+            
+            &:hover {
+                transform: scale(1.15);
+            }
+        }
+        
+        .card-body {
+            background: #14151a;
+            z-index: 4;
+        }
+    }
+    
+    &:hover .card {
+        outline: 4px solid var(--lavender);
+    }
+}
+
+#facebook-callout {
+    color: var(--light-800);
+    border: 2px solid var(--light-800);
+    padding: 2px 7px;
+    border-radius: 8px;
+    
+    &:hover {
+        background: var(--light-800);
+        color: #111 !important;
+    }
+}
+
 
 .published-tag {
     position: absolute;
@@ -2697,4 +2754,46 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     &.images-loading {
         opacity: 0
     }
+}
+
+.prompt-builder #prompt-builder-inner .try-preset-btn {
+    border-width: 2px !important;
+    border-radius: 8px !important;
+    padding: 6px 12px !important;
+    transition: 0.3s;
+    
+    &:hover {
+        border-color: #fff !important;
+        color: #fff !important;
+        background-image: linear-gradient(to right,var(--lavender), var(--lavender), #fff, #fff, #fff) !important;
+    }
+}
+
+.character-preset-card .btn.btn-primary {
+    border-radius: 6px !important;
+}
+
+.character-preset-card .cost-indicator {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #000;
+    z-index: 1;
+    
+    h4 i {
+        color: #e9a313
+    }
+}
+
+.card-corner {
+    width: 120px;
+    height: 180px;
+    position: absolute;
+    top: -80px;
+    right: -65px;
+    z-index: 1;
+    transform: rotate(135deg);
+    background: #eeeeee;
+    box-shadow: 0 0 30px 2px rgba(0, 0, 0, 0.4);
+    outline: 2px solid #fff;
 }

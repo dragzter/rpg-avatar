@@ -94,7 +94,17 @@ export const useAiStore = defineStore("aiImages", {
                 this.requestLoading = true;
                 this.imagesLoaded = false;
 
-                const data = modelRequestMapper(userData);
+                let data = {};
+                if (userData.preset_id) {
+                    // presets are in the backend - no need to use the mapper.
+                    data.preset_id = userData.preset_id;
+                    data.preset = true;
+                    data.model = userData.model;
+                    data.user_id = userData.user_id;
+                } else {
+                    data = modelRequestMapper(userData);
+                    data.preset = false;
+                }
 
                 const response = await axios.post(API.start_premium_image, { data });
 

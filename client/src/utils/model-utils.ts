@@ -202,7 +202,8 @@ export const model_selection: AiModel[] = [
         negative_prompt: false,
         tags: ["portrait", "landscape", "illustration", "fantasy", "photo realism"],
         description:
-            "Faster, better FLUX Pro. Text-to-image model with excellent image quality, prompt adherence, and output diversity.",
+            "Top of the line, faster, better FLUX Pro. Text-to-image model with excellent image" +
+            " quality, prompt adherence, and output diversity.",
     },
     {
         label: "black-forest-labs/flux-schnell",

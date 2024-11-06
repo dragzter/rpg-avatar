@@ -46,11 +46,9 @@
                                 aria-selected="false"
                             >
                                 <span>Prompt History</span>
-                                <small class="image-cap-indicator ms-1"
-                                    >{{ userStore.visiblePrompts }}/{{
-                                        userStore.quickHistory?.length || 0
-                                    }}</small
-                                >
+                                <small class="image-cap-indicator ms-1">{{
+                                    userStore.quickHistory?.length || 0
+                                }}</small>
                             </button>
                         </div>
                     </nav>
@@ -72,16 +70,15 @@
                             role="tabpanel"
                             aria-labelledby="nav-media-lib-tab"
                         >
-                            <template v-if="imageCount > 50">
-                                <p class="text-end text-sm-center p-3 pb-1 mb-2">
-                                    {{ startImage }} - {{ endImage }} out of {{ totalImages }}
-                                </p>
-                                <MediaPagination
-                                    :change-page="changePage"
-                                    :current-page="currentPage"
-                                    :total-pages="totalPages"
-                                />
-                            </template>
+                            <ImgCountsIndicator
+                                v-if="imageCount > 50"
+                                :changePage="changePage"
+                                :currentPage="currentPage"
+                                :endImage="endImage"
+                                :startImage="startImage"
+                                :totalImages="totalImages"
+                                :totalPages="totalPages"
+                            />
 
                             <MediaLibraryProfile v-if="imageCount > 1" />
                             <p v-else class="text-muted p-4 m-0">
@@ -89,16 +86,15 @@
                                 <router-link to="/">here</router-link>.
                             </p>
 
-                            <template v-if="imageCount > 50">
-                                <p class="text-center mt-3">
-                                    Showing {{ startImage }} - {{ endImage }} out of {{ totalImages }}
-                                </p>
-                                <MediaPagination
-                                    :change-page="changePage"
-                                    :current-page="currentPage"
-                                    :total-pages="totalPages"
-                                />
-                            </template>
+                            <ImgCountsIndicator
+                                v-if="imageCount > 50"
+                                :changePage="changePage"
+                                :currentPage="currentPage"
+                                :endImage="endImage"
+                                :startImage="startImage"
+                                :totalImages="totalImages"
+                                :totalPages="totalPages"
+                            />
                         </div>
 
                         <!-- TAB - prompt history -->
@@ -108,26 +104,47 @@
                             role="tabpanel"
                             aria-labelledby="nav-prompt-history"
                         >
+                            <ImgCountsIndicator
+                                v-if="imageCount > 50"
+                                :changePage="changePage"
+                                :currentPage="currentPage"
+                                :endImage="endImage"
+                                :startImage="startImage"
+                                :totalImages="totalImages"
+                                :totalPages="totalPages"
+                            >
+                                <p class="text-end text-sm-center p-3 pb-1 mb-2">
+                                    Showing images {{ startImage }} - {{ endImage }} <br />
+                                    (<span class="text-white">{{ totalImages }}</span> Images) - (<span
+                                        class="text-white"
+                                        >{{ userStore.quickHistory.length }}</span
+                                    >
+                                    Prompts)
+                                </p>
+                            </ImgCountsIndicator>
                             <div class="p-3 prompt-history-tab">
                                 <div class="container">
                                     <div class="row py-2">
                                         <div
                                             class="col px-0 d-flex align-items-center justify-content-between"
                                         >
-                                            <button
-                                                :disabled="startSelect"
-                                                @click="startSelect = true"
-                                                class="btn btn-secondary"
-                                            >
-                                                <i class="fa-light fa-grid-2-plus"></i>
-                                                Select
-                                            </button>
-
-                                            <p class="text-muted m-0 prompt-count-indicator">
-                                                <strong>{{ userStore.visiblePrompts }}</strong> of
-                                                <strong>{{ userStore.quickHistory.length }}</strong>
-                                                prompts
-                                            </p>
+                                            <div>
+                                                <button
+                                                    :disabled="startSelect"
+                                                    class="btn btn-secondary"
+                                                    @click="startSelect = true"
+                                                >
+                                                    <i class="fa-light fa-grid-2-plus"></i>
+                                                    Bulk Select
+                                                </button>
+                                                <button
+                                                    v-if="startSelect"
+                                                    class="btn btn-tertiary ms-2"
+                                                    @click="cancelSelections"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -177,6 +194,7 @@
                                                             class="object-fit-cover w-100 h-100"
                                                         />
                                                     </div>
+
                                                     <span
                                                         class="position-absolute badge top-0 count-indicator-prompt-history-item"
                                                     >
@@ -196,7 +214,13 @@
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
-                                                        <p class="card-text">
+                                                        <p v-if="item.preset" class="preset-indicator">
+                                                            <i
+                                                                class="fa-sharp fa-solid fa-wand-magic-sparkles"
+                                                            ></i>
+                                                            AI Preset
+                                                        </p>
+                                                        <p v-else class="card-text">
                                                             {{ item.prompt_excerpt }}
                                                         </p>
                                                         <p class="card-text">
@@ -211,6 +235,15 @@
                                     </template>
                                 </div>
                             </div>
+                            <ImgCountsIndicator
+                                v-if="imageCount > 50"
+                                :changePage="changePage"
+                                :currentPage="currentPage"
+                                :endImage="endImage"
+                                :startImage="startImage"
+                                :totalImages="totalImages"
+                                :totalPages="totalPages"
+                            />
                         </div>
                     </div>
                 </div>
@@ -242,7 +275,26 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <p class="text-muted mb-1">Prompt</p>
-                    <p @click="copyPrompt(selectedPrompt.prompt)" class="text-white" style="cursor: copy">
+                    <template v-if="selectedPrompt.preset">
+                        <p class="mt-2">
+                            This prompt was created using
+                            <span class="accent-text fw-bold">{{ selectedPrompt.prompt }}</span>
+                            from the character catalog.
+                        </p>
+                        <button
+                            class="preset-prompt-button btn btn-primary mt-2"
+                            style="border-radius: 6px !important"
+                            @click="reRunPrompt(selectedPrompt.prompt, selectedPrompt.model)"
+                        >
+                            <i class="fa-sharp fa-solid fa-wand-magic-sparkles"></i> Re-run this prompt
+                        </button>
+                    </template>
+                    <p
+                        v-else
+                        class="text-white"
+                        style="cursor: copy"
+                        @click="copyPrompt(selectedPrompt.prompt)"
+                    >
                         {{ selectedPrompt.prompt?.replace('"', "") }}
                     </p>
                 </div>
@@ -344,12 +396,14 @@
             </template>
         </ModalComponent>
 
+        <!-- Bulk Delete Toolbar -->
         <div
             v-if="startSelect"
             class="bulk-delete-toolbar position-fixed rounded-3 p-2 text-center"
             style="
                 bottom: 15px;
                 left: 50%;
+                z-index: 1000;
                 transform: translateX(-50%);
                 background: var(--dark-800);
                 max-width: 400px;
@@ -384,7 +438,7 @@
 
 <script lang="ts" setup>
 import { useUserStore } from "@/stores/user";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, defineComponent, nextTick, h, onMounted, onUnmounted, ref, watch } from "vue";
 import ToastComponent from "@/components/global/ToastComponent.vue";
 import { isMoreThan24Hours, nicerDate } from "@/utils/date-utils";
 import { API, STORAGE_KEYS } from "@/utils";
@@ -398,12 +452,15 @@ import UserDetails from "@/components/page-sections/UserDetails.vue";
 import MediaLibraryProfile from "@/components/page-sections/MediaLibraryProfile.vue";
 import axios from "axios";
 import MediaPagination from "@/components/page-sections/MediaPagination.vue";
+import { useRouter } from "vue-router";
+import ImgCountsIndicator from "@/components/page-sections/ImgCountsIndicator.vue";
 
 const { user } = useAuth0();
 
 /**
  * =*'^'*= DATA =*'^'*=
  */
+const router = useRouter();
 const userStore = useUserStore();
 const tokenCodeToRedeem = ref("");
 const passCodeToRedeem = ref("");
@@ -652,6 +709,16 @@ const fetchOrLoadExistingImages = async (
         userStore.imageThumbnails = storage.g(STORAGE_KEYS.thumbnails).thumbnails;
         userStore.images = storage.g(STORAGE_KEYS.images).images;
     }
+};
+
+const reRunPrompt = (preset_id: string, model: string) => {
+    router.push({
+        name: "generate-image",
+        query: {
+            preset_id,
+            model,
+        },
+    });
 };
 
 /**

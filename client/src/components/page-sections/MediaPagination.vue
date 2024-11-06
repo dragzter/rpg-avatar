@@ -4,7 +4,7 @@
             <!-- Previous button -->
             <li :class="{ disabled: currentPage === 1 }" class="page-item">
                 <button class="page-link" @click="changePage(currentPage - 1)">
-                    <span class="accent-text"><i class="fa-solid fa-arrow-left"></i> Previous </span>
+                    <span class="accent-text"><i class="fa-solid fa-arrow-left"></i> Prev </span>
                 </button>
             </li>
 

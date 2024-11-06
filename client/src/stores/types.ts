@@ -66,6 +66,8 @@ export interface UserAIPrompt {
     nsfw_pass: boolean;
     user_id: string;
 
+    preset_id?: string;
+
     rpg_presets?: boolean;
     randomize?: boolean;
     art_style?: string;
