@@ -91,6 +91,7 @@ class UserService {
                         created: p.created,
                         thumbnails: p.thumbnails,
                         file_names: p.file_names,
+                        preset: p.preset,
                         published_images: p.published_images,
                     };
 

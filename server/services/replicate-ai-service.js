@@ -5,6 +5,7 @@ import Replicate from "replicate";
 import axios from "axios";
 import { promptConstructorV2 } from "../utils/prompt-constructor.js";
 import OpenAiService from "./open-ai-service.js";
+import { getPresetConfig } from "../utils/preset-configs.js";
 
 class ReplicateAiService {
     replicate;
@@ -43,7 +44,15 @@ class ReplicateAiService {
         console.log(`[ReplicateAiService] ${message}`);
     }
 
-    async startImageTask(userDetails) {
+    async startImageTask(userDetails, preset = false) {
+        console.log("Starting image task preset is...", preset);
+        if (preset) {
+            userDetails = {
+                ...userDetails,
+                ...getPresetConfig(userDetails.preset_id, userDetails.model),
+            };
+        }
+
         const {
             input,
             user_id,
@@ -57,6 +66,7 @@ class ReplicateAiService {
         } = userDetails;
         const user = await UserService.getUserById(user_id);
 
+        console.log("User ID", user_id);
         // (1) ================ COST CHECK ================
         if (user?.token_balance < cost) {
             return {
@@ -103,6 +113,8 @@ class ReplicateAiService {
             failureCode: "network",
             errorMessage: "",
             check_count: 0,
+            preset,
+            preset_id: userDetails.preset_id,
             cost,
             user,
             model,
@@ -314,10 +326,17 @@ class ReplicateAiService {
                     ...modelSchema,
                     count: state.count,
                     user_id: state.user.id,
+                    preset: state.preset,
                     thumbnails: thumbnail_file_names,
                     file_names: file_names,
                     prompt_id: uuidv4(),
                 };
+
+                // Hide the actual prompt
+                console.log("aggregate: ", prompt_aggregate);
+                if (state.preset) {
+                    prompt_aggregate[state.model].prompt = state.preset_id;
+                }
 
                 // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);

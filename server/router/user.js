@@ -185,7 +185,8 @@ router.post("/api/user/:userId", async (req, res) => {
                 );
 
             const newUser = {
-                token_balance: hasReceivedInitialTokens ? 0 : 20, // No initial tokens if they received before
+                token_balance: hasReceivedInitialTokens ? 0 : 10, // No initial tokens if they
+                // received before
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],

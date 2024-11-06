@@ -23,7 +23,10 @@ const router = express.Router();
 router.post("/api/repl/start-image-task", async (req, res) => {
     try {
         const { data } = req.body;
-        const response = await ReplicateAiService.startImageTask(data);
+        const response = await ReplicateAiService.startImageTask(
+            data,
+            data.preset
+        );
 
         res.status(200).json(response);
     } catch (error) {

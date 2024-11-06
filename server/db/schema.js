@@ -251,6 +251,10 @@ export const PromptSchema = new Schema(
             type: String,
             required: false,
         },
+        preset: {
+            type: Boolean,
+            required: false,
+        },
         rpg_presets: {
             type: Boolean,
             required: false,
