@@ -214,7 +214,7 @@
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
-                                                        <p v-if="item.preset" class="preset-indicator">
+                                                        <p v-if="item?.preset" class="preset-indicator">
                                                             <i
                                                                 class="fa-sharp fa-solid fa-wand-magic-sparkles"
                                                             ></i>
@@ -275,7 +275,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <p class="text-muted mb-1">Prompt</p>
-                    <template v-if="selectedPrompt.preset">
+                    <template v-if="selectedPrompt?.preset">
                         <p class="mt-2">
                             This prompt was created using
                             <span class="accent-text fw-bold">{{ selectedPrompt.prompt }}</span>
@@ -284,7 +284,9 @@
                         <button
                             class="preset-prompt-button btn btn-primary mt-2"
                             style="border-radius: 6px !important"
-                            @click="reRunPrompt(selectedPrompt.prompt, selectedPrompt.model)"
+                            @click="
+                                reRunPrompt(selectedPrompt.prompt, selectedPrompt.model || ('' as string))
+                            "
                         >
                             <i class="fa-sharp fa-solid fa-wand-magic-sparkles"></i> Re-run this prompt
                         </button>
@@ -483,7 +485,7 @@ const userError = computed(() => userStore.userError);
 const loading = computed(() => userStore.userLoading);
 const toastMessage = computed(() => userStore.toastMessage);
 const selectedPrompt = computed(() => userStore.selectedPrompt);
-const totalImages = computed(() => rpgUser.value.image_count);
+const totalImages = computed(() => rpgUser.value.image_count || 0);
 const lightboxThumbnails = computed(() => userStore.selectedPrompt.imgURLS);
 const totalPages = computed(() => {
     return Math.ceil(userStore.totalPages);

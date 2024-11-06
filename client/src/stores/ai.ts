@@ -94,7 +94,7 @@ export const useAiStore = defineStore("aiImages", {
                 this.requestLoading = true;
                 this.imagesLoaded = false;
 
-                let data = {};
+                let data = {} as any;
                 if (userData.preset_id) {
                     // presets are in the backend - no need to use the mapper.
                     data.preset_id = userData.preset_id;

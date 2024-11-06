@@ -233,6 +233,7 @@ export interface PromptHistoryItem {
     rpg_presets?: boolean;
     art_style?: string;
     created?: string;
+    preset?: string;
     size?: {
         width: number;
         height: number;
@@ -252,6 +253,7 @@ export interface QuickPromptHistory {
     published_images: string[];
     prompt_excerpt: string;
     created?: string;
+    preset?: string;
     thumbnails?: string[];
     urls?: string[];
 }

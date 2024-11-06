@@ -137,7 +137,6 @@
         :images="lightboxImages"
         :show="showThumbnailLightBox"
         :index="lightboxThumbnailIndex"
-        @toast-message="announce"
         :view-only="true"
         @update:show="showThumbnailLightBox = false"
         :is-admin="false"
@@ -342,19 +341,10 @@ const sd_characters = ref([
     },
 ]);
 const userStore = useUserStore();
-
-const lightboxImages = ref([]);
+const showToast = ref(false);
+const lightboxImages = ref([] as string[]);
 
 // Methods
-const announce = (msg) => {
-    userStore.toastMessage = msg;
-
-    showToast.value = true;
-    setTimeout(() => {
-        showToast.value = false;
-    }, 2000);
-};
-
 const handleClickImage = (url) => {
     lightboxImages.value = [url];
     showThumbnailLightBox.value = true;
