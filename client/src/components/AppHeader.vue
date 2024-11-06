@@ -29,7 +29,7 @@
                     </div>
 
                     <div id="auth-column">
-                        <div v-if="isAuthenticated" class="mx-2 welcome-user">
+                        <div v-if="isAuthenticated" class="mx-1 welcome-user">
                             <span class="me-2 border border-2 p-1 px-2" style="border-radius: 5px"
                                 ><i class="fa-light fa-coin-vertical" style="color: goldenrod"></i>
                                 {{ rpgUser.token_balance }}</span

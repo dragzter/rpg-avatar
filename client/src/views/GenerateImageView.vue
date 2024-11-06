@@ -103,7 +103,11 @@
 
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <h6 class="prompt-info-text"><strong>2.</strong> TYPE IN PROMPT</h6>
-                            <router-link class="btn btn-accent try-preset-btn" to="characters">
+                            <router-link
+                                :disabled="loading"
+                                class="btn btn-accent try-preset-btn"
+                                to="characters"
+                            >
                                 <i class="fa-solid fa-sparkles"></i> Preset
                             </router-link>
                         </div>
@@ -479,7 +483,6 @@ const handleSubmit = async (randomize: boolean) => {
     };
 
     if (selected_model.value.model_type) {
-        console.log("firing action", userSelections.value.user_id);
         await requestType[selected_model.value.model_type]();
     }
 };

@@ -29,9 +29,11 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from "vue-router";
+import { useAuth0 } from "@auth0/auth0-vue";
 
 const emit = defineEmits(["clickImage"]);
 const router = useRouter();
+const { isAuthenticated, loginWithPopup } = useAuth0();
 const props = defineProps<{
     data: {
         name: string;
@@ -43,8 +45,13 @@ const props = defineProps<{
     };
 }>();
 
-const createFromPreset = () => {
-    router.push({
+const createFromPreset = async () => {
+    console.log(isAuthenticated.value);
+    if (!isAuthenticated.value) {
+        await loginWithPopup();
+    }
+
+    await router.push({
         name: "generate-image",
         query: {
             preset_id: props.data.api_preset_id,
