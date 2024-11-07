@@ -446,7 +446,6 @@ class BackblazeStorageService {
                     imageCount += nonThumbnailObjects.length;
                 }
 
-                console.log("Image count:", imageCount);
                 isTruncated = response.IsTruncated;
                 continuationToken = response.NextContinuationToken;
             }

@@ -44,7 +44,6 @@ export function promptEnhance(promptString) {
         "she",
     ];
     if (promptString?.includes("female")) {
-        console.log("Prompt enhanced!");
         return (
             promptString.replaceAll('"', "") +
             " She is gorgeous, perfect body, fit physique, perfect hourglass figure, large breasts. Perfect face"

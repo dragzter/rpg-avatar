@@ -10,7 +10,6 @@ import UserService from "../services/user-service.js";
 const router = express.Router();
 
 router.post("/api/image", async (req, res) => {
-    console.log(req.body, "route: /api/image");
     try {
         const imageUrl = await OpenAiService.requestImage(req.body);
 

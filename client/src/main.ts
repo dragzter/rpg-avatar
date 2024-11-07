@@ -13,8 +13,10 @@ import { createPinia } from "pinia";
 import App from "./App.vue";
 import { createRouter } from "./router";
 import { createAuth0 } from "@auth0/auth0-vue";
+import { createHead } from "@vueuse/head";
 
 const app = createApp(App);
+const head = createHead(); // Initialize `createHead`
 
 app.use(
     createAuth0({
@@ -30,7 +32,4 @@ app.use(
 
 app.component("Popper", Popper);
 
-app.use(createPinia())
-    .use(createRouter(app))
-    .use(VueEasyLightbox)
-    .mount("#app");
+app.use(createPinia()).use(head).use(createRouter(app)).use(VueEasyLightbox).mount("#app");

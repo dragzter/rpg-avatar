@@ -148,6 +148,11 @@ import CharacterPresetCard from "@/components/page-sections/CharacterPresetCard.
 import { ref } from "vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { useUserStore } from "@/stores/user";
+import { useHead } from "@vueuse/head";
+import { galleryMetaTags } from "@/utils/meta-tags";
+
+// Meta tags
+useHead(galleryMetaTags);
 
 // Data
 const Tabs = {

@@ -336,6 +336,11 @@ import { model_selection } from "@/utils/model-utils";
 import GenerateOption from "@/components/global/GenerateOption.vue";
 import { storage } from "@/utils/storage";
 import { useRouter } from "vue-router";
+import { useHead } from "@vueuse/head";
+import { homeScreenMetaTags } from "@/utils/meta-tags";
+
+// Meta tags
+useHead(homeScreenMetaTags);
 
 /**
  * =*'^'*= DATA =*'^'*=
@@ -517,7 +522,6 @@ const firePresetFromRoute = async () => {
         userSelections.value.prompt = route.value.query.preset_id as string;
         userSelections.value.preset_id = route.value.query.preset_id as string;
         userSelections.value.user_id = rpgUser.value.id;
-        console.log("setuser id", userSelections.value.user_id);
         await handleSubmit(false);
     }
 };

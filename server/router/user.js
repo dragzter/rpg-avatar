@@ -57,8 +57,6 @@ router.post("/api/facebook/data-deletion-callback", async (req, res) => {
         // Step 1: Parse the signed request to get the Facebook user ID
         const data = parseSignedRequest(signed_request);
 
-        console.log(data, "data");
-
         if (!!data?.user_id) {
             return res.status(400).json({ message: "Invalid request" });
         }
@@ -145,7 +143,6 @@ router.post("/api/user", async (req, res) => {
 
 router.post("/api/user/delete", async (req, res) => {
     try {
-        console.log(req.body, "req.body");
         if (!req.body?.userId) {
             return res.status(400).json({ error: "User id not sent." });
         }

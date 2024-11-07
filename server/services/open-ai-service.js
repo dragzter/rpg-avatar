@@ -158,8 +158,6 @@ class OpenAIService {
     async requestImage(userRequest) {
         const prompt = await this.requestAiPrompt(userRequest);
 
-        console.log("calling image AI tool...");
-        console.log("using prompt: ", prompt);
         const response = await this.openai.images.generate({
             model: this.MODEL.Dalle3,
             prompt: prompt,
