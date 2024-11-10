@@ -14,6 +14,7 @@ class UserService {
         flux_dev: "flux_dev",
         flux_11_pro: "flux_11_pro",
         flux_schnell: "flux_schnell",
+        flux_pro_ultra: "flux_pro_ultra",
     };
 
     async getUserById(userId) {
@@ -111,20 +112,41 @@ class UserService {
     }
 
     async getPromptById(promptId) {
+        const getSize = (prompt) => {
+            if (prompt.width && prompt.height) {
+                return {
+                    width: prompt.width,
+                    height: prompt.height,
+                };
+            } else if (
+                prompt.aspect_ratio &&
+                (!prompt.height || !prompt.width)
+            ) {
+                const ar = {
+                    "1:1": { width: 2048, height: 2048 },
+                    "4:3": { width: 2368, height: 1792 },
+                    "3:4": { width: 1792, height: 2368 },
+                };
+
+                return ar[prompt.aspect_ratio];
+            } else {
+                return { width: 1, height: 1 };
+            }
+        };
+
         try {
             const _p = await PromptModel.findOne({
                 prompt_id: promptId,
             }).exec();
             const model = Object.keys(this.models).find((key) => _p[key]);
 
+            console.log(_p[model]);
             if (model) {
                 _p.prompt = _p[model].prompt;
-                _p.size = {
-                    width: _p[model].width,
-                    height: _p[model].height,
-                };
+                _p.size = getSize(_p[model]);
                 _p.adherence = _p[model].guidance;
                 _p.model = model;
+                _p.raw = _p[model].raw;
             }
 
             console.log(_p);

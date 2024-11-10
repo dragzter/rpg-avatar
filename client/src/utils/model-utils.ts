@@ -11,8 +11,29 @@ export function modelRequestMapper(request) {
         : {};
 
     const aspect_ratio = request.size.width !== 1024 ? "custom" : "1:1";
+    const getFluxUltraRatio = (size) => {
+        if (size.width === 2368) {
+            return "4:3";
+        } else if (size.width === 2048) {
+            return "1:1";
+        } else if (size.width === 1792) {
+            return "3:4";
+        }
+    };
 
     const outbound = {
+        flux_pro_ultra: {
+            get: (req: UserAIPrompt) => {
+                return {
+                    prompt: req.prompt,
+                    output_format: "jpg",
+                    aspect_ratio: getFluxUltraRatio(req.size),
+                    safety_tolerance: 6,
+                    raw: req.raw === "no" ? false : (true as boolean),
+                };
+            },
+            cost: 5,
+        },
         flux_11_pro: {
             get: (req: UserAIPrompt) => {
                 return {
@@ -115,6 +136,38 @@ export const FluxImageSizeOptions: SizeOption[] = [
         recommended: false,
     },
 ];
+export const FluxUltraSizeOptions: SizeOption[] = [
+    {
+        label: "2368x1792",
+        ratio: "4:3",
+        cssClass: "ratio-4x3",
+        size: {
+            width: 2368,
+            height: 1792,
+        },
+        recommended: false,
+    },
+    {
+        label: "2048x2048",
+        ratio: "1:1",
+        cssClass: "ratio-1x1",
+        size: {
+            width: 2048,
+            height: 2048,
+        },
+        recommended: true,
+    },
+    {
+        label: "1792x2368",
+        ratio: "3:4",
+        cssClass: "ratio-3x4",
+        size: {
+            width: 1792,
+            height: 2368,
+        },
+        recommended: false,
+    },
+];
 export const SDImageSizeOptions: SizeOption[] = [
     {
         label: "512x512",
@@ -170,22 +223,22 @@ export const SDImageSizeOptions: SizeOption[] = [
 
 export const model_selection: AiModel[] = [
     {
-        label: "black-forest-labs/flux-pro",
-        img: "flux_pro.png",
-        value: "flux_pro",
-        adherence: [2, 5],
-        size_options: FluxImageSizeOptions,
+        label: "black-forest-labs/flux-1.1-pro-ultra",
+        img: "flux_pro_ultra.png",
+        value: "flux_pro_ultra",
+        adherence: [],
+        size_options: FluxUltraSizeOptions,
         count_option: false,
         max_outputs: [1, 1],
         model_type: "flux",
         max_img_per_request: 1,
         default_img_per_request: 1,
-        cost: 4,
+        cost: 5,
+        raw_option: true,
         negative_prompt: false,
-        adherence_default: 3,
         tags: ["portrait", "landscape", "illustration", "fantasy", "photo realism"],
         description:
-            "State-of-the-art image generation with top of the line prompt following, visual quality, image detail and output diversity.",
+            "FLUX1.1 [pro] in ultra and raw modes. Images are up to 4 megapixels. Use raw mode for realism.",
     },
     {
         label: "black-forest-labs/flux-1.1-pro",
@@ -196,7 +249,7 @@ export const model_selection: AiModel[] = [
         count_option: false,
         max_outputs: [1, 1],
         model_type: "flux",
-        cost: 3,
+        cost: 4,
         max_img_per_request: 1,
         default_img_per_request: 1,
         negative_prompt: false,
@@ -205,6 +258,25 @@ export const model_selection: AiModel[] = [
             "Top of the line, faster, better FLUX Pro. Text-to-image model with excellent image" +
             " quality, prompt adherence, and output diversity.",
     },
+    {
+        label: "black-forest-labs/flux-pro",
+        img: "flux_pro.png",
+        value: "flux_pro",
+        adherence: [2, 5],
+        size_options: FluxImageSizeOptions,
+        count_option: false,
+        max_outputs: [1, 1],
+        model_type: "flux",
+        max_img_per_request: 1,
+        default_img_per_request: 1,
+        cost: 5,
+        negative_prompt: false,
+        adherence_default: 3,
+        tags: ["portrait", "landscape", "illustration", "fantasy", "photo realism"],
+        description:
+            "State-of-the-art image generation with top of the line prompt following, visual quality, image detail and output diversity.",
+    },
+
     {
         label: "black-forest-labs/flux-schnell",
         img: "flux_schnell3.png",

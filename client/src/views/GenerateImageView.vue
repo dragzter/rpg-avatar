@@ -1,7 +1,7 @@
 <template>
     <div id="generate-image" class="container">
         <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-4">
+            <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="prompt-builder">
                     <div id="prompt-builder-inner" class="d-flex flex-column h-100">
                         <div class="d-flex align-items-center justify-content-between">
@@ -49,7 +49,7 @@
                                         <i class="fa fa-coins me-2 text-warning"></i>
                                         <span><i class="fa fa-times"></i></span>{{ selected_model.cost }}
                                     </h4>
-                                    <h5 class="m-0 text-truncate" style="max-width: 250px">
+                                    <h5 class="m-0 text-truncate" style="max-width: 260px">
                                         {{ selected_model.label }}
                                     </h5>
 
@@ -129,6 +129,17 @@
                                 :loading="loading"
                                 :options="selected_model.size_options"
                                 label="Image Resolution (px)"
+                            />
+
+                            <SelectComponent
+                                v-if="selected_model.raw_option"
+                                v-model="userSelections.raw as string"
+                                :enable-tooltip="true"
+                                :loading="loading"
+                                :options="rawOptions"
+                                class="w-100"
+                                label="Raw Mode"
+                                tooltip-text="Generate less processed, more natural-looking images. Default: no"
                             />
 
                             <div
@@ -242,7 +253,7 @@
             </div>
             <!-- image generation column-->
             <div
-                class="col-sm-12 col-lg-8 col-md-12 d-flex align-items-md-start align-items-center image-generation-column"
+                class="col-sm-12 col-lg-7 col-md-12 d-flex align-items-md-start align-items-center image-generation-column"
             >
                 <div id="image-load-section" class="position-relative ms-0 mt-0">
                     <div :class="` output-images-container ${gridCount}`">
@@ -316,7 +327,7 @@
 </template>
 <script lang="ts" setup>
 import SelectComponent from "@/components/global/SelectComponent.vue";
-import { characterTypes, styleOptions } from "@/utils/select-options";
+import { characterTypes, styleOptions, rawOptions } from "@/utils/select-options";
 import InputComponent from "@/components/global/InputComponent.vue";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import type { AiModel, UserAIPrompt } from "@/stores/types";
@@ -370,6 +381,7 @@ const userSelections = ref<UserAIPrompt>({
     user_id: "",
     adherence: 7,
     cost: 1,
+    raw: "no",
     size: {
         width: 1024,
         height: 1024,
@@ -563,6 +575,16 @@ watch(
     () => aiStore.random_ai_prompt,
     (newPrompt) => {
         userSelections.value.prompt = newPrompt;
+    }
+);
+
+watch(
+    () => selected_model.value,
+    (newModel) => {
+        if (newModel?.size_options?.length) {
+            userSelections.value.size = newModel?.size_options?.find((opt) => opt.recommended)?.size ||
+                newModel?.size_options[0]?.size || { width: 1, height: 1 };
+        }
     }
 );
 </script>

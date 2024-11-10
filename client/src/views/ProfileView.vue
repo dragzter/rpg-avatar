@@ -331,6 +331,16 @@
                         <label for="floatingTextarea">Model</label>
                     </div>
 
+                    <div v-if="selectedPrompt?.flux_pro_ultra" class="form-floating mb-2">
+                        <input
+                            id="floatingTextarea"
+                            :value="selectedPrompt.flux_pro_ultra.raw"
+                            class="form-control read-only"
+                            readonly
+                        />
+                        <label for="floatingTextarea">Raw Mode</label>
+                    </div>
+
                     <div v-if="selectedPrompt?.rpg_presets" class="form-floating mb-2">
                         <input
                             readonly
@@ -631,6 +641,12 @@ const deleteSelections = async () => {
             user_id: rpgUser.value.id,
         });
         promptSelection.value = [];
+
+        await fetchOrLoadExistingImages(
+            rpgUser.value.id,
+            { page: currentPage.value, limit: itemsPerPage.value },
+            true
+        );
     }
 };
 

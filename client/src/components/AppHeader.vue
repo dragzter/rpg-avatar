@@ -60,7 +60,9 @@
                             </button>
                             <ul class="dropdown-menu">
                                 <li>
-                                    <router-link class="dropdown-item" to="profile">Profile </router-link>
+                                    <router-link class="dropdown-item profile-link fw-bold" to="profile"
+                                        >Profile
+                                    </router-link>
                                 </li>
 
                                 <li>

@@ -9,9 +9,7 @@
                 :class="[
                     {
                         disabled: loading,
-                        selected:
-                            JSON.stringify(modelValue) ===
-                            JSON.stringify(option.size),
+                        selected: getSelected(JSON.stringify(modelValue), JSON.stringify(option.size)),
                     },
                     option.cssClass,
                 ]"
@@ -23,9 +21,7 @@
                 </span>
 
                 <div class="ratio-indicator">{{ option.ratio }}</div>
-                <div v-if="option.recommended" class="recommended-indicator">
-                    Recommended
-                </div>
+                <div v-if="option.recommended" class="recommended-indicator">Recommended</div>
             </div>
         </div>
     </div>
@@ -47,6 +43,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
+
+const getSelected = (val, stringified) => {
+    return val === stringified;
+};
 
 const selectOption = (option) => {
     emit("update:modelValue", option.size);
@@ -106,6 +106,19 @@ const selectOption = (option) => {
 
 .radio-option.ratio-3x2 {
     height: 58px;
+}
+
+.radio-option.ratio-16x9 {
+    height: 45px;
+}
+
+.radio-option.ratio-4x3 {
+    height: 60px;
+}
+
+.radio-option.ratio-3x4 {
+    width: 60px;
+    height: 80px;
 }
 
 .radio-option.selected {

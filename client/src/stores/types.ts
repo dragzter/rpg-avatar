@@ -81,6 +81,8 @@ export interface UserAIPrompt {
     negative_prompt?: string;
     steps?: number;
     adherence?: number;
+    raw?: string | boolean; // e.g. "no" or "yes" - this is converted to a boolean in the generation
+    // process
     cost?: number;
 }
 
@@ -218,6 +220,7 @@ export type AiModel = {
     negative_prompt?: boolean;
     adherence_default?: number;
     description?: string;
+    raw_option?: boolean;
     tags?: string[];
 };
 
@@ -238,6 +241,7 @@ export interface PromptHistoryItem {
         width: number;
         height: number;
     };
+    flux_pro_ultra?: any;
     negative_prompt?: string;
     published_images?: string[];
     thumbnails?: string[];

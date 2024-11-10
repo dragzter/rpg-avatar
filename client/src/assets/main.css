@@ -1705,6 +1705,10 @@ main {
         width: auto;
         display: flex;
         align-items: center;
+        
+        .profile-link {
+            color: var(--lavender);
+        }
 
         .btn.dropdown-toggle {
             background: none;
@@ -2458,6 +2462,18 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     .nav-tabs {
         border: none;
     }
+    
+    .disabled.page-item button {
+        background: transparent;
+    }
+    
+    .page-item, .page-item button {
+        outline: none !important;
+    }
+    
+    .page-item button:active {
+        background: var(--dark-400);
+    }
 
     #nav-tabContent {
         border: 1px solid var(--dark-500);
@@ -2729,6 +2745,14 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
 }
 
 .rpg-pagination {
+    
+    ul {
+        border-top: 1px solid rgba(204, 204, 204, 0.2);
+        border-bottom: 1px solid rgba(204, 204, 204, 0.2);
+        background: rgba(255,255,255,0.05);
+    }
+    
+    
     li:not(.disabled) button {
         background: none;
         color: #fff !important;

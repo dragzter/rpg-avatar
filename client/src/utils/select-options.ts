@@ -92,6 +92,17 @@ export const codeTypeOptions = [
     },
 ];
 
+export const rawOptions = [
+    {
+        label: "Yes",
+        value: "yes",
+    },
+    {
+        label: "No",
+        value: "no",
+    },
+];
+
 export const styleOptions = [
     {
         label: "Grunge",

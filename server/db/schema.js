@@ -54,6 +54,30 @@ export const PassCodeSchema = new Schema(
     { collection: "pass_codes" }
 );
 
+const FluxPro11UltraSchema = new Schema({
+    prompt: {
+        type: String,
+        required: false,
+    },
+    output_format: {
+        type: String,
+        required: false,
+    },
+    aspect_ratio: {
+        type: String,
+        required: false,
+    },
+    safety_tolerance: {
+        type: Number,
+        required: false,
+    },
+    raw: {
+        type: Boolean,
+        default: false,
+        required: false,
+    },
+});
+
 const FluxPro11Schema = new Schema({
     prompt: {
         type: String,
@@ -315,6 +339,10 @@ export const PromptSchema = new Schema(
         },
         flux_11_pro: {
             type: FluxPro11Schema,
+            required: false,
+        },
+        flux_pro_ultra: {
+            type: FluxPro11UltraSchema,
             required: false,
         },
     },

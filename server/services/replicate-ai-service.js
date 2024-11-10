@@ -25,17 +25,19 @@ class ReplicateAiService {
         });
 
         this.models = {
-            flux_pro: process.env.FLUX_PRO, // 0.055c per image --
+            flux_pro_ultra: process.env.FLUX_PRO_ULTRA, // 0.06$ per image --
+            // https://replicate.com/black-forest-labs/flux-1.1-pro-ultra
+            flux_pro: process.env.FLUX_PRO, // 0.055$ per image --
             // https://replicate.com/black-forest-labs/flux-pro
-            flux_11_pro: process.env.FLUX_11_PRO, // 0.04c per image --
+            flux_11_pro: process.env.FLUX_11_PRO, // 0.04$ per image --
             // https://replicate.com/black-forest-labs/flux-1.1-pro
-            flux_schnell: process.env.FLUX_SCHNELL, // 0.003c per image --
+            flux_schnell: process.env.FLUX_SCHNELL, // 0.003$ per image --
             // https://replicate.com/black-forest-labs/flux-schnell
-            flux_dev: process.env.FLUX_DEV, // 0.03c per image --
+            flux_dev: process.env.FLUX_DEV, // 0.03$ per image --
             // https://replicate.com/black-forest-labs/flux-dev
-            avatar: process.env.FOFR_BECOME_IMAGE_MODEL, // 0.02c per image --
+            avatar: process.env.FOFR_BECOME_IMAGE_MODEL, // 0.02$ per image --
             // https://replicate.com/fofr/become-image
-            sticker: process.env.FOFR_STICKER_MODEL, // 0.02c per image --
+            sticker: process.env.FOFR_STICKER_MODEL, // 0.02$ per image --
             // https://replicate.com/fofr/face-to-sticker
         };
     }
@@ -45,7 +47,6 @@ class ReplicateAiService {
     }
 
     async startImageTask(userDetails, preset = false) {
-        console.log("Starting image task preset is...", preset);
         if (preset) {
             userDetails = {
                 ...userDetails,
@@ -66,7 +67,6 @@ class ReplicateAiService {
         } = userDetails;
         const user = await UserService.getUserById(user_id);
 
-        console.log("User ID", user_id);
         // (1) ================ COST CHECK ================
         if (user?.token_balance < cost) {
             return {
@@ -138,6 +138,7 @@ class ReplicateAiService {
         this.state.get(task_id).controller = controller;
 
         try {
+            console.log(input, "input", this.models[model], "model");
             const output = await this.replicate.run(this.models[model], {
                 input,
                 signal,
@@ -176,7 +177,6 @@ class ReplicateAiService {
         console.log(`Canceling task: ${task_id}`);
         this.state.get(task_id).canceled = true;
         this.state.get(task_id).controller.abort();
-        this.state.delete(task_id);
     }
 
     async creditUser(credits, task_id) {
@@ -199,10 +199,11 @@ class ReplicateAiService {
         );
 
         if (t.canceled) {
+            this.state.delete(task_id);
             return {
                 success: false,
                 status: "canceled",
-                message: `Task ${task_id} has timed out.`,
+                message: `Task ${task_id} has been canceled.`,
             };
         }
 
@@ -333,11 +334,11 @@ class ReplicateAiService {
                 };
 
                 // Hide the actual prompt
-                console.log("aggregate: ", prompt_aggregate);
                 if (state.preset) {
                     prompt_aggregate[state.model].prompt = state.preset_id;
                 }
 
+                console.log("Saving prompt: ", prompt_aggregate.prompt_id);
                 // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);
 
