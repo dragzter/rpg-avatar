@@ -260,7 +260,7 @@
                         <template v-for="(image, index) in imagesV2">
                             <div
                                 :class="[
-                                    `image-grid-block mx-auto ms-lg-0  w-100 gblock-${index + 1}`,
+                                    `image-grid-block mx-auto ms-lg-0 position-relative w-100 gblock-${index + 1}`,
                                     {
                                         'h-auto': loaded,
                                         'w-auto': loaded,
