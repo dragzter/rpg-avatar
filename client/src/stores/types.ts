@@ -261,3 +261,10 @@ export interface QuickPromptHistory {
     thumbnails?: string[];
     urls?: string[];
 }
+
+export interface CreateAvatarPostArgs {
+    baseImageBlob: Blob;
+    faceImageBlob: Blob;
+    cost: number;
+    user_id: string;
+}

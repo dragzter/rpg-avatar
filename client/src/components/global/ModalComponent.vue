@@ -7,7 +7,10 @@
         aria-labelledby="exampleModalLabel"
         tabindex="-1"
     >
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div
+            :class="{ 'modal-fullscreen': fullSize }"
+            class="modal-dialog modal-dialog-scrollable modal-dialog-centered"
+        >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 v-if="modalTitle" class="modal-title">
@@ -47,6 +50,10 @@ const props = defineProps({
     wrapperClasses: {
         type: String,
         default: "",
+    },
+    fullSize: {
+        type: Boolean,
+        default: false,
     },
     size: {
         type: String,

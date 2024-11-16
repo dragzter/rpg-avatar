@@ -5,9 +5,7 @@
             <div class="d-flex align-items-center" style="height: 120px">
                 <div :class="`rpg-loader-${loaderNumber} mx-auto`"></div>
             </div>
-            <button class="btn btn-tertiary mt-2" @click="randomizeLoader">
-                Loader
-            </button>
+            <button class="btn btn-tertiary mt-2" @click="randomizeLoader">Loader</button>
         </div>
     </div>
 </template>
@@ -22,7 +20,7 @@ const loaderNumber = ref(Math.floor(Math.random() * 70) + 1);
 const aiStore = useAiStore();
 
 // COMPUTED
-const loading = computed(() => aiStore.requestLoading);
+const loading = computed(() => aiStore.requestLoading || aiStore.avatarRequestLoading);
 
 // HANDLERS
 const randomizeLoader = () => {

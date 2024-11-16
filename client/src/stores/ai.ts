@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import type { AiImageResponse, ImageTaskStartedResponse, UserAIPrompt } from "@/stores/types";
+import type {
+    AiImageResponse,
+    CreateAvatarPostArgs,
+    ImageTaskStartedResponse,
+    UserAIPrompt,
+} from "@/stores/types";
 import { API, ApiTaskStatus, STORAGE_KEYS } from "@/utils/";
 import axios, { type AxiosResponse } from "axios";
 import { useUserStore } from "@/stores/user";
@@ -9,7 +14,9 @@ import { modelRequestMapper } from "@/utils/model-utils";
 export const useAiStore = defineStore("aiImages", {
     state: () => ({
         generatedImageUrl: "",
+        generatedAvatarUrl: "",
         requestLoading: false,
+        avatarRequestLoading: false,
         generatedImagesV2: [] as AiImageResponse[],
         imagesLoaded: false,
         toastMessage: "",
@@ -18,6 +25,7 @@ export const useAiStore = defineStore("aiImages", {
         task_id: "",
         toastType: "success",
         toastError: false,
+        avatarTaskId: "",
         aiGeneratedPromptLoading: false,
     }),
     actions: {
@@ -45,6 +53,85 @@ export const useAiStore = defineStore("aiImages", {
                 storage.rm(STORAGE_KEYS.task_id);
             } catch (err) {
                 console.log(err);
+            }
+        },
+
+        async createAvatar({ baseImageBlob, faceImageBlob, user_id, cost }: CreateAvatarPostArgs) {
+            try {
+                this.generatedAvatarUrl = "";
+                this.avatarRequestLoading = true;
+
+                // Create FormData and append both image blobs
+                const formData = new FormData();
+                formData.append("user_id", user_id);
+                formData.append("cost", cost.toString());
+                formData.append("baseImage", baseImageBlob, "base-image.jpg");
+                formData.append("faceImage", faceImageBlob, "face-image.jpg");
+
+                const response = await axios.post(API.create_avatar_start, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+
+                if (response.data?.task_id) {
+                    this.avatarTaskId = response.data.task_id;
+                    const userStore = useUserStore();
+
+                    await new Promise<void>((resolve) => {
+                        const pollStatus = setInterval(async () => {
+                            try {
+                                const statusResp = await axios.post(API.create_avatar_status, {
+                                    task_id: this.avatarTaskId,
+                                });
+
+                                const taskId = this.avatarTaskId;
+                                const outcomes: Record<string, () => void | Promise<void>> = {
+                                    [ApiTaskStatus.COMPLETE]: async () => {
+                                        clearInterval(pollStatus);
+                                        const avatarResp = await axios.post(API.create_avatar_download, {
+                                            task_id: taskId,
+                                        });
+                                        console.log("Complete");
+                                        console.log(avatarResp.data);
+
+                                        this.generatedAvatarUrl = avatarResp.data?.images || "";
+                                        userStore.user.token_balance = avatarResp.data.new_token_balance;
+                                        resolve();
+                                    },
+                                    [ApiTaskStatus.PENDING]: () => {
+                                        console.log("Avatar Pending...");
+                                    },
+                                    [ApiTaskStatus.FAILED]: () => {
+                                        clearInterval(pollStatus);
+                                        console.log("Avatar Failed");
+                                        resolve();
+                                    },
+                                    [ApiTaskStatus.CANCELED]: () => {
+                                        clearInterval(pollStatus);
+                                        console.log("Avatar Canceled");
+                                        resolve();
+                                    },
+                                    [ApiTaskStatus.TIMEOUT]: () => {
+                                        clearInterval(pollStatus);
+                                        console.log("Avatar Timeout");
+                                        resolve();
+                                    },
+                                };
+
+                                outcomes[statusResp.data.status as string]();
+                            } catch (err) {
+                                console.log(err);
+                                clearInterval(pollStatus);
+                                resolve(); // Resolve in case of error to prevent hanging
+                            }
+                        }, 1000);
+                    });
+                }
+            } catch (err) {
+                console.log(err);
+            } finally {
+                this.avatarRequestLoading = false; // Only turns false once polling ends
             }
         },
 

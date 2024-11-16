@@ -396,7 +396,7 @@ const showLightbox = ref(false);
  * =*'^'*= COMPUTED =*'^'*=
  */
 const isFluxModelRequest = computed(() => fluxModels.value.includes(selected_model.value.value));
-const rpgUser = computed(() => userStore.user || { token_balance: 0 });
+const rpgUser = computed(() => userStore.user || { token_balance: 0, id: "", nsfw_pass: false });
 const maxImagesPossible = computed(() => {
     if (rpgUser.value.token_balance === 0) {
         return 0;
@@ -462,7 +462,9 @@ const generateRandomPrompt = async () => {
         await loginWithPopup();
     }
 
-    userSelections.value.archetype = characterTypes[Math.floor(Math.random() * characterTypes.length)]?.value;
+    userSelections.value.archetype = <string>(
+        characterTypes[Math.floor(Math.random() * characterTypes.length)]?.value
+    );
     userSelections.value.art_style = styleOptions[Math.floor(Math.random() * styleOptions.length)]?.value;
     await aiStore.getRandomPromptV2({
         archetype: userSelections.value.archetype,

@@ -5,7 +5,6 @@ import ProductView from "@/views/ProductView.vue";
 import ReturnPolicyView from "@/views/ReturnPolicyView.vue";
 import ProfileView from "@/views/ProfileView.vue";
 import { createAuthGuard, useAuth0, User } from "@auth0/auth0-vue";
-import GalleryView from "@/views/GalleryView.vue";
 import LoaderView from "@/views/LoaderView.vue";
 import AdminDashboard from "@/views/AdminDashboard.vue";
 import SupportView from "@/views/SupportView.vue";
@@ -14,6 +13,7 @@ import PageNotFound from "@/views/PageNotFound.vue";
 import PrivacyPolicy from "@/views/PrivacyPolicy.vue";
 import DeletionStatusView from "@/views/DeletionStatusView.vue";
 import CharacterCatalog from "@/views/CharacterCatalog.vue";
+import GenerateAvatarView from "@/views/GenerateAvatarView.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -23,6 +23,11 @@ export function createRouter(app: App): Router {
                 path: "/",
                 name: "home",
                 component: GenerateImageView,
+            },
+            {
+                path: "/create-avatar",
+                name: "avatar",
+                component: GenerateAvatarView,
             },
             {
                 path: "/generate-image",

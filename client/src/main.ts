@@ -14,6 +14,7 @@ import App from "./App.vue";
 import { createRouter } from "./router";
 import { createAuth0 } from "@auth0/auth0-vue";
 import { createHead } from "@vueuse/head";
+import "animate.css";
 
 const app = createApp(App);
 const head = createHead(); // Initialize `createHead`

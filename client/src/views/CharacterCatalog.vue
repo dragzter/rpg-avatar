@@ -13,7 +13,9 @@
                 </div>
                 <div class="mt-4">
                     <div class="d-flex align-items-center">
-                        <h1 class="text-white">Preset Prompt Gallery</h1>
+                        <h1 class="text-white">
+                            <strong class="text-warning">1 Click Create</strong> Gallery
+                        </h1>
                         <span class="badge ms-3 bg-danger">NEW</span>
                     </div>
                     <p class="mx-auto lead mt-3">

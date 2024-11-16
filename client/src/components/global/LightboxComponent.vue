@@ -153,33 +153,46 @@ const downloadImage = async (url) => {
     await nextTick();
 
     try {
-        // Call the Node.js server to download the image, passing URL as a query parameter
-        const response = await axios.get(import.meta.env.VITE_APP_API_URL + "/download-image", {
-            params: {
-                url: url,
-            },
-            responseType: "blob", // Expect the binary response as a blob
-        });
+        let blobUrl;
 
-        // Create a URL for the Blob object directly from response.data (the blob)
-        const blobUrl = URL.createObjectURL(response.data);
+        // Check if the URL is a base64 string
+        if (url.startsWith("data:image/")) {
+            // Convert base64 to Blob
+            const byteString = atob(url.split(",")[1]);
+            const mimeType = url.match(/data:(.*?);base64,/)[1];
+            const arrayBuffer = new Uint8Array(byteString.length);
+
+            for (let i = 0; i < byteString.length; i++) {
+                arrayBuffer[i] = byteString.charCodeAt(i);
+            }
+
+            const blob = new Blob([arrayBuffer], { type: mimeType });
+            blobUrl = URL.createObjectURL(blob);
+        } else {
+            // If the URL is not base64, fetch it from the server
+            const response = await axios.get(import.meta.env.VITE_APP_API_URL + "/download-image", {
+                params: { url },
+                responseType: "blob", // Expect binary response as a blob
+            } as any);
+            blobUrl = URL.createObjectURL(response.data);
+        }
 
         // Create a link element for download
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = `rpgavatar.${uuid()}.jpeg`; // Set the desired file name
+        link.download = `rpgavatar.${uuid()}.jpeg`; // Set desired file name
 
         // Trigger the download
         document.body.appendChild(link);
         link.click();
 
-        // Clean up the Blob URL
+        // Clean up
         URL.revokeObjectURL(blobUrl);
         document.body.removeChild(link);
 
         emit("toastMessage", "Download completed!");
-    } catch (err: any) {
-        console.log("Error details:", err.response ? err.response : err);
+    } catch (err) {
+        console.error("Error details:", (err as any).response || err);
         emit("error", err);
         emit("toastMessage", "Download failed");
     }

@@ -6,6 +6,9 @@ import { promptConstructor } from "../utils/prompt-constructor.js";
 import BackblazeStorageService from "../services/backblaze-storage-service.js";
 import axios from "axios";
 import UserService from "../services/user-service.js";
+import multer from "multer";
+
+const upload = multer();
 
 const router = express.Router();
 
@@ -181,6 +184,70 @@ router.post("/api/image/delete", async (req, res) => {
             success: false,
             error: error.message,
         });
+    }
+});
+
+router.post(
+    "/api/image/avatar",
+    upload.fields([{ name: "baseImage" }, { name: "faceImage" }]),
+    async (req, res) => {
+        try {
+            const { cost, user_id } = req.body;
+
+            // Ensure files are uploaded
+            if (!req.files || !req.files.baseImage || !req.files.faceImage) {
+                return res.status(400).json({
+                    error: "Both baseImage and faceImage are required.",
+                });
+            }
+
+            // Access the uploaded files from multer
+            const baseImageFile =
+                req.files.baseImage[0].buffer.toString("base64");
+            const faceImageFile =
+                req.files.faceImage[0].buffer.toString("base64");
+
+            // Send these files to your avatar generation service
+            const response = await NovitaAiService.startAvatarGeneration({
+                cost,
+                user_id,
+                baseImage: baseImageFile,
+                faceImage: faceImageFile,
+            });
+
+            console.log(response);
+
+            res.status(200).json(response);
+        } catch (error) {
+            console.error("Error in avatar generation:", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+);
+
+router.post("/api/image/avatar-status", async (req, res) => {
+    try {
+        const { task_id } = req.body;
+
+        const response = await NovitaAiService.checkAvatarStatus(task_id);
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error("Error in avatar generation status:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+router.post("/api/image/avatar-download", async (req, res) => {
+    try {
+        const { task_id } = req.body;
+
+        const response = await NovitaAiService.getAvatarImage(task_id);
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error("Error in avatar download:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
 

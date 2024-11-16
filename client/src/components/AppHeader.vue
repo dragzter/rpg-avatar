@@ -22,7 +22,9 @@
                             >BUY
                         </router-link>
 
+                        <router-link class="nav-link mx-1" to="create-avatar">AVATAR MAKER </router-link>
                         <router-link class="nav-link mx-1 accent-link" to="gallery">GALLERY </router-link>
+
                         <!--                        <router-link class="btn btn-secondary mx-2" to="generate-image"-->
                         <!--                            >GENERATE-->
                         <!--                        </router-link>-->

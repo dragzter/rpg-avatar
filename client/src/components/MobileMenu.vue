@@ -36,6 +36,9 @@
 
                             <router-link class="nav-link" to="gallery">GALLERY </router-link>
                             <router-link class="btn btn-primary" to="generate-image">GENERATE </router-link>
+                            <router-link class="btn btn-primary" to="create-avatar"
+                                >CREATE AVATAR
+                            </router-link>
                         </div>
                     </div>
                 </div>
@@ -43,3 +46,4 @@
         </div>
     </div>
 </template>
+<script setup></script>

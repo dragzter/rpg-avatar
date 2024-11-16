@@ -10,6 +10,7 @@ import {
     promptEnhance,
 } from "../utils/prompt-constructor.js";
 import OpenAiService from "./open-ai-service.js";
+import { checkAndConvertImage } from "../utils/helpers.js";
 
 class NovitaAIService {
     // store state specific to the user/request
@@ -32,6 +33,8 @@ class NovitaAIService {
         "adherence",
     ];
 
+    maxAvatarResolution = 2048;
+
     defaultModel = "gleipnir_v20BF16_174601.safetensors";
     model_selection = {
         character_model: "gleipnir_v20BF16_174601.safetensors",
@@ -53,6 +56,110 @@ class NovitaAIService {
 
     constructor() {
         this.client = new NovitaSDK(process.env.NOVITA_API_KEY);
+    }
+
+    async checkAvatarStatus(task_id) {
+        const state = this.state.get(task_id);
+        return {
+            status: state.status,
+        };
+    }
+
+    async deleteTask(task_id) {
+        delete this.state.delete(task_id);
+        return {
+            message: "Task deleted successfully.",
+            success: true,
+        };
+    }
+
+    async getAvatarImage(task_id) {
+        const state = this.state.get(task_id);
+        return {
+            images: state.images,
+            message: state.message,
+            success: state.success,
+            new_token_balance: state.new_token_balance,
+        };
+    }
+
+    async startAvatarGeneration(userData) {
+        const user = await UserService.getUserById(userData.user_id);
+        if (user?.token_balance < userData.cost) {
+            return {
+                message:
+                    "Not enough tokens for this request. Purchase more tokens.",
+                success: false,
+            };
+        }
+
+        // Convert images to base64 data URLs
+        const img_file = await checkAndConvertImage(userData.baseImage);
+        const face_img_file = await checkAndConvertImage(userData.faceImage);
+
+        const request = {
+            image_file: img_file,
+            face_image_file: face_img_file,
+            extra: {
+                response_image_type: "jpeg",
+            },
+        };
+
+        try {
+            const task_id = uuidv4();
+            // Set the Instance State
+            this.state.set(task_id, {
+                user,
+                task_id,
+                status: ApiTaskStatus.PENDING,
+                prompt: {
+                    files: request,
+                    details: userData.details || "Created Avatar",
+                },
+            });
+
+            // Initiate the image generation
+            this.client
+                .mergeFace(request)
+                .then(async (response) => {
+                    await this.creditUserForImages(userData.cost, task_id);
+                    const state = this.state.get(task_id);
+
+                    this.state.set(task_id, {
+                        ...state,
+                        images: response.image_file,
+                        status: ApiTaskStatus.COMPLETE,
+                        success: true,
+                        message: "Avatar successfully created.",
+                        new_token_balance: state.user.token_balance,
+                    });
+                })
+                .catch((error) => {
+                    console.log("Error initiating image generation:", error);
+                    this.state.set(task_id, {
+                        status: ApiTaskStatus.FAILED,
+                        success: false,
+                        message:
+                            "Avatar creation failed, this is likely a network problem.",
+                        error,
+                    });
+                });
+
+            console.log("Avatar generation started.");
+            return {
+                task_id,
+                success: true,
+                message: "Image generation started.",
+            };
+        } catch (error) {
+            console.log("Error initiating image generation:", error);
+            return {
+                success: false,
+                message:
+                    "Error initiating image generation. This is likely an issue with the server.",
+                error,
+            };
+        }
     }
 
     async startImageGeneration(userData) {

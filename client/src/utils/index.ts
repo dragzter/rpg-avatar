@@ -33,6 +33,9 @@ export const API = {
     cancel_flux_image: import.meta.env.VITE_APP_API_URL + "/api/repl/cancel",
     get_images_paginated: import.meta.env.VITE_APP_API_URL + "/api/images-paginated",
     delete_empty_prompts: import.meta.env.VITE_APP_API_URL + "/users/delete-empty-prompts",
+    create_avatar_start: import.meta.env.VITE_APP_API_URL + "/api/image/avatar",
+    create_avatar_status: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-status",
+    create_avatar_download: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-download",
 };
 
 export const STORAGE_KEYS = {
@@ -45,12 +48,33 @@ export const STORAGE_KEYS = {
     new_images: "new_images",
 };
 
-export const ApiTaskStatus = {
+export const ApiTaskStatus: Record<string, string> = {
     PENDING: "pending",
     COMPLETE: "complete",
     FAILED: "failed",
     CANCELED: "canceled",
     TIMEOUT: "timeout",
+};
+
+export const AvatarTags = {
+    female: "female",
+    models: "models",
+    male: "male",
+    vintage: "vintage",
+    watercolor: "watercolor",
+    realism: "realism",
+    military: "military",
+    portrait: "portrait",
+    seasonal: "seasonal",
+    cyberpunk: "cyberpunk",
+    fantasy: "fantasy",
+    sci_fi: "sci fi",
+    anime: "anime",
+    cartoon: "cartoon",
+    superhero: "superhero",
+    horror: "horror",
+    historical: "historical",
+    sports: "sports",
 };
 
 export function getCurrencyLabel(amount: number) {
