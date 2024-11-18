@@ -74,7 +74,6 @@
                                 <div
                                     class="user-face-image-wrapper ms-2 flex-column"
                                     :class="{ 'pe-none': loading }"
-                                    @click="triggerFileUpload"
                                 >
                                     <h5 class="mb-3">
                                         <span class="prompt-info-text"><strong>2.</strong></span
@@ -100,6 +99,7 @@
                                     <div
                                         class="user-face-image position-relative"
                                         :class="{ 'face-image-selected': uploadedImage }"
+                                        @click="triggerFileUpload"
                                     >
                                         <img v-if="uploadedImage" :src="uploadedImage" alt="Uploaded Image" />
                                         <div v-if="!uploadedImage" class="position-absolute p-3">
@@ -225,7 +225,7 @@
                         </div>
 
                         <hr />
-                        <div class="row quick-select-base-image-row mb-4">
+                        <div class="row quick-select-base-image-row mb-4 d-none d-md-block">
                             <h6 class="text-white">
                                 <i class="fa-solid fa-bolt-lightning text-warning"></i> SAMPLE BASE IMAGES
                             </h6>
@@ -310,13 +310,32 @@
         </div>
 
         <!-- Full screen modal -->
-        <modal-component id="base-image-presets" modal-title="Select Base Image" size="lg" :full-size="true">
+        <modal-component id="base-image-presets" :full-size="true" modal-title="Pick Base Image" size="lg">
             <template v-for="(gallery, key) in baseImages.slice(1)">
                 <AvatarGridBlock
                     :items="gallery.items"
                     :title="gallery.title"
                     @image-selected="setBaseImage"
                 />
+            </template>
+            <template #header>
+                <div class="ms-auto base-image-modal-upload me-4" @click="triggerBaseFileUpload">
+                    <button class="btn btn-primary text-center w-100">
+                        <i class="fa-solid text-white fs-4 fa-arrow-up-from-bracket"></i>
+                        <small class="text-center ms-2 fw-bold"
+                            >UPLOAD <span class="d-inline-block d-md-none">CUSTOM BASE IMG</span></small
+                        >
+                    </button>
+
+                    <input
+                        ref="fileInputBase"
+                        accept=".jpeg, .jpg, .png, .webp"
+                        data-max-size="10485760"
+                        style="display: none"
+                        type="file"
+                        @change="handleBaseUpload"
+                    />
+                </div>
             </template>
             <template #footer>
                 <button data-bs-dismiss="modal" class="btn btn-tertiary">Close</button>
@@ -349,98 +368,18 @@ import {
     saveImageToIndexedDB,
 } from "@/utils/index-db-service";
 import { AvatarTags } from "@/utils";
+import { useAuth0 } from "@auth0/auth0-vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
+import { AvatarBaseImages } from "@/utils/avatar-base-image-repo";
+import { Modal } from "bootstrap";
 
-const baseImages = ref([
-    {
-        title: "Beautiful Women",
-        tags: [AvatarTags.female, AvatarTags.models, AvatarTags.fantasy],
-        items: [
-            "/assets/presets/villa.jpeg",
-            "/assets/presets/river_goddess.jpeg",
-            "/assets/elvenmage-4.jpeg",
-            "/assets/avatar-bases/angel_eyes.jpeg",
-            "/assets/avatar-bases/red_bikini_lounge.jpeg",
-        ],
-    },
-    {
-        title: "Beautiful Women",
-        tags: [AvatarTags.female, AvatarTags.models, AvatarTags.fantasy],
-        items: [
-            "/assets/presets/blue_sorceress.jpeg",
-            "/assets/presets/slyvan_priestess.jpeg",
-            "/assets/presets/villa.jpeg",
-            "/assets/presets/temple_priestess.jpeg",
-            "/assets/presets/river_goddess.jpeg",
-            "/assets/elvenmage-4.jpeg",
-            "/assets/avatar-bases/red_bikini_lounge.jpeg",
-            "/assets/avatar-bases/smiles_braids.jpeg",
-            "/assets/avatar-bases/druidess.jpeg",
-            "/assets/avatar-bases/look_back.jpeg",
-            "/assets/avatar-bases/the_good_witch.jpeg",
-            "/assets/avatar-bases/cyber_lock.jpeg",
-            "/assets/avatar-bases/relaxed_rogue.jpeg",
-            "/assets/avatar-bases/sports1.jpeg",
-        ],
-    },
-    {
-        title: "Male RPG Characters",
-        tags: [],
-        items: [
-            "/assets/avatar-bases/old_monk.jpeg",
-            "/assets/avatar-bases/artificer_2.jpeg",
-            "/assets/avatar-bases/beefy_fighter.jpeg",
-            "/assets/avatar-bases/future_soldier.jpeg",
-            "/assets/avatar-bases/male_viking_2.jpeg",
-        ],
-    },
-    {
-        title: "Realism",
-        tags: [],
-        items: ["/assets/avatar-bases/army_1.jpeg", "/assets/avatar-bases/captain.jpeg"],
-    },
-]);
-
-// const baseImageSamples = ref([
-//     //"/assets/presets/blue_sorceress.jpeg",
-//     //"/assets/presets/slyvan_priestess.jpeg",
-//     "/assets/presets/villa.jpeg",
-//     //"/assets/presets/temple_priestess.jpeg",
-//     "/assets/presets/river_goddess.jpeg",
-//     "/assets/elvenmage-4.jpeg",
-//     "/assets/avatar-bases/angel_eyes.jpeg",
-//     "/assets/avatar-bases/red_bikini_lounge.jpeg",
-// ]);
-//
-// const beautifulWomen = ref([
-//     "/assets/presets/blue_sorceress.jpeg",
-//     "/assets/presets/slyvan_priestess.jpeg",
-//     "/assets/presets/villa.jpeg",
-//     "/assets/presets/temple_priestess.jpeg",
-//     "/assets/presets/river_goddess.jpeg",
-//     "/assets/elvenmage-4.jpeg",
-//     "/assets/avatar-bases/red_bikini_lounge.jpeg",
-//     "/assets/avatar-bases/smiles_braids.jpeg",
-//     "/assets/avatar-bases/druidess.jpeg",
-//     "/assets/avatar-bases/look_back.jpeg",
-//     "/assets/avatar-bases/the_good_witch.jpeg",
-//     "/assets/avatar-bases/cyber_lock.jpeg",
-//     "/assets/avatar-bases/relaxed_rogue.jpeg",
-//     "/assets/avatar-bases/sports1.jpeg",
-// ]);
-//
-// const maleRpgCharacters = ref([
-//     "/assets/avatar-bases/old_monk.jpeg",
-//     "/assets/avatar-bases/artificer_2.jpeg",
-//     "/assets/avatar-bases/beefy_fighter.jpeg",
-//     "/assets/avatar-bases/future_soldier.jpeg",
-//     "/assets/avatar-bases/male_viking_2.jpeg",
-// ]);
+const baseImages = ref(AvatarBaseImages);
 
 const realismSamples = ref(["/assets/avatar-bases/army_1.jpeg", "/assets/avatar-bases/captain.jpeg"]);
 
 const userStore = useUserStore();
 const aiStore = useAiStore();
+const { isAuthenticated, loginWithPopup } = useAuth0();
 
 const fileInput = ref(null); // Reference to the hidden file input
 const fileInputBase = ref(null);
@@ -451,6 +390,7 @@ const showToast = ref(false);
 const showThumbnailLightBox = ref(false);
 const lightboxThumbnailIndex = ref(0);
 const lightboxImages = ref([] as string[]);
+const modalInstance = ref<Modal | null>(null);
 
 // Computed
 const rpgUser = computed(() => userStore.user || { token_balance: 0, id: "" });
@@ -489,6 +429,8 @@ const handleBaseUpload = async (event) => {
 
         await saveImageToIndexedDB(file);
         await loadBaseImages();
+
+        modalInstance.value?.hide();
     }
 };
 
@@ -514,20 +456,26 @@ const setBaseImage = (sample: string) => {
     if (!loading.value) {
         baseImage.value = sample;
     }
+
+    // Close modal
+    modalInstance.value?.hide();
 };
 
 const createAvatar = async () => {
-    // Create the avatar
-    const faceImg = await axios.get(uploadedImage.value, { responseType: "blob" } as any);
-    const baseImg = await axios.get(baseImage.value, { responseType: "blob" } as any);
+    if (!isAuthenticated.value) {
+        await loginWithPopup();
+    } else {
+        // Create the avatar
+        const faceImg = await axios.get(uploadedImage.value, { responseType: "blob" } as any);
+        const baseImg = await axios.get(baseImage.value, { responseType: "blob" } as any);
 
-    console.log(baseImg.data, faceImg.data);
-    await aiStore.createAvatar({
-        baseImageBlob: baseImg.data,
-        faceImageBlob: faceImg.data,
-        cost: 6,
-        user_id: rpgUser.value.id,
-    });
+        await aiStore.createAvatar({
+            baseImageBlob: baseImg.data,
+            faceImageBlob: faceImg.data,
+            cost: 6,
+            user_id: rpgUser.value.id,
+        });
+    }
 };
 
 const loadBaseImages = async () => {
@@ -545,5 +493,11 @@ const loadBaseImages = async () => {
 // Life-cycle
 onMounted(async () => {
     await loadBaseImages();
+
+    const modalElement = document.getElementById("base-image-presets");
+    if (modalElement) {
+        // @ts-ignore
+        modalInstance.value = Modal.getInstance(modalElement) || new Modal(modalElement);
+    }
 });
 </script>

@@ -23,11 +23,9 @@ export async function saveImageToIndexedDB(file) {
 
     const countRequest = store.count();
     countRequest.onsuccess = () => {
-        if (countRequest.result >= MAX_IMAGES) {
-            alert("You can only store up to 5 images.");
-            return;
+        if (countRequest.result < MAX_IMAGES) {
+            store.add({ file });
         }
-        store.add({ file });
     };
 
     transaction.oncomplete = () => console.log("Image saved to IndexedDB.");

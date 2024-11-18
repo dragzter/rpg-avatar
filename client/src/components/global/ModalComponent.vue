@@ -16,6 +16,7 @@
                     <h5 v-if="modalTitle" class="modal-title">
                         {{ modalTitle }}
                     </h5>
+                    <slot name="header"></slot>
                     <button
                         type="button"
                         class="btn-close"

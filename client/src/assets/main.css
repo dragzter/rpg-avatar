@@ -2860,6 +2860,37 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
     border-radius: 8px !important;;
 }
 
+#base-image-presets {
+    .modal-header {
+        .btn-close {
+            margin: 0 !important;
+        }
+        
+        .base-image-modal-upload {
+            width: auto;
+        }
+        
+        @media (max-width: 576px) {
+            .modal-title {
+                display: none !important;
+            }
+            
+            .base-image-modal-upload {
+                width: 100%;
+            }
+        }
+        
+    }
+    
+    .modal-body {
+        @media (max-width: 576px) {
+            text-align: center;
+        }
+    }
+}
+
+
+
 #generate-avatar {
     .avatar-generator {
         max-width: 650px;
@@ -2907,6 +2938,8 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         border: 1px solid var(--dark-600);
         border-radius: 8px;
         position: relative;
+        aspect-ratio: 1 / 1;
+        cursor: pointer;
         
         &::before {
             content: "";
@@ -2936,10 +2969,10 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         .base-image-wrapper,
         .user-face-image-wrapper {
             width: 100%;
-            cursor: pointer;
             display: flex;
             
             .base-image, .user-face-image {
+                cursor: pointer;
                 overflow: hidden;
                 position: relative;
                 width: 100%;

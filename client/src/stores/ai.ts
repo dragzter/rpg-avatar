@@ -93,8 +93,6 @@ export const useAiStore = defineStore("aiImages", {
                                             task_id: taskId,
                                         });
                                         console.log("Complete");
-                                        console.log(avatarResp.data);
-
                                         this.generatedAvatarUrl = avatarResp.data?.images || "";
                                         userStore.user.token_balance = avatarResp.data.new_token_balance;
                                         resolve();
