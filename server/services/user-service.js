@@ -94,6 +94,7 @@ class UserService {
                         file_names: p.file_names,
                         preset: p.preset,
                         published_images: p.published_images,
+                        avatar: p.avatar || false,
                     };
 
                     // find out of the prompt contains any one of the properties in models
@@ -140,7 +141,7 @@ class UserService {
             }).exec();
             const model = Object.keys(this.models).find((key) => _p[key]);
 
-            console.log(_p[model]);
+            console.log(_p[model], "model", _p);
             if (model) {
                 _p.prompt = _p[model].prompt;
                 _p.size = getSize(_p[model]);

@@ -112,10 +112,8 @@ class NovitaAIService {
                 user,
                 task_id,
                 status: ApiTaskStatus.PENDING,
-                prompt: {
-                    files: request,
-                    details: userData.details || "Created Avatar",
-                },
+                avatar: true,
+                prompt: "Created Avatar",
             });
 
             // Initiate the image generation
@@ -133,6 +131,11 @@ class NovitaAIService {
                         message: "Avatar successfully created.",
                         new_token_balance: state.user.token_balance,
                     });
+
+                    this.downloadAndUploadImages(
+                        [response.image_file],
+                        task_id
+                    );
                 })
                 .catch((error) => {
                     console.log("Error initiating image generation:", error);
@@ -145,7 +148,6 @@ class NovitaAIService {
                     });
                 });
 
-            console.log("Avatar generation started.");
             return {
                 task_id,
                 success: true,
@@ -284,7 +286,10 @@ class NovitaAIService {
 
     async creditUserForImages(credits, task_id) {
         const state = this.state.get(task_id);
-        state.user.token_balance -= credits;
+        console.log(state.user);
+        if (state.user.token_balance) {
+            state.user.token_balance -= credits;
+        }
         await UserService.saveUser(state.user);
     }
 
@@ -413,7 +418,7 @@ class NovitaAIService {
         });
     }
 
-    downloadAndUploadImages(imageUrls, task_id) {
+    async downloadAndUploadImages(imageUrls, task_id) {
         const state = this.state.get(task_id);
         console.log("Downloading and uploading images...");
         const file_names = [];
@@ -424,11 +429,28 @@ class NovitaAIService {
                 const folder = `${state.user.id.replace("|", "")}`;
                 const file_key = Math.random().toString(36).substring(6);
 
-                const response = await axios.get(url, {
-                    responseType: "arraybuffer",
-                });
+                let buffer;
 
-                const buffer = response.data;
+                if (url.startsWith("http") || url.startsWith("https")) {
+                    // URL case: download the image as a buffer
+                    const response = await axios.get(url, {
+                        responseType: "arraybuffer",
+                    });
+                    buffer = Buffer.from(response.data);
+                } else {
+                    // Base64 case: add the prefix if missing
+                    const base64WithPrefix = url.startsWith("data:image/")
+                        ? url
+                        : `data:image/jpeg;base64,${url}`;
+
+                    const byteString = atob(base64WithPrefix.split(",")[1]);
+                    const arrayBuffer = new Uint8Array(byteString.length);
+                    for (let i = 0; i < byteString.length; i++) {
+                        arrayBuffer[i] = byteString.charCodeAt(i);
+                    }
+                    buffer = Buffer.from(arrayBuffer);
+                }
+
                 const image_key = `${folder}/${file_key}.image.jpeg`;
                 const thumbnail = `${folder}/thumbnails/${file_key}.thumbnail.jpeg`;
 
@@ -454,24 +476,20 @@ class NovitaAIService {
             }
         });
 
-        // Kick off the uploads and thumbnail generation concurrently without waiting for
-        // them to finish
         Promise.all(uploadPromises)
             .then(async () => {
                 console.log("All images and thumbnails uploaded successfully.");
 
                 const prompt_aggregate = {
                     ...state.prompt,
+                    avatar: state.avatar || false,
                     user_id: state.user.id,
                     thumbnails: thumbnail_file_names,
                     file_names: file_names,
                     prompt_id: uuidv4(),
                 };
 
-                // Save the prompt to the database
                 await UserService.savePrompt(prompt_aggregate);
-
-                // Update the user's image count
                 await UserService.getAndUpdateUserImageCount(state.user.id);
             })
             .catch((error) => {

@@ -267,6 +267,10 @@ export const PromptSchema = new Schema(
             type: String,
             required: false,
         },
+        avatar: {
+            type: Boolean,
+            required: false,
+        },
         archetype: {
             type: String,
             required: false,
