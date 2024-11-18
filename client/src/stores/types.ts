@@ -237,6 +237,7 @@ export interface PromptHistoryItem {
     art_style?: string;
     created?: string;
     preset?: string;
+    avatar?: boolean;
     size?: {
         width: number;
         height: number;
@@ -257,6 +258,7 @@ export interface QuickPromptHistory {
     published_images: string[];
     prompt_excerpt: string;
     created?: string;
+    avatar?: boolean;
     preset?: string;
     thumbnails?: string[];
     urls?: string[];

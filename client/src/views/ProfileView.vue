@@ -214,6 +214,15 @@
                                                 </div>
                                                 <div class="col-md-8">
                                                     <div class="card-body">
+                                                        <p
+                                                            v-if="item?.avatar"
+                                                            class="preset-indicator is-avatar"
+                                                        >
+                                                            <i
+                                                                class="fa-sharp fa-solid fa-wand-magic-sparkles"
+                                                            ></i>
+                                                            Avatar
+                                                        </p>
                                                         <p v-if="item?.preset" class="preset-indicator">
                                                             <i
                                                                 class="fa-sharp fa-solid fa-wand-magic-sparkles"
@@ -291,6 +300,9 @@
                             <i class="fa-sharp fa-solid fa-wand-magic-sparkles"></i> Re-run this prompt
                         </button>
                     </template>
+                    <template v-else-if="selectedPrompt?.avatar">
+                        <p class="mt-2">This is an Avatar creation.</p>
+                    </template>
                     <p
                         v-else
                         class="text-white"
@@ -361,7 +373,11 @@
                         prompted
                     </p>
 
-                    <p class="mb-1 rounded-3 p-2" style="background: var(--dark-600)">
+                    <p
+                        v-if="!selectedPrompt.avatar"
+                        class="mb-1 rounded-3 p-2"
+                        style="background: var(--dark-600)"
+                    >
                         {{ selectedPrompt?.size?.width || 0 }}
                         <i class="fa-solid fa-xmark fw-bold"></i>
                         {{ selectedPrompt?.size?.height || 0 }} (px)

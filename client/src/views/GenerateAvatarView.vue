@@ -47,6 +47,8 @@
                                                     class="mx-auto"
                                                     style="max-width: 260px; display: block"
                                                 >
+                                                    Use one of our samples, or upload your own!
+                                                    <hr />
                                                     To ensure accurate face integration, please upload a base
                                                     image where the face is clear, centered, well-lit, and
                                                     fully visible.
