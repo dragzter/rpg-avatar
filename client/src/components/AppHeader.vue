@@ -17,17 +17,14 @@
                     </div>
 
                     <div id="nav-column" class="d-flex align-items-center d-none d-md-inline-flex">
-                        <router-link aria-current="page" class="nav-link mx-1" to="/">HOME </router-link>
+                        <router-link aria-current="page" class="nav-link mx-1" to="/">Generate </router-link>
                         <router-link class="nav-link mx-1 btn-outline-special" to="get-tokens"
-                            >BUY
+                            >Buy
                         </router-link>
-
-                        <router-link class="nav-link mx-1" to="create-avatar">AVATAR MAKER </router-link>
-                        <router-link class="nav-link mx-1 accent-link" to="gallery">GALLERY </router-link>
-
-                        <!--                        <router-link class="btn btn-secondary mx-2" to="generate-image"-->
-                        <!--                            >GENERATE-->
-                        <!--                        </router-link>-->
+                        <router-link class="nav-link mx-1 accent-link" to="gallery">AI Gallery </router-link>
+                        <router-link class="mx-1 btn btn-primary px-2 py-1" to="create-avatar"
+                            ><i class="fa-sharp fa-solid fa-user-ninja"></i> Avatar Maker
+                        </router-link>
                     </div>
 
                     <div id="auth-column">
