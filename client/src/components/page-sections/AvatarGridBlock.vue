@@ -9,10 +9,14 @@
             <div class="col">
                 <div class="grid-container-large g-2">
                     <template v-for="item in items">
-                        <div class="grid-item" data-bs-dismiss="modal">
+                        <div
+                            class="grid-item"
+                            data-bs-dismiss="modal"
+                            style="outline: 1px solid var(--lavender)"
+                        >
                             <img
                                 @click="$emit('imageSelected', item)"
-                                :src="item"
+                                v-lazy="item"
                                 alt="Avatar Base Image Option"
                             />
                         </div>

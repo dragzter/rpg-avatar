@@ -2,7 +2,7 @@
  *  00. Variable
 /* ====================================== */
 :root {
-    --lavender: #a570ff;
+    --lavender: rgba(165, 112, 255, 0.24);
     --pink: #ff6eb2;
     --peach: #ffad66;
     --light: #ffffff;

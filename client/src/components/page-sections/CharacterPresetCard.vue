@@ -9,7 +9,7 @@
             </div>
 
             <img
-                :src="`assets/presets/${data.image}`"
+                v-lazy="{ src: `assets/presets/${data.image}` }"
                 @click="clickImage(`assets/presets/${data.image}`)"
                 class="card-img-top"
                 alt="Fantasy Character"
