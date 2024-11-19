@@ -4,6 +4,7 @@
             <div class="col-sm-12 col-md-12 col-lg-5">
                 <div class="prompt-builder">
                     <div id="prompt-builder-inner" class="d-flex flex-column h-100">
+                        <h1 class="h3 accent-text">Generate AI Art</h1>
                         <div class="d-flex align-items-center justify-content-between">
                             <h6 class="prompt-info-text"><strong>1.</strong> SELECT AI MODEL</h6>
                             <router-link

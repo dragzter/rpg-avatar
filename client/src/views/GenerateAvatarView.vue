@@ -6,7 +6,7 @@
                     <div class="avatar-generator p-3 mb-4">
                         <div class="row mb-4">
                             <div class="col d-flex align-items-center justify-content-between mb-3">
-                                <h3 class="m-0 accent-text">Avatar Maker</h3>
+                                <h1 class="m-0 h3 accent-text">Avatar Maker</h1>
 
                                 <router-link
                                     class="fw-light ms-3"
@@ -374,6 +374,11 @@ import { useAuth0 } from "@auth0/auth0-vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { AvatarBaseImages } from "@/utils/avatar-base-image-repo";
 import { Modal } from "bootstrap";
+import { useHead } from "@vueuse/head";
+import { homeScreenMetaTags } from "@/utils/meta-tags";
+
+// Meta tags
+useHead(homeScreenMetaTags);
 
 const baseImages = ref(AvatarBaseImages);
 
