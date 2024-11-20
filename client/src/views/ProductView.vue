@@ -4,17 +4,11 @@
             <ProductTitle
                 :show-logo="true"
                 css-id="product-currency-title"
-                size="h1"
-                sub-text=" <br><strong>NOTE</strong>: Token redemption and Pass purchases are final and non-refundable."
-                titleHTML="Tokens <span>&</span> Passes"
-            />
-
-            <ProductTitle
-                :wrapper-css-classes="['mt-3', 'mb-5', 'pt-3']"
-                css-id="product-currency-title"
+                :showLogo="false"
+                class="mb-4"
                 size="h2"
-                sub-text="Each token entitles you to one image prompt. Redeem your tokens one-for-one to bring your creative visions to life."
-                titleHTML="Gen <span>Tokens</span>"
+                sub-text=" <br><strong>NOTE</strong>: Token redemption and purchase is final and non-refundable. Redeem tokens for AI-generated images."
+                titleHTML="Buy Tokens"
             />
 
             <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
@@ -36,17 +30,17 @@
             </svg>
 
             <div
-                style="max-width: 1030px; border: 3px solid var(--dark-500)"
-                class="alert rounded-5 d-flex text-white bg-dark-600 align-items-start mx-auto mb-5"
+                class="alert rounded-5 d-flex text-white bg-dark-600 align-items-center justify-content-center mx-auto mb-5"
+                style="max-width: 700px; border: 3px solid var(--dark-500)"
                 role="alert"
             >
                 <svg class="bi flex-shrink-0 me-3" width="24" height="24" role="img" aria-label="Info:">
                     <use xlink:href="#check-circle-fill" />
                 </svg>
-                <h4 class="mb-0">
-                    Each user receives
+                <h4 class="mb-0 text-center">
+                    <span>Users receive </span>
                     <strong class="accent-text">free storage</strong> for up to
-                    <strong class="accent-text">400</strong> of your generated images.
+                    <strong class="accent-text">400</strong> images.
                 </h4>
             </div>
 
