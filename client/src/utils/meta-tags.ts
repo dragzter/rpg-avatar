@@ -27,9 +27,41 @@ export const homeScreenMetaTags = {
         },
         { name: "twitter:image", content: "https://rpgavatar.com/assets/summary-image-rpgavatar.png" },
         { name: "twitter:card", content: "summary_large_image" },
+    ],
+};
 
-        // Optional but recommended for Twitter
-        { name: "twitter:site", content: "@YourTwitterHandle" }, // Replace with your Twitter handle if available
+export const avatarMakerMetaTags = {
+    title: "Avatar Maker | Create Custom RPG Avatars Easily",
+    meta: [
+        // SEO Meta Tags
+        {
+            name: "description",
+            content:
+                "Design unique RPG avatars by blending your face with a wide selection of base" +
+                " images. Explore dozens of pre-made options or upload your own base image for" +
+                " complete customization.",
+        },
+
+        // Open Graph (OG) Meta Tags (for Facebook, LinkedIn, etc.)
+        { property: "og:title", content: "Avatar Maker | Create Custom RPG Avatars Easily" },
+        {
+            property: "og:description",
+            content:
+                "Easily create custom RPG avatars by merging your face with base images. Choose from dozens of templates or upload your own base for endless possibilities.",
+        },
+        { property: "og:image", content: "https://rpgavatar.com/assets/avatar-maker-summary.png" },
+        { property: "og:url", content: "https://rpgavatar.com/avatar-maker" },
+        { property: "og:type", content: "website" },
+
+        // Twitter Meta Tags
+        { name: "twitter:title", content: "Avatar Maker | Create Custom RPG Avatars Easily" },
+        {
+            name: "twitter:description",
+            content:
+                "Combine your face images with base templates to design custom RPG avatars. Explore pre-made bases or upload your own for a fully personalized experience.",
+        },
+        { name: "twitter:image", content: "https://rpgavatar.com/assets/avatar-maker-summary.png" },
+        { name: "twitter:card", content: "summary_large_image" },
     ],
 };
 

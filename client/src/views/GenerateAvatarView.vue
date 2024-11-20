@@ -375,10 +375,10 @@ import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { AvatarBaseImages } from "@/utils/avatar-base-image-repo";
 import { Modal } from "bootstrap";
 import { useHead } from "@vueuse/head";
-import { homeScreenMetaTags } from "@/utils/meta-tags";
+import { avatarMakerMetaTags, homeScreenMetaTags } from "@/utils/meta-tags";
 
 // Meta tags
-useHead(homeScreenMetaTags);
+useHead(avatarMakerMetaTags);
 
 const baseImages = ref(AvatarBaseImages);
 
@@ -388,10 +388,10 @@ const userStore = useUserStore();
 const aiStore = useAiStore();
 const { isAuthenticated, loginWithPopup } = useAuth0();
 
-const fileInput = ref(null); // Reference to the hidden file input
+const fileInput = ref(null);
 const fileInputBase = ref(null);
-const uploadedImage = ref(""); // URL of the uploaded image
-const baseImage = ref(""); // URL of the base image
+const uploadedImage = ref("");
+const baseImage = ref("");
 const savedBaseImages = ref([]);
 const showToast = ref(false);
 const showThumbnailLightBox = ref(false);

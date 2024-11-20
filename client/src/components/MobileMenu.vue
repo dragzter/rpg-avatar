@@ -31,13 +31,15 @@
                 <div class="modal-body">
                     <div class="link-wrapper-mobile-menu">
                         <div id="nav-column-mobile" class="d-flex flex-column">
-                            <router-link aria-current="page" class="nav-link" to="/">HOME </router-link>
-                            <router-link class="nav-link" to="get-tokens">BUY </router-link>
+                            <router-link aria-current="page" class="nav-link" to="/">Home </router-link>
+                            <router-link class="nav-link" to="get-tokens">Buy Tokens </router-link>
 
-                            <router-link class="nav-link" to="gallery">GALLERY </router-link>
-                            <router-link class="btn btn-primary" to="generate-image">GENERATE </router-link>
+                            <router-link class="nav-link" to="gallery">AI Gallery </router-link>
+                            <router-link class="btn btn-tertiary" to="generate-image"
+                                >Generate Characters</router-link
+                            >
                             <router-link class="btn btn-primary" to="create-avatar"
-                                >CREATE AVATAR
+                                ><i class="fa-solid fa-user"></i> Create Avatar
                             </router-link>
                         </div>
                     </div>

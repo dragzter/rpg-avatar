@@ -16,15 +16,17 @@
                         </router-link>
                     </div>
 
-                    <div id="nav-column" class="d-flex align-items-center d-none d-md-inline-flex">
-                        <router-link aria-current="page" class="nav-link mx-1" to="/">Generate </router-link>
-                        <router-link class="nav-link mx-1 btn-outline-special" to="get-tokens"
-                            >Buy
-                        </router-link>
-                        <router-link class="nav-link mx-1 accent-link" to="gallery">AI Gallery </router-link>
+                    <div id="nav-column" class="d-flex align-items-center d-none d-lg-inline-flex">
                         <router-link class="mx-1 btn btn-primary px-2 py-1" to="create-avatar"
                             ><i class="fa-sharp fa-solid fa-user-ninja"></i> Avatar Maker
                         </router-link>
+                        <router-link aria-current="page" class="nav-link mx-1" to="/generate-image"
+                            >Generate AI Art
+                        </router-link>
+                        <router-link class="nav-link mx-1 btn-outline-special" to="get-tokens"
+                            >Buy Tokens
+                        </router-link>
+                        <router-link class="nav-link mx-1 accent-link" to="gallery">AI Gallery </router-link>
                     </div>
 
                     <div id="auth-column">
@@ -103,12 +105,12 @@
                         </div>
 
                         <!-- Mobile menu -->
-                        <div class="mobile-menu-toggle d-md-none">
+                        <div class="mobile-menu-toggle d-lg-none">
                             <button
                                 aria-controls="navbarText"
                                 aria-expanded="false"
                                 aria-label="Toggle navigation"
-                                class="navbar-toggler d-md-none ms-4 mt-1"
+                                class="navbar-toggler d-lg-none ms-4 mt-1"
                                 @click="openMobileMenu"
                                 type="button"
                             >

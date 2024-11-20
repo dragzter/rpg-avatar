@@ -274,7 +274,7 @@
                                     v-if="image?.image_url"
                                     :src="image.image_url"
                                     alt="A generated Image"
-                                    class="img-fluid"
+                                    class="img-fluid position-relative"
                                 />
                                 <LoaderComponent />
                             </div>

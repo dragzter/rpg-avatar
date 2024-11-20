@@ -22,7 +22,7 @@ export function createRouter(app: App): Router {
             {
                 path: "/",
                 name: "home",
-                component: GenerateImageView,
+                component: GenerateAvatarView,
             },
             {
                 path: "/create-avatar",

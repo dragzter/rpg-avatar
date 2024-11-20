@@ -19,8 +19,8 @@
                         <span class="badge ms-3 bg-danger">NEW</span>
                     </div>
                     <p class="mx-auto lead mt-3">
-                        Discover a gallery of <strong class="text-white">ready-made AI prompts</strong>,
-                        curated from popular designs to make creating stunning art as
+                        Enjoy a gallery of <strong class="text-white">ready-made AI prompts</strong>, curated
+                        from popular designs to make creating stunning art as
                         <strong class="text-white">simple as clicking a button</strong>. No need to craft a
                         prompt yourself—just choose a character and let us bring it to life within seconds.
                         Check back soon, <strong class="text-white">new characters added regularly</strong>.
