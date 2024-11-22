@@ -4,7 +4,9 @@ export const homeScreenMetaTags = {
         // SEO Description
         {
             name: "description",
-            content: "Easily create unique, high quality RPG avatars and high-fantasy AI artwork",
+            content:
+                "Easily create unique, high quality RPG characters and high-fantasy AI" +
+                " artwork suitable for game assets and concept art.",
         },
 
         // Open Graph (used by Facebook and other platforms)
@@ -12,18 +14,20 @@ export const homeScreenMetaTags = {
         {
             property: "og:description",
             content:
-                "Easily create unique, high quality RPG avatars, RPG Characters, AI characters and high-fantasy AI artwork",
+                "Easily create unique, high quality RPG characters and high-fantasy AI" +
+                " artwork suitable for game assets and concept art.",
         },
         { property: "og:image", content: "https://rpgavatar.com/assets/summary-image-rpgavatar.png" },
         { property: "og:url", content: "https://rpgavatar.com" },
         { property: "og:type", content: "website" },
 
         // Twitter
-        { name: "twitter:title", content: "RPG Avatar AI Art Generator" },
+        { property: "twitter:title", content: "RPG Avatar AI Art Generator" },
         {
-            name: "twitter:description",
+            property: "twitter:description",
             content:
-                "Easily create unique, high quality RPG avatars, RPG Characters, AI characters and high-fantasy AI artwork",
+                "Easily create unique, high quality RPG characters and high-fantasy AI" +
+                " artwork suitable for game assets and concept art.",
         },
         { name: "twitter:image", content: "https://rpgavatar.com/assets/summary-image-rpgavatar.png" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -35,11 +39,14 @@ export const avatarMakerMetaTags = {
     meta: [
         // SEO Meta Tags
         {
+            property: "og:locale",
+            content: "en_US",
+        },
+        { name: "canonical", content: "https://rpgavatar.com/avatar-maker" },
+        {
             name: "description",
             content:
-                "Design unique RPG avatars by blending your face with a wide selection of base" +
-                " images. Explore dozens of pre-made options or upload your own base image for" +
-                " complete customization.",
+                "Transform yourself into an RPG avatar by seamlessly blending your face with a diverse range of fantasy images using our Avatar Maker. Choose from dozens of pre-made designs or upload your own images.",
         },
 
         // Open Graph (OG) Meta Tags (for Facebook, LinkedIn, etc.)
@@ -77,7 +84,6 @@ export const galleryMetaTags = {
                 " Art" +
                 " work.",
         },
-
         // Open Graph
         { property: "og:title", content: "Prompt Preset Gallery - RPG Avatar AI Art Generator" },
         {

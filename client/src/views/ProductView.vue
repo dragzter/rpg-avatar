@@ -2,9 +2,8 @@
     <div class="pricing-area">
         <div class="container">
             <ProductTitle
-                :show-logo="true"
+                :show-logo="false"
                 css-id="product-currency-title"
-                :showLogo="false"
                 class="mb-4"
                 size="h2"
                 sub-text=" <br><strong>NOTE</strong>: Token redemption and purchase is final and non-refundable. Redeem tokens for AI-generated images."
