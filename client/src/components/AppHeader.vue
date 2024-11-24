@@ -16,9 +16,9 @@
                         </router-link>
                     </div>
 
-                    <div id="nav-column" class="d-flex align-items-center d-none d-lg-inline-flex">
+                    <div id="nav-column" class="d-flex align-items-center d-none d-xl-inline-flex">
                         <router-link class="mx-1 btn btn-primary px-2 py-1" to="create-avatar"
-                            ><i class="fa-sharp fa-solid fa-user-ninja"></i> Avatar Maker
+                            ><i class="fa-sharp fa-solid fa-user-ninja"></i> Avatar Creator
                         </router-link>
                         <router-link aria-current="page" class="nav-link mx-1" to="/generate-image"
                             >Generate AI Art
@@ -52,8 +52,8 @@
                                 type="button"
                             >
                                 <img
-                                    v-if="user?.picture"
-                                    :src="user?.picture"
+                                    v-if="user?.picture || rpgUser?.picture"
+                                    :src="user?.picture || rpgUser?.picture"
                                     alt="User profile picture"
                                     style="width: 40px; border-radius: 50%"
                                 />
@@ -105,12 +105,12 @@
                         </div>
 
                         <!-- Mobile menu -->
-                        <div class="mobile-menu-toggle d-lg-none">
+                        <div class="mobile-menu-toggle d-xl-none">
                             <button
                                 aria-controls="navbarText"
                                 aria-expanded="false"
                                 aria-label="Toggle navigation"
-                                class="navbar-toggler d-lg-none ms-4 mt-1"
+                                class="navbar-toggler d-xl-none ms-4 mt-1"
                                 @click="openMobileMenu"
                                 type="button"
                             >
@@ -142,7 +142,7 @@ const rpgUser = computed(() => userStore.user);
 const loading = computed(() => userStore.userLoading);
 
 const login = () => {
-    loginWithRedirect({ redirect_uri: window.location.href } as Record<string, string>);
+    loginWithRedirect({ redirect_uri: window.location.href } as any);
 };
 
 watch(

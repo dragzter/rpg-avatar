@@ -6,7 +6,11 @@
                     <div class="avatar-generator p-3 mb-4">
                         <div class="row mb-4">
                             <div class="col d-flex align-items-center justify-content-between mb-3">
-                                <h1 class="m-0 h3 accent-text">Avatar Maker</h1>
+                                <div>
+                                    <h1 class="m-0 h3 accent-text">Avatar Creator</h1>
+                                    <FeedbackTriggerSnippet />
+                                    <small>Add a base image and a face image to get started.</small>
+                                </div>
 
                                 <router-link
                                     class="fw-light ms-3"
@@ -16,6 +20,7 @@
                                     to="get-tokens"
                                 >
                                     <h5
+                                        style="min-width: 110px"
                                         :class="{ 'border-danger': rpgUser.token_balance === 0 }"
                                         class="user-tokens-wrapper mb-0"
                                     >
@@ -133,7 +138,7 @@
                             </div>
                         </div>
                         <div class="row mb-3">
-                            <div class="col d-flex align-items-center">
+                            <div class="col d-flex align-items-center position-relative">
                                 <button
                                     @click="createAvatar"
                                     :disabled="!uploadedImage || !baseImage || loading"
@@ -353,6 +358,27 @@
             :is-admin="false"
         />
     </div>
+
+    <feedback-module
+        v-show="rpgUser?.id && !rpgUser?.custom_attributes?.[feedbackKey]"
+        :feedback_key="feedbackKey"
+        :user-id="rpgUser.id"
+        @feedback-submitted="onFeedbackSubmit"
+    />
+
+    <feedback-modal
+        :feedback_key="feedbackKey"
+        :user-id="rpgUser.id"
+        @feedback-submitted="onFeedbackSubmit"
+    />
+
+    <ToastComponent
+        :autoClose="true"
+        :autoCloseDelay="4000"
+        :isError="isError"
+        :message="userStore.toastMessage"
+        :show="showToast"
+    />
 </template>
 
 <script setup lang="ts">
@@ -369,13 +395,17 @@ import {
     getAllImagesFromIndexedDB,
     saveImageToIndexedDB,
 } from "@/utils/index-db-service";
-import { AvatarTags } from "@/utils";
+import { AvatarTags, CustomUserAttrs } from "@/utils";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { AvatarBaseImages } from "@/utils/avatar-base-image-repo";
 import { Modal } from "bootstrap";
 import { useHead } from "@vueuse/head";
 import { avatarMakerMetaTags, homeScreenMetaTags } from "@/utils/meta-tags";
+import FeedbackModule from "@/components/page-sections/FeedbackModule.vue";
+import ToastComponent from "@/components/global/ToastComponent.vue";
+import FeedbackModal from "@/components/page-sections/FeedbackModal.vue";
+import FeedbackTriggerSnippet from "@/components/page-sections/FeedbackTriggerSnippet.vue";
 
 // Meta tags
 useHead(avatarMakerMetaTags);
@@ -398,11 +428,13 @@ const showThumbnailLightBox = ref(false);
 const lightboxThumbnailIndex = ref(0);
 const lightboxImages = ref([] as string[]);
 const modalInstance = ref<Modal | null>(null);
+const feedbackKey = CustomUserAttrs.avatar_feedback;
 
 // Computed
-const rpgUser = computed(() => userStore.user || { token_balance: 0, id: "" });
+const rpgUser = computed(() => userStore.user || { token_balance: 0, id: "", custom_attributes: {} });
 const avatarUrl = computed(() => aiStore.generatedAvatarUrl);
 const loading = computed(() => aiStore.avatarRequestLoading);
+const isError = computed(() => aiStore.toastError);
 
 // Methods
 const onToastMessage = (message) => {
@@ -495,6 +527,11 @@ const loadBaseImages = async () => {
     } catch (error) {
         console.error("Failed to load images:", error);
     }
+};
+
+const onFeedbackSubmit = () => {
+    showToast.value = true;
+    userStore.toastMessage = "Thank you for your feedback!";
 };
 
 // Life-cycle

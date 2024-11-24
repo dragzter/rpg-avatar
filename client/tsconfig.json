@@ -4,7 +4,11 @@
     "types": [
       "./src/vue-shim.d.ts"
     ],
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
   },
   "references": [
     {

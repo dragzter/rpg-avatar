@@ -7,6 +7,7 @@ export const API = {
     start_image_v2_task: import.meta.env.VITE_APP_API_URL + "/api/task-image-v2",
     start_premium_image: import.meta.env.VITE_APP_API_URL + "/api/repl/start-image-task",
     get_user: import.meta.env.VITE_APP_API_URL + "/api/user",
+    get_user_by_id: import.meta.env.VITE_APP_API_URL + "/api/get/user",
     redeem_code: import.meta.env.VITE_APP_API_URL + "/api/redeem",
     redeem_code_v2: import.meta.env.VITE_APP_API_URL + "/api/redeem-v2",
     sign_disclaimer: import.meta.env.VITE_APP_API_URL + "/api/user/sign-disclaimer",
@@ -36,6 +37,13 @@ export const API = {
     create_avatar_start: import.meta.env.VITE_APP_API_URL + "/api/image/avatar",
     create_avatar_status: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-status",
     create_avatar_download: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-download",
+    submit_feedback: import.meta.env.VITE_APP_API_URL + "/api/feedback",
+};
+
+export const CustomUserAttrs: Record<string, string> = {
+    avatar_feedback: "avatar_feedback",
+    image_generate_feedback: "image_generate_feedback",
+    presets_feedback: "presets_feedback",
 };
 
 export const STORAGE_KEYS = {

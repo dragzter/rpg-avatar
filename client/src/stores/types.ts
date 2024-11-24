@@ -224,6 +224,13 @@ export type AiModel = {
     tags?: string[];
 };
 
+export interface FeedbackPost {
+    stars: number;
+    feedback: string;
+    user_id: string;
+    feedback_key: string;
+}
+
 export interface PromptHistoryItem {
     user_id: string;
     prompt_id: string;

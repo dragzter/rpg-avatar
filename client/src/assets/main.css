@@ -3256,3 +3256,76 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         background: var(--dark-500);
     }
 }
+
+#feedback-module {
+    .triple-star-message .wrapper-stars {
+        position: absolute;
+        top: -30px;
+        left: 33%;
+        
+        .left-star {
+            margin-right: -8px;
+        }
+        
+        .right-star {
+            margin-left: -8px;
+        }
+        
+        .center-star {
+            position: relative;
+            top: -10px;
+        }
+    }
+    
+    .feedback-box {
+        background: var(--dark-600);
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 4;
+        outline: 2px solid var(--lavender);
+    }
+    
+}
+
+#feedback-modal-component {
+    .rating-star {
+        filter: grayscale(1);
+        opacity: 0.4;
+        margin: 0 3px;
+        
+        &.is-active {
+            filter: grayscale(0);
+            opacity: 1;
+        }
+    }
+}
+
+.feedback-button-optional {
+    top: -20px;
+    right: -20px;
+    
+    button {
+        background: transparent !important;
+    }
+}
+
+button.btn.btn-icon {
+    width: 35px !important; /* Adjust width to your preferred size */
+    height: 35px !important; /* Keep height equal to width for a round button */
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--lavender) !important;
+    outline: 2px solid #c6a5ff;
+    color: #fff !important;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+        background-color: #c8c8c8 !important;
+        color: var(--lavender) !important;
+        outline-color: #e1cce4;
+    }
+}

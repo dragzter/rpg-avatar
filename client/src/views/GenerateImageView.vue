@@ -5,6 +5,8 @@
                 <div class="prompt-builder">
                     <div id="prompt-builder-inner" class="d-flex flex-column h-100">
                         <h1 class="h3 accent-text">Generate AI Art</h1>
+                        <FeedbackTriggerSnippet />
+
                         <div class="d-flex align-items-center justify-content-between">
                             <h6 class="prompt-info-text"><strong>1.</strong> SELECT AI MODEL</h6>
                             <router-link
@@ -63,20 +65,6 @@
                                 <strong class="text-white">Click </strong> To Select Model
                             </p>
                         </div>
-
-                        <!--                        <GenerateOption-->
-                        <!--                            wrapper-id="nsfw-enable-checkbox"-->
-                        <!--                            id="nsfw-enable-checkbox-input"-->
-                        <!--                            :isChecked="rpgUser.nsfw_pass"-->
-                        <!--                            @update:isChecked="toggleNSFWStatus"-->
-                        <!--                            :loading="loading"-->
-                        <!--                            label="NSFW Prompts"-->
-                        <!--                            :show-toggle="false"-->
-                        <!--                            tooltipText="If disabled NSFW prompts will be blocked."-->
-                        <!--                            activeText="Enabled"-->
-                        <!--                            inactiveText="Disabled"-->
-                        <!--                            :class="{ 'is-available': rpgUser.nsfw_pass }"-->
-                        <!--                        />-->
 
                         <div
                             v-if="isRPGChecked"
@@ -324,6 +312,19 @@
                 </template>
             </div>
         </modal-component>
+
+        <feedback-module
+            v-show="rpgUser?.id && !rpgUser?.custom_attributes?.[feedbackKey]"
+            :feedback_key="feedbackKey"
+            :user-id="rpgUser.id"
+            @feedback-submitted="onFeedbackSubmit"
+        />
+
+        <feedback-modal
+            :feedback_key="feedbackKey"
+            :user-id="rpgUser.id"
+            @feedback-submitted="onFeedbackSubmit"
+        />
     </div>
 </template>
 <script lang="ts" setup>
@@ -350,6 +351,10 @@ import { storage } from "@/utils/storage";
 import { useRouter } from "vue-router";
 import { useHead } from "@vueuse/head";
 import { homeScreenMetaTags } from "@/utils/meta-tags";
+import FeedbackModal from "@/components/page-sections/FeedbackModal.vue";
+import FeedbackModule from "@/components/page-sections/FeedbackModule.vue";
+import { CustomUserAttrs } from "@/utils";
+import FeedbackTriggerSnippet from "@/components/page-sections/FeedbackTriggerSnippet.vue";
 
 // Meta tags
 useHead(homeScreenMetaTags);
@@ -367,6 +372,7 @@ const { isAuthenticated, loginWithPopup } = useAuth0();
 const showToast = ref(false);
 const toastMessage = ref("");
 const fluxModels = ref(["flux_pro", "flux_11_pro", "flux_dev", "flux_schnell"]);
+const feedbackKey = CustomUserAttrs.image_generate_feedback;
 
 const userSelections = ref<UserAIPrompt>({
     archetype: "fighter",
@@ -539,6 +545,11 @@ const firePresetFromRoute = async () => {
         userSelections.value.user_id = rpgUser.value.id;
         await handleSubmit(false);
     }
+};
+
+const onFeedbackSubmit = () => {
+    showToast.value = true;
+    userStore.toastMessage = "Thank you for your feedback!";
 };
 
 /**

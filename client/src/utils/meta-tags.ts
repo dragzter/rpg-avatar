@@ -46,11 +46,13 @@ export const avatarMakerMetaTags = {
         {
             name: "description",
             content:
-                "Transform yourself into an RPG avatar by seamlessly blending your face with a diverse range of fantasy images using our Avatar Maker. Choose from dozens of pre-made designs or upload your own images.",
+                "Transform yourself into an RPG avatar by seamlessly blending your face with a" +
+                " diverse range of fantasy images using our Avatar Creator. Choose from dozens of" +
+                " pre-made designs or upload your own images.",
         },
 
         // Open Graph (OG) Meta Tags (for Facebook, LinkedIn, etc.)
-        { property: "og:title", content: "Avatar Maker | Create Custom RPG Avatars Easily" },
+        { property: "og:title", content: "Avatar Creator | Create Custom RPG Avatars Easily" },
         {
             property: "og:description",
             content:
@@ -61,7 +63,7 @@ export const avatarMakerMetaTags = {
         { property: "og:type", content: "website" },
 
         // Twitter Meta Tags
-        { name: "twitter:title", content: "Avatar Maker | Create Custom RPG Avatars Easily" },
+        { name: "twitter:title", content: "Avatar Creator | Create Custom RPG Avatars Easily" },
         {
             name: "twitter:description",
             content:

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import type {
     CodeRedeemRequest,
+    FeedbackPost,
     PromptHistoryItem,
     QuickPromptHistory,
     RedeemAPIResponse,
@@ -62,6 +63,25 @@ export const useUserStore = defineStore("user", {
             } catch (error) {
                 this.userError = true;
                 this.toastMessage = (error as any).response.data.message;
+            }
+        },
+
+        async submitFeedback({ stars, feedback, user_id, feedback_key }: FeedbackPost) {
+            try {
+                const response = await axios.post(API.submit_feedback, {
+                    stars,
+                    feedback,
+                    user_id,
+                    feedback_key,
+                });
+
+                // Update user tokens if response is successful and has a token_balance
+                if (response.data.success && response.data.new_token_balance) {
+                    this.user.token_balance = response.data.token_balance;
+                    await this.getUserById(user_id);
+                }
+            } catch (error) {
+                console.log(error);
             }
         },
 
@@ -371,6 +391,25 @@ export const useUserStore = defineStore("user", {
             }
         },
 
+        // This gets the user by id directly from the DB without attempting to create a new user
+        async getUserById(userId: string) {
+            try {
+                this.userLoaded = false;
+                this.userLoading = true;
+
+                const response = await axios.get(API.get_user_by_id + `/${userId}`);
+
+                if (response.data.user) {
+                    this.user = response.data.user;
+                    this.userLoaded = true;
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.userLoading = false;
+            }
+        },
+
         async getUser(user: User) {
             // We always use the Auth0 user to GET/POST user details.
             // The server will check if the user exists, then if it
@@ -387,7 +426,8 @@ export const useUserStore = defineStore("user", {
             } catch (err) {
                 console.log(err);
             } finally {
-                this.userLoaded = false;
+                this.userLoaded = true;
+                this.userLoading = false;
             }
         },
     },

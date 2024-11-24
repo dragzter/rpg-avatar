@@ -36,7 +36,7 @@
 
                             <router-link class="nav-link" to="gallery">AI Gallery </router-link>
                             <router-link class="btn btn-tertiary" to="generate-image"
-                                >Generate Characters</router-link
+                                ><i class="fa-regular fa-image"></i> Generate Character Art</router-link
                             >
                             <router-link class="btn btn-primary" to="create-avatar"
                                 ><i class="fa-solid fa-user"></i> Create Avatar

@@ -18,6 +18,7 @@
                         </h1>
                         <span class="badge ms-3 bg-danger">NEW</span>
                     </div>
+                    <FeedbackTriggerSnippet />
                     <p class="mx-auto lead mt-3">
                         Enjoy a gallery of <strong class="text-white">ready-made AI prompts</strong>, curated
                         from popular designs to make creating stunning art as
@@ -144,14 +145,31 @@
         @update:show="showThumbnailLightBox = false"
         :is-admin="false"
     />
+
+    <feedback-module
+        v-show="rpgUser?.id && !rpgUser?.custom_attributes?.[feedbackKey]"
+        :feedback_key="feedbackKey"
+        :user-id="rpgUser.id"
+        @feedback-submitted="onFeedbackSubmit"
+    />
+
+    <feedback-modal
+        :feedback_key="feedbackKey"
+        :user-id="rpgUser.id"
+        @feedback-submitted="onFeedbackSubmit"
+    />
 </template>
 <script setup lang="ts">
 import CharacterPresetCard from "@/components/page-sections/CharacterPresetCard.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import LightboxComponent from "@/components/global/LightboxComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { useHead } from "@vueuse/head";
 import { galleryMetaTags } from "@/utils/meta-tags";
+import FeedbackTriggerSnippet from "@/components/page-sections/FeedbackTriggerSnippet.vue";
+import FeedbackModal from "@/components/page-sections/FeedbackModal.vue";
+import FeedbackModule from "@/components/page-sections/FeedbackModule.vue";
+import { CustomUserAttrs } from "@/utils";
 
 // Meta tags
 useHead(galleryMetaTags);
@@ -163,6 +181,7 @@ const Tabs = {
     game: "tab-game",
 };
 
+const feedbackKey = CustomUserAttrs.presets_feedback;
 const lightboxThumbnailIndex = ref(0);
 const showThumbnailLightBox = ref(false);
 const flux_characters = ref([
@@ -368,7 +387,14 @@ const userStore = useUserStore();
 const showToast = ref(false);
 const lightboxImages = ref([] as string[]);
 
+const rpgUser = computed(() => userStore.user || { id: "", custom_attributes: {} });
+
 // Methods
+const onFeedbackSubmit = () => {
+    showToast.value = true;
+    userStore.toastMessage = "Thank you for your feedback!";
+};
+
 const handleClickImage = (url) => {
     lightboxImages.value = [url];
     showThumbnailLightBox.value = true;
