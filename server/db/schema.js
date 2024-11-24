@@ -390,6 +390,18 @@ export const DeletionRequestSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
 });
 
+export const FeedbackSchema = new mongoose.Schema(
+    {
+        user_id: String,
+        user_name: String,
+        feedback: String,
+        feedback_key: String,
+        stars: Number,
+        createdAt: { type: Date, default: Date.now },
+    },
+    { collection: "feedback" }
+);
+
 export const UserSchema = new Schema(
     {
         name: {

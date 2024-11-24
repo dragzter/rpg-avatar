@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import {
     DeletionRequestSchema,
+    FeedbackSchema,
     GalleryImageSchema,
     PassCodeSchema,
     PromptSchema,
@@ -25,3 +26,4 @@ export const GalleryImageModel = mongoose.model(
     "GalleryImageSchema",
     GalleryImageSchema
 );
+export const FeedbackModel = mongoose.model("Feedback", FeedbackSchema);

@@ -127,17 +127,51 @@ router.get("/api/deletion-status/:confirmationCode", async (req, res) => {
     }
 });
 
-router.post("/api/user", async (req, res) => {
+router.post("/api/feedback", async (req, res) => {
     try {
-        if (!req.body) {
-            return res.status(400).json({ error: "User object not sent." });
-        }
-        const userObject = { ...req.body };
-        userObject.local_id = uuidv4(); // Save user with new local id
-        return await UserService.saveUser(userObject);
+        const { feedback, user_id, stars, feedback_key } = req.body;
+
+        console.log("Feedback received:", feedback, user_id, stars);
+
+        const response = await UserService.saveFeedback({
+            feedback,
+            user_id,
+            stars,
+            feedback_key,
+        });
+
+        return res.status(200).json(response);
     } catch (error) {
         console.log(error);
         return res.status(500).json(error);
+    }
+});
+
+router.get("/api/get/user/:user_id", async (req, res) => {
+    try {
+        const { user_id } = req.params;
+        if (!user_id) {
+            return res
+                .status(400)
+                .json({ message: "User id not provided", success: false });
+        }
+
+        const user = await UserService.getUserById(user_id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({
+            success: true,
+            user,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Failed to retrieve user",
+            error,
+        });
     }
 });
 
@@ -174,6 +208,7 @@ router.post("/api/user/:userId", async (req, res) => {
 
             await UserService.getAndUpdateUserImageCount(user.id);
 
+            user.picture = providedUser.picture;
             return res.status(200).json(user);
         } else {
             const hasReceivedInitialTokens =
@@ -182,12 +217,13 @@ router.post("/api/user/:userId", async (req, res) => {
                 );
 
             const newUser = {
-                token_balance: hasReceivedInitialTokens ? 0 : 10, // No initial tokens if they
+                token_balance: hasReceivedInitialTokens ? 0 : 6, // No initial tokens if they
                 // received before
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],
                 disabled: false,
+                picture: providedUser.picture,
                 custom_attributes: {},
                 email: providedUser.email || "No email provided",
                 id: providedUser.sub,

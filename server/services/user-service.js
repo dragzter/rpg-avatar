@@ -1,4 +1,5 @@
 import {
+    FeedbackModel,
     GalleryImageModel,
     PromptModel,
     TokenTrackingModel,
@@ -15,6 +16,10 @@ class UserService {
         flux_11_pro: "flux_11_pro",
         flux_schnell: "flux_schnell",
         flux_pro_ultra: "flux_pro_ultra",
+    };
+
+    customAttributes = {
+        feedback_submitted: "feedback_submitted",
     };
 
     async getUserById(userId) {
@@ -36,6 +41,7 @@ class UserService {
     async saveUser(user) {
         try {
             const _user = new UserModel(user);
+
             await _user.save();
         } catch (err) {
             console.log(err);
@@ -267,6 +273,55 @@ class UserService {
                 success: false,
                 message: "Failed to remove image from prompt and gallery",
                 error: error.message,
+            };
+        }
+    }
+
+    async saveFeedback({ feedback, stars, user_id, feedback_key }) {
+        try {
+            const user = await this.getUserById(user_id);
+
+            console.log(user, user);
+            const _feedback = new FeedbackModel({
+                feedback,
+                stars,
+                user_id,
+                feedback_key,
+                user_name: user.nickname || user.name || user.email,
+            });
+
+            console.log(
+                feedback_key,
+                "feedback_key",
+                user?.custom_attributes?.[feedback_key]
+            );
+
+            // First feedback submitted by user will be rewarded with 5 tokens
+            // Subsequent feedback will not be rewarded with tokens.
+            if (!user?.custom_attributes?.[feedback_key]) {
+                user.custom_attributes = {
+                    ...user.custom_attributes,
+                    [feedback_key]: true,
+                };
+
+                user.token_balance += 5;
+            }
+
+            await user.save();
+            await _feedback.save();
+
+            return {
+                success: true,
+                message: "Feedback submitted successfully",
+                new_token_balance: user.token_balance,
+            };
+        } catch (err) {
+            console.log(err);
+
+            return {
+                success: false,
+                message: "Failed to submit feedback",
+                error: err.message,
             };
         }
     }
