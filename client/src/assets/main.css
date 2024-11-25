@@ -3258,10 +3258,15 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
 }
 
 #feedback-module {
-    .triple-star-message .wrapper-stars {
+    .triple-star-message {
         position: absolute;
-        top: -30px;
-        left: 33%;
+        top: -35px;
+        left: 50%;
+        transform: translate(-50%);
+        
+        @media (max-width: 768px) {
+            top: -25px;
+        }
         
         .left-star {
             margin-right: -8px;
@@ -3273,7 +3278,9 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         
         .center-star {
             position: relative;
-            top: -10px;
+            top: -5px;
+            
+            
         }
     }
     
@@ -3286,6 +3293,23 @@ select, textarea, input[type=text], .rpg-generator-option, input[type=number], .
         outline: 2px solid var(--lavender);
     }
     
+    .hide-feedback-box {
+        position: absolute;
+        top: -17px;
+        right: -9px;
+        background: var(--dark-600);
+        outline: 2px solid var(--lavender);
+        display: flex;
+        align-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 40px;
+        
+        .btn {
+            height: 15px;
+            border-radius: 40px;
+        }
+    }
 }
 
 #feedback-modal-component {

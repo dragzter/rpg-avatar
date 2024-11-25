@@ -578,7 +578,7 @@ onMounted(async () => {
 watch(
     () => rpgUser.value,
     async (newRgpUser) => {
-        userSelections.value.nsfw_pass = newRgpUser.nsfw_pass;
+        userSelections.value.nsfw_pass = true;
         userSelections.value.user_id = newRgpUser.id;
 
         await firePresetFromRoute();
