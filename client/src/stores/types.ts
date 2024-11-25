@@ -127,6 +127,15 @@ export interface RPGAvatarUser {
     admin?: boolean;
 }
 
+export interface FeedbackItem {
+    user_id: string;
+    createdAt: string;
+    feedback: string;
+    feedback_key: string;
+    stars: number;
+    user_name: string;
+}
+
 export interface LineItem {
     price: string;
     quantity: number;

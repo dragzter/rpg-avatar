@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { API } from "@/utils/";
 import axios from "axios";
-import type { CodesAddRequest } from "@/stores/types";
+import type { CodesAddRequest, FeedbackItem, RPGAvatarUser } from "@/stores/types";
 
 export const useAdminStore = defineStore("admin", {
     state: () => ({
@@ -9,8 +9,47 @@ export const useAdminStore = defineStore("admin", {
         toastMessage: "",
         existing_codes: {} as Record<string, any>,
         task_id: "",
+        feedbackList: [] as FeedbackItem[],
+        users: [] as RPGAvatarUser[],
     }),
     actions: {
+        async getUserList() {
+            try {
+                this.loading = true;
+                const response = await axios.get(API.get_user_list);
+                this.users = response.data;
+            } catch (err) {
+                console.log(err);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async addTokensToUser({ user_id, tokens }: { user_id: string; tokens: number }) {
+            try {
+                this.loading = true;
+                const response = await axios.post(API.add_tokens_to_user, {
+                    user_id,
+                    tokens,
+                });
+
+                await this.getUserList();
+            } catch (err) {
+                console.log(err);
+            } finally {
+                this.loading = false;
+            }
+        },
+        async getFeedback() {
+            try {
+                this.loading = true;
+                const response = await axios.get(API.get_feedback);
+                this.feedbackList = response.data;
+            } catch (err) {
+                console.log(err);
+            } finally {
+                this.loading = false;
+            }
+        },
         async addCodes(
             requestData: CodesAddRequest = {
                 code_list: [],
@@ -23,10 +62,7 @@ export const useAdminStore = defineStore("admin", {
             try {
                 this.loading = true;
 
-                const response = await axios.post(
-                    API.admin_add_codes,
-                    requestData
-                );
+                const response = await axios.post(API.admin_add_codes, requestData);
             } catch (err) {
                 console.log(err);
             } finally {

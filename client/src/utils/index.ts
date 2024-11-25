@@ -38,6 +38,15 @@ export const API = {
     create_avatar_status: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-status",
     create_avatar_download: import.meta.env.VITE_APP_API_URL + "/api/image/avatar-download",
     submit_feedback: import.meta.env.VITE_APP_API_URL + "/api/feedback",
+    get_feedback: import.meta.env.VITE_APP_API_URL + "/api/feedback/all",
+    get_user_list: import.meta.env.VITE_APP_API_URL + "/api/user/list",
+    add_tokens_to_user: import.meta.env.VITE_APP_API_URL + "/api/user/add-tokens",
+};
+
+export const FeedbackLabels: Record<string, string> = {
+    avatar_feedback: "Avatar",
+    image_generate_feedback: "Image Generation",
+    presets_feedback: "Presets",
 };
 
 export const CustomUserAttrs: Record<string, string> = {

@@ -147,6 +147,19 @@ router.post("/api/feedback", async (req, res) => {
     }
 });
 
+router.post("/api/user/add-tokens", async (req, res) => {
+    try {
+        const { user_id, tokens } = req.body;
+
+        const response = await UserService.giftTokens({ user_id, tokens });
+
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
 router.get("/api/get/user/:user_id", async (req, res) => {
     try {
         const { user_id } = req.params;
@@ -172,6 +185,26 @@ router.get("/api/get/user/:user_id", async (req, res) => {
             message: "Failed to retrieve user",
             error,
         });
+    }
+});
+
+router.get("/api/feedback/all", async (req, res) => {
+    try {
+        const response = await UserService.getAllFeedback();
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
+    }
+});
+
+router.get("/api/user/list", async (req, res) => {
+    try {
+        const response = await UserService.getAllUsers();
+        return res.status(200).json(response);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(error);
     }
 });
 

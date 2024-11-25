@@ -444,6 +444,43 @@ class UserService {
             };
         }
     }
+
+    async getAllFeedback() {
+        try {
+            return await FeedbackModel.find().exec();
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async giftTokens({ user_id, tokens }) {
+        try {
+            const user = await UserModel.findOne({
+                id: user_id,
+            }).exec();
+
+            if (user) {
+                user.token_balance += tokens;
+                await user.save();
+
+                return {
+                    success: true,
+                    message: "Tokens gifted successfully",
+                    new_token_balance: user.token_balance,
+                };
+            }
+        } catch (error) {
+            console.error("Error gifting tokens:", error);
+        }
+    }
+
+    async getAllUsers() {
+        try {
+            return await UserModel.find().exec();
+        } catch (err) {
+            console.log(err);
+        }
+    }
 }
 
 export default new UserService();
