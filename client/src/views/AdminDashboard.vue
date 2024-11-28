@@ -7,49 +7,66 @@
                     <div class="card-header">
                         <h2 class="card-title">Admin Tools</h2>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body pb-0 px-0">
                         <nav>
                             <div id="nav-tab-admin" class="nav nav-tabs" role="tablist">
                                 <button
                                     id="nav-tools-tab"
                                     aria-controls="nav-tools"
                                     aria-selected="true"
-                                    class="nav-link active ms-2"
+                                    class="nav-link active ms-1 d-flex"
                                     data-bs-target="#nav-tools"
                                     data-bs-toggle="tab"
                                     role="tab"
                                     type="button"
                                 >
-                                    Tools
+                                    <span class="me-1"><i class="fa-solid fa-screwdriver-wrench"></i></span>
+                                    <span class="d-none d-md-inline-block">Tools</span>
                                 </button>
                                 <button
                                     id="nav-users-tab"
                                     aria-controls="nav-users"
                                     aria-selected="true"
-                                    class="nav-link ms-2"
+                                    class="nav-link ms-1 d-flex"
                                     data-bs-target="#nav-users"
                                     data-bs-toggle="tab"
                                     role="tab"
                                     type="button"
                                 >
-                                    <small class="image-cap-indicator ms-1">{{ users?.length || 0 }}</small>
-                                    Users
+                                    <small class="image-cap-indicator me-1">{{ users?.length || 0 }}</small>
+                                    <span class="me-1"><i class="fa-solid fa-users"></i></span>
+                                    <span class="d-none d-md-inline-block">Users</span>
                                 </button>
                                 <button
                                     id="nav-feedback-tab"
                                     aria-controls="nav-feedback"
                                     aria-selected="true"
-                                    class="nav-link ms-2"
+                                    class="nav-link ms-1 d-flex"
                                     data-bs-target="#nav-feedback"
                                     data-bs-toggle="tab"
                                     role="tab"
                                     type="button"
                                 >
-                                    <small class="image-cap-indicator ms-1">{{
+                                    <small class="image-cap-indicator me-1">{{
                                         feedbackList?.length || 0
                                     }}</small>
 
-                                    Feedback
+                                    <span class="me-1"><i class="fa-solid fa-comments"></i></span>
+                                    <span class="d-none d-md-inline-block">Feedback</span>
+                                </button>
+
+                                <button
+                                    id="nav-codes-tab"
+                                    aria-controls="nav-codes"
+                                    aria-selected="true"
+                                    class="nav-link ms-1 d-flex"
+                                    data-bs-target="#nav-codes"
+                                    data-bs-toggle="tab"
+                                    role="tab"
+                                    type="button"
+                                >
+                                    <span class="me-1"><i class="fa-solid fa-tickets-simple"></i></span>
+                                    <span class="d-none d-md-inline-block">Codes</span>
                                 </button>
                             </div>
                         </nav>
@@ -106,24 +123,24 @@
                                                 </button>
                                             </form>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h5 class="mb-4">Gift Tokens</h5>
-                                            <p class="text-muted">
-                                                Gift user tokens. Specify email and number of tokens.
-                                            </p>
-                                            <form>
-                                                <input-component label="Recipient Email" />
-                                                <input-component label="Amount" />
-                                                <button
-                                                    :disabled="loading"
-                                                    class="btn btn-tertiary"
-                                                    type="submit"
-                                                >
-                                                    <LoadSpinner v-if="loading" class="me-2" />
-                                                    Submit
-                                                </button>
-                                            </form>
-                                        </div>
+                                        <!--                                        <div class="col-md-6">-->
+                                        <!--                                            <h5 class="mb-4">Gift Tokens</h5>-->
+                                        <!--                                            <p class="text-muted">-->
+                                        <!--                                                Gift user tokens. Specify email and number of tokens.-->
+                                        <!--                                            </p>-->
+                                        <!--                                            <form>-->
+                                        <!--                                                <input-component label="Recipient Email" />-->
+                                        <!--                                                <input-component label="Amount" />-->
+                                        <!--                                                <button-->
+                                        <!--                                                    :disabled="loading"-->
+                                        <!--                                                    class="btn btn-tertiary"-->
+                                        <!--                                                    type="submit"-->
+                                        <!--                                                >-->
+                                        <!--                                                    <LoadSpinner v-if="loading" class="me-2" />-->
+                                        <!--                                                    Submit-->
+                                        <!--                                                </button>-->
+                                        <!--                                            </form>-->
+                                        <!--                                        </div>-->
                                     </div>
                                 </div>
                             </div>
@@ -234,7 +251,7 @@
                             <div
                                 id="nav-feedback"
                                 aria-labelledby="nav-feedback-tab"
-                                class="tab-pane p-2 show container-fluid users-details"
+                                class="tab-pane p-2 show container-fluid feedback-details"
                                 role="tabpanel"
                             >
                                 <div class="row">
@@ -247,84 +264,130 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title d-flex justify-content-between">
-                            Token Codes
-                            <span class="badge ms-2 rounded-pill text-bg-light">{{
-                                adminStore.availableCodes.length
-                            }}</span>
-                        </h5>
-                        <p class="text-muted mb-0">Unredeemed</p>
-                    </div>
-                    <div class="card-body overflow-auto" style="max-height: 380px; min-height: 380px">
-                        <ul class="list-group list-group-flush">
-                            <template v-for="code in adminStore.availableCodes">
-                                <ButtonComponent
-                                    :enable-tooltip="true"
-                                    button-classes="coupon-list-item mb-1 px-2 border-1 rounded-5"
-                                    buttonType="list-group-item list-group-item-action "
-                                    tooltip-title="Click to copy code"
-                                    @click="copyCode(code.code)"
-                                >
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <small class="border rounded-5 border-1 px-2 py-1">Code:</small>
-                                            <span class="fs-6 ms-3 fw-bold py-1 px-3">{{ code.code }}</span>
-                                        </div>
-                                        <div class="me-2">
-                                            <i class="fa-regular fa-copy"></i>
-                                        </div>
-                                    </div>
-                                </ButtonComponent>
-                            </template>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title d-flex justify-content-between">
-                            Inactive Codes
-                            <span class="badge ms-2 rounded-pill text-bg-light">{{
-                                adminStore.redeemedCodes.length
-                            }}</span>
-                        </h5>
-                        <p class="text-muted mb-0">Redeemed</p>
-                    </div>
-                    <div class="card-body overflow-auto" style="max-height: 380px; min-height: 380px">
-                        <ul class="list-group list-group-flush">
-                            <template v-for="code in adminStore.redeemedCodes">
-                                <ButtonComponent
-                                    :enable-tooltip="true"
-                                    button-classes="coupon-list-item text-bg-secondary rounded-5 mb-1 px-2 border-1"
-                                    buttonType="list-group-item list-group-item-action"
-                                    tooltip-title="Click to copy inactive code"
-                                    @click="copyCode(code.code)"
-                                >
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <small class="border rounded-5 border-1 px-2 py-1">Code:</small>
-                                            <span class="fs-6 ms-3 text-muted py-1 px-3"
-                                                >{{ code.code }}
-                                                <small class="text-warning">(redeemed)</small></span
+
+                            <div
+                                id="nav-codes"
+                                aria-labelledby="nav-codes-tab"
+                                class="tab-pane p-2 show container-fluid code-details"
+                                role="tabpanel"
+                            >
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title d-flex justify-content-between">
+                                                    Token Codes
+                                                    <span class="badge ms-2 text-bg-light">{{
+                                                        adminStore.availableCodes.length
+                                                    }}</span>
+                                                </h5>
+                                                <p class="text-muted mb-0">Unredeemed</p>
+                                            </div>
+                                            <div
+                                                class="card-body p-1 overflow-auto"
+                                                style="max-height: 580px; min-height: 580px"
                                             >
-                                        </div>
-                                        <div class="me-2">
-                                            <i class="fa-regular fa-copy"></i>
+                                                <ul class="list-group list-group-flush">
+                                                    <template v-for="code in adminStore.availableCodes">
+                                                        <ButtonComponent
+                                                            :class="{
+                                                                'text-bg-info': copiedCoupon === code.code,
+                                                            }"
+                                                            button-classes="coupon-list-item rounded-1 mb-1 px-2 border-1 "
+                                                            buttonType="list-group-item list-group-item-action "
+                                                            @click="copyCode(code.code)"
+                                                        >
+                                                            <div
+                                                                class="d-flex justify-content-between align-items-center"
+                                                            >
+                                                                <div>
+                                                                    <small
+                                                                        v-if="copiedCoupon === code.code"
+                                                                        class="border d-inline-block animate__animated animate__bounceIn rounded-1 border-1 px-2 py-1"
+                                                                        >COPIED</small
+                                                                    >
+                                                                    <small
+                                                                        v-else
+                                                                        class="border rounded-1 border-1 px-2 py-1"
+                                                                        >Code:</small
+                                                                    >
+                                                                    <span
+                                                                        class="fs-6 ms-3 fw-bold py-1 px-3"
+                                                                        >{{ code.code }}</span
+                                                                    >
+                                                                </div>
+                                                                <div class="me-2">
+                                                                    <i class="fa-regular fa-copy"></i>
+                                                                </div>
+                                                            </div>
+                                                        </ButtonComponent>
+                                                    </template>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
-                                </ButtonComponent>
-                            </template>
-                        </ul>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="card-title d-flex justify-content-between">
+                                                    Inactive Codes
+                                                    <span class="badge ms-2 text-bg-light">{{
+                                                        adminStore.redeemedCodes.length
+                                                    }}</span>
+                                                </h5>
+                                                <p class="text-muted mb-0">Redeemed</p>
+                                            </div>
+                                            <div
+                                                class="card-body px-1 py-1 overflow-auto"
+                                                style="max-height: 580px; min-height: 580px"
+                                            >
+                                                <ul class="list-group list-group-flush">
+                                                    <template v-for="code in adminStore.redeemedCodes">
+                                                        <ButtonComponent
+                                                            :class="{
+                                                                'text-bg-info': copiedCoupon === code.code,
+                                                                'text-bg-secondary':
+                                                                    copiedCoupon !== code.code,
+                                                            }"
+                                                            button-classes="coupon-list-item rounded-1  mb-1 px-2 border-1"
+                                                            buttonType="list-group-item list-group-item-action"
+                                                            @click="copyCode(code.code)"
+                                                        >
+                                                            <div
+                                                                class="d-flex justify-content-between align-items-center"
+                                                            >
+                                                                <div>
+                                                                    <small
+                                                                        v-if="copiedCoupon === code.code"
+                                                                        class="border rounded-1 border-1 px-2 py-1"
+                                                                        >COPIED</small
+                                                                    >
+                                                                    <small
+                                                                        v-else
+                                                                        class="border rounded-1 border-1 px-2 py-1"
+                                                                        >Code:</small
+                                                                    >
+                                                                    <span
+                                                                        class="fs-6 ms-3 text-muted py-1 px-3"
+                                                                        >{{ code.code }}
+                                                                        <small class="text-warning"
+                                                                            >(redeemed)</small
+                                                                        ></span
+                                                                    >
+                                                                </div>
+                                                                <div class="me-2">
+                                                                    <i class="fa-regular fa-copy"></i>
+                                                                </div>
+                                                            </div>
+                                                        </ButtonComponent>
+                                                    </template>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -371,6 +434,7 @@ const showToast = ref(false);
 const toastMessage = ref("");
 const addingTokens = ref<boolean[]>([]);
 const tokensToAdd = ref(0);
+const copiedCoupon = ref("");
 
 // COMPUTED
 const userId = computed(() => userStore.user.id);
@@ -389,6 +453,16 @@ const filteredUsers = computed(() =>
 // HANDLERS
 const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
+
+    showToast.value = true;
+    toastMessage.value = `Copied ${code} to clipboard!`;
+
+    copiedCoupon.value = code;
+
+    setTimeout(() => {
+        showToast.value = false;
+        toastMessage.value = "";
+    }, 4000);
 };
 
 const addTokensToUser = async (user_id, tokens) => {
