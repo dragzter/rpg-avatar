@@ -241,7 +241,16 @@ router.post("/api/user/:userId", async (req, res) => {
 
             await UserService.getAndUpdateUserImageCount(user.id);
 
-            user.picture = providedUser.picture;
+            if (!user.picture) {
+                user.picture = providedUser.picture;
+                await UserService.saveUser(user);
+            }
+
+            if (!user.createdAt) {
+                user.createdAt = new Date().toISOString();
+                await UserService.saveUser(user);
+            }
+
             return res.status(200).json(user);
         } else {
             const hasReceivedInitialTokens =
@@ -250,8 +259,7 @@ router.post("/api/user/:userId", async (req, res) => {
                 );
 
             const newUser = {
-                token_balance: hasReceivedInitialTokens ? 0 : 6, // No initial tokens if they
-                // received before
+                token_balance: hasReceivedInitialTokens ? 0 : 6,
                 nsfw_pass: false,
                 passes: [],
                 prompts: [],
