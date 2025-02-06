@@ -27,6 +27,33 @@ export const SolutionContentItems: ContentItem[] = [
     },
 ];
 
+export const AvatarContentItems: ContentItem[] = [
+    {
+        title: "Custom-Made Art for Campaigns and Adventures",
+        text: "Need dynamic visuals for your RPG campaign? Our app generates custom images for your quests, battles, and environments, ensuring your world feels rich and immersive. Elevate your game with personalized art that draws your players deeper into the story.",
+        imagePosition: "left",
+        image: "alchemist-4.jpeg",
+        buttonText: "Learn More",
+        routerTo: "gallery",
+    },
+    {
+        title: "",
+        text: "",
+        imagePosition: "right",
+        image: "mage-2.jpg",
+        buttonText: "Learn More",
+        routerTo: "gallery",
+    },
+    {
+        title: "",
+        text: "",
+        imagePosition: "right",
+        image: "mage-2.jpg",
+        buttonText: "Learn More",
+        routerTo: "gallery",
+    },
+];
+
 export function excerpt(text: string, length: number): string {
     return text.length > length ? text.substring(0, length) + "..." : text;
 }

@@ -1,21 +1,19 @@
 <template>
-    <section id="app-hero" class="waves-1_bg">
+    <section id="app-hero" class="">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <div id="intro" class="m-auto my-5">
-                        <h1 class="fw-bolder hero-title pe-md-5">Effortlessly Create Unique RPG Avatars</h1>
+                        <h1 class="fw-bolder hero-title pe-md-5">{{ title }}</h1>
                         <p class="fs-5 my-4 pe-md-5">
-                            Our AI-driven generator makes it easy to design personalized RPG avatars. With
-                            just a few clicks, bring your fantasy character to life in vivid detail.
+                            {{ text }}
                         </p>
                         <div class="d-flex justify-content-between justify-content-md-start">
-                            <router-link class="btn btn-lg me-3 fw-normal btn-primary" to="generate-image"
-                                >GET STARTED
-                            </router-link>
-                            <router-link class="btn btn-lg fw-normal btn-info btn-special" to="generate-image"
-                                >LEARN MORE
-                            </router-link>
+                            <template v-for="(button, i) in buttons" :key="i">
+                                <router-link :class="button.button_classes" :to="button.link"
+                                    >{{ button.link_text }}
+                                </router-link>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -25,7 +23,7 @@
                             <img
                                 alt=""
                                 class="img-fluid"
-                                src="/assets/rogue-24-female.png"
+                                :src="`/assets/${image}`"
                                 style="border-radius: 10px"
                             />
                         </div>
@@ -35,3 +33,20 @@
         </div>
     </section>
 </template>
+<script setup>
+import { onMounted } from "vue";
+
+const props = defineProps({
+    title: String,
+    text: String,
+    image: {
+        type: String,
+        default: "rogue-24-female.png",
+    },
+    buttons: Array,
+});
+
+onMounted(() => {
+    console.log(props.buttons);
+});
+</script>

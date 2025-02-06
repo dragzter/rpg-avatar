@@ -164,6 +164,7 @@ export const RedemptionType = {
 };
 
 export type ContentItem = {
+    id?: string;
     title: string;
     text: string;
     routerTo?: string;

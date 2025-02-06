@@ -89,7 +89,7 @@ section#app-hero {
     background-image: url("../assets/waves-bg-1.png");
     background-repeat: no-repeat;
     background-position: left center;
-    background-size: contain;
+    background-size: cover;
     opacity: 0.2;
     top: 0;
     left: 0;
@@ -553,7 +553,7 @@ header nav ul li a:hover {
 /* ====================================== */
 
 .solution-item h3 {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 500;
     color: var(--light-500);
 }
@@ -561,21 +561,31 @@ header nav ul li a:hover {
 .solution-item p {
     margin: 16px 0 32px;
     max-width: 566px;
+    font-size: 20px;
+    
 }
 
 .solution-item {
     padding: 31px;
     margin-bottom: 48px;
-    border: 1px solid #2f2a49;
+    /*border: 1px solid #2f2a49;*/
     border-radius: 16px;
-    background: linear-gradient(
-            180deg,
-            rgba(141, 141, 185, 0.16) 0%,
-            rgba(8, 8, 12, 0) 100%
-    );
-    backdrop-filter: blur(8px);
+    /*background: linear-gradient(*/
+    /*        180deg,*/
+    /*        rgba(141, 141, 185, 0.16) 0%,*/
+    /*        rgba(8, 8, 12, 0) 100%*/
+    /*);*/
+    /*backdrop-filter: blur(8px);*/
 
     @media (max-width: 768px) {
+        p {
+            font-size: 18px;
+        }
+        
+        h3 {
+            font-size: 26px;
+        }
+        
         p, h3 {
             text-align: center;
         }

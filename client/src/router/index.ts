@@ -14,6 +14,7 @@ import PrivacyPolicy from "@/views/PrivacyPolicy.vue";
 import DeletionStatusView from "@/views/DeletionStatusView.vue";
 import CharacterCatalog from "@/views/CharacterCatalog.vue";
 import GenerateAvatarView from "@/views/GenerateAvatarView.vue";
+import AvatarHomeView from "@/views/AvatarHomeView.vue";
 
 export function createRouter(app: App): Router {
     const router = createVueRouter({
@@ -22,7 +23,7 @@ export function createRouter(app: App): Router {
             {
                 path: "/",
                 name: "home",
-                component: GenerateAvatarView,
+                component: AvatarHomeView,
             },
             {
                 path: "/create-avatar",
