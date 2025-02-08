@@ -4,7 +4,7 @@
             :title="heroContent.title"
             :text="heroContent.text"
             :buttons="heroContent.buttons"
-            image="avatar_100.png"
+            image="avatar_100.jpg"
         />
         <PageCtaHeading :content="ctaHeading.title" />
         <div class="col-md-12">

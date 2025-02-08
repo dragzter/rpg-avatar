@@ -1,5 +1,5 @@
 <template>
-    <section id="app-hero" class="">
+    <section id="app-hero" class="rpg-avatar-main">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6">
@@ -21,7 +21,7 @@
                     <div class="accent-frame hero-image-main">
                         <div>
                             <img
-                                alt=""
+                                alt="RPG Avatar"
                                 class="img-fluid"
                                 :src="`/assets/${image}`"
                                 style="border-radius: 10px"
