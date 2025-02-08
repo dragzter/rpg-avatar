@@ -32,7 +32,7 @@ import { ref } from "vue";
 import PageCtaHeading from "@/components/page-sections/PageCtaHeading.vue";
 import SolutionItem from "@/components/global/SolutionItem.vue";
 import { useHead } from "@vueuse/head";
-import { homeScreenMetaTags } from "@/utils/meta-tags.js";
+import { homeScreenMetaTags } from "@/utils/meta-tags";
 
 useHead(homeScreenMetaTags);
 
