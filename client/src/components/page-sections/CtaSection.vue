@@ -22,7 +22,7 @@ const props = defineProps({
     text: String,
     title: {
         type: String,
-        default: `Your AI Avatar Awaits – <span>Start Creating Now!</span>`,
+        default: `Your new AI world awaits – <span>Start Creating Now!</span>`,
     },
     buttonText: {
         type: String,

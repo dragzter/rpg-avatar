@@ -1,33 +1,30 @@
 export const homeScreenMetaTags = {
-    title: "RPG Avatar AI Art Generator",
+    title: "RPG Avatar Maker & AI Character Creator – Create RPG Avatars & AI Game Assets",
     meta: [
         // SEO Description
         {
             name: "description",
             content:
-                "Easily create unique, high quality RPG characters and high-fantasy AI" +
-                " artwork suitable for game assets and concept art.",
+                "Easily generate high-quality RPG avatars and custom AI art with our advanced RPG avatar maker and AI character creator. Perfect for gamers, digital artists, and game developers looking to create unique AI avatars and professional AI game assets.",
         },
 
-        // Open Graph (used by Facebook and other platforms)
-        { property: "og:title", content: "RPG Avatar AI Art Generator" },
+        // Open Graph (for Facebook and other platforms)
+        { property: "og:title", content: "RPG Avatar Maker & AI Character Creator" },
         {
             property: "og:description",
             content:
-                "Easily create unique, high quality RPG characters and high-fantasy AI" +
-                " artwork suitable for game assets and concept art.",
+                "Easily generate high-quality RPG avatars and custom AI art with our advanced RPG avatar maker and AI character creator. Perfect for gamers, digital artists, and game developers looking to create unique AI avatars and professional AI game assets.",
         },
         { property: "og:image", content: "https://rpgavatar.com/assets/summary-image-rpgavatar.png" },
         { property: "og:url", content: "https://rpgavatar.com" },
         { property: "og:type", content: "website" },
 
         // Twitter
-        { property: "twitter:title", content: "RPG Avatar AI Art Generator" },
+        { property: "twitter:title", content: "RPG Avatar Maker & AI Character Creator" },
         {
             property: "twitter:description",
             content:
-                "Easily create unique, high quality RPG characters and high-fantasy AI" +
-                " artwork suitable for game assets and concept art.",
+                "Easily generate high-quality RPG avatars and custom AI art with our advanced RPG avatar maker and AI character creator. Perfect for gamers, digital artists, and game developers looking to create unique AI avatars and professional AI game assets.",
         },
         { name: "twitter:image", content: "https://rpgavatar.com/assets/summary-image-rpgavatar.png" },
         { name: "twitter:card", content: "summary_large_image" },
