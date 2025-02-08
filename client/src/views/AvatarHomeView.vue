@@ -31,6 +31,10 @@ import { AvatarHomeViewContent } from "@/stores/data/avatar_home_content";
 import { ref } from "vue";
 import PageCtaHeading from "@/components/page-sections/PageCtaHeading.vue";
 import SolutionItem from "@/components/global/SolutionItem.vue";
+import { useHead } from "@vueuse/head";
+import { homeScreenMetaTags } from "@/utils/meta-tags.js";
+
+useHead(homeScreenMetaTags);
 
 const content = ref(AvatarHomeViewContent);
 const heroContent = ref(content.value.sections.hero.content);
