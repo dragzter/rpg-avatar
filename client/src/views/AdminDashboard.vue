@@ -228,12 +228,12 @@
                                                     <i class="fa-regular text-faded-warn fa-copy"></i
                                                 ></small>
                                                 <small class="d-block card-text">
-                                                    Img Count: {{ user.image_count || "N/A" }}
+                                                    Img Count: {{ user.image_count }}
                                                 </small>
                                                 <small class="d-block card-text">
                                                     Tokens:
                                                     <span class="badge bg-primary">{{
-                                                        user.token_balance || "N/A"
+                                                        user.token_balance
                                                     }}</span>
                                                 </small>
                                                 <small
