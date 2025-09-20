@@ -29,23 +29,27 @@ export const AvatarHomeViewContent = {
                     imagePosition: "left",
                     image: "avatar_ad_55.png",
                 },
-                // {
-                //     title: "Instant, High-Quality AI Avatars",
-                //     text: "Our AI character creator makes it easy to generate professional RPG avatars and AI art in seconds. Upload your image, choose from a range of fantasy themes, and watch your custom avatar come to life.",
-                //     routerTo: "/create-avatar",
-                //     buttonText: "Create AI Avatar",
-                //     imagePosition: "right",
-                //     image: "avatar_ad_57.png",
-                // },
+                {
+                    title: "Instant, High-Quality Presets",
+                    text:
+                        "Our AI character creator makes it easy to generate professional RPG" +
+                        " avatars and AI art in seconds. Use our library of presets to generate" +
+                        " stunning images.",
+                    routerTo: "/gallery",
+                    buttonText: "Use Preset Library",
+                    imagePosition: "right",
+                    image: "avatar_100.png",
+                },
                 {
                     title: "Epic Fantasy Characters",
                     text:
                         "Immerse yourself in fantasy with our advanced RPG character creator.  Select from a list of " +
-                        "preset prompts of classic RPG Archetypes and see them created in vivid" +
+                        "preset archetypes and see them created in" +
+                        " vivid" +
                         " detail.",
-                    routerTo: "/create-character",
+                    routerTo: "/generate-image",
                     buttonText: "Create Characters",
-                    imagePosition: "right",
+                    imagePosition: "left",
                     image: "character_creator.png",
                 },
                 // {
@@ -71,7 +75,7 @@ export const AvatarHomeViewContent = {
                     text: "Boost your game development with our AI-powered tool that creates high-quality 2D assets. From sprites to backgrounds, generate custom AI game assets that bring your digital worlds to life.",
                     routerTo: "/2d-game-assets",
                     buttonText: "Generate Art",
-                    imagePosition: "left",
+                    imagePosition: "right",
                     image: "2d_assets_2_sm.png",
                 },
             ],

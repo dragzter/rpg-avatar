@@ -30,6 +30,25 @@
                     </div>
                 </div>
             </div>
+            <div class="row">
+                <div class="row g-0 align-items-center bg-dark text-white rounded-3 p-4 p-md-5 shadow">
+                    <!-- Left: text (50%) -->
+                    <div class="col-12 col-md-9">
+                        <h2 class="h2-md text-start mb-2 title-2">Limited-Time <span>Sale</span></h2>
+                        <h3 class="mb-0 title-3 text-start">
+                            Get <span><strong>50–70% OFF</strong></span> token prices. Stock up and save big
+                            while the offer lasts.
+                        </h3>
+                    </div>
+
+                    <!-- Right: button (50%) -->
+                    <div class="col-12 col-md-3 mt-3 mt-md-0">
+                        <div class="d-flex d-md-block justify-content-center justify-content-md-end">
+                            <router-link class="btn-primary btn" to="get-tokens">Buy Tokens </router-link>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </template>
