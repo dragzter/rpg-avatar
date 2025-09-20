@@ -149,19 +149,19 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>150 for $4</td>
-                        <td>2.67 cents</td>
-                        <td>$4</td>
+                        <td>150 for $2</td>
+                        <td>1.33 cents</td>
+                        <td>$2</td>
                     </tr>
                     <tr>
-                        <td>325 for $8</td>
-                        <td>2.46 cents</td>
-                        <td>$8</td>
+                        <td>325 for $3.25</td>
+                        <td>1.00 cents</td>
+                        <td>$3.25</td>
                     </tr>
                     <tr>
-                        <td>1500 for $29</td>
-                        <td>1.93 cents</td>
-                        <td>$29</td>
+                        <td>1500 for $9</td>
+                        <td>0.60 cents</td>
+                        <td>$9</td>
                     </tr>
                 </tbody>
             </table>
